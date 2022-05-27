@@ -27,7 +27,7 @@ def grade(file, tests):
         if output[1] != "": # Some error happened
             results.append(["RE", time_elapsed])
             continue
-        if output[0] == solution:
+        if output[0].rstrip() == solution.rstrip():
             results.append(["AC", time_elapsed])
             continue
         else: # Output doesn't match
