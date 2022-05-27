@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>{{ data.title }}</h1>
-<p class="box">
+<div class="box">
     {{ data.description | safe }}
-</p>
+</div>
 <h2>Submit solution</h2>
 <div class="box">
     <form method="post" enctype=multipart/form-data>
