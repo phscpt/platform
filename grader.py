@@ -1,4 +1,4 @@
-import subprocess
+import subprocess, os
 from subprocess import Popen, PIPE
 import time
 
@@ -24,7 +24,10 @@ def grade(file, tests, language):
             print(f"running {file} (python)")
             process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
         if language == "java":
-            process = Popen(["java", file.split(".")[0]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+            olddir = os.getcwd()
+            os.chdir("tmp")
+            process = Popen(["java", file.split(".")[0].split("/")[-1]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+            os.chdir(olddir)
         try:
             output = process.communicate(input = str(data), timeout = TIME_LIMIT)
             time_elapsed = (time.perf_counter_ns() - time_start)//1000000
