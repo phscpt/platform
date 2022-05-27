@@ -6,10 +6,16 @@
 </div>
 <h2>Submit solution</h2>
 <div class="box">
-    <form method="post" enctype=multipart/form-data>
-        <input type="file" accept = ".py" name="file" id="file" required>
-        <input type="submit">      
-    </form>
+    <input type="file" accept = ".py,.java">
+    
+    <form action="/action_page.php"></form>
+    <label for="cars">Language:</label>
+    <select name="language" id="language">
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+      </select>
+    <br>   
+    <input type="submit"> 
 </div>
 <h2>Results</h2>
 
