@@ -1,6 +1,7 @@
 import grader
 import json
 import os
+import markdown
 from flask import Flask, request, render_template
 app = Flask(__name__)
 
@@ -21,7 +22,7 @@ def upload():
     if request.method == "POST":
         id = request.form["id"]
         title = request.form["title"]
-        description = request.form["description"]
+        description = markdown.markdown(request.form["description"])
         testcases = []
         for i in range(max_testcases):
             inp = request.form["input" + str(i)]
