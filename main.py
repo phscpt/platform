@@ -7,10 +7,6 @@ app = Flask(__name__)
 max_testcases = 10
 
 @app.route("/", methods=["GET"])
-def index():
-    return render_template("index.html")
-
-@app.route("/list", methods=["GET"])
 def catalogue():
     problem_names = os.listdir("problems")
     problems = []
@@ -51,4 +47,4 @@ def problem():
     return render_template("problem.html", results=False, data=data)
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", debug=True)
+    app.run("0.0.0.0")

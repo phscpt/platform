@@ -15,7 +15,7 @@ def grade(file, tests):
     results = []
     for test in tests:
         data, solution = test
-        process = Popen(["py", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+        process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
         try:
             output = process.communicate(input = str(data), timeout = TIME_LIMIT)
         except subprocess.TimeoutExpired:
