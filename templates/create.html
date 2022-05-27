@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<br>
+<form method="post">
+    <h1>Create Problem</h1>
+    <h2>Problem Identifier</h2>
+    <input name="id" placeholder = "Short Unique Text">
+    <br>
+    <h2>Problem Title</h2>
+    <input name="title" placeholder = "Problem Title">
+    <br>
+    <h2>Description</h2>
+    <textarea name="description"></textarea>    
+    <br>
+    <h2>Testcases</h2>
+    {% for i in range(max_testcases) %}
+    <div class="grid-mini">
+        <div class="box">
+            <h4>Input {{i}}</h4>
+            <textarea name="input{{ i }}"></textarea>
+        </div>
+        <div class="box">
+            <h4>Output {{i}}</h4>
+            <textarea name="output{{ i }}"></textarea>
+        </div>
+    </div><br>
+    {% endfor %}
+    <br>
+    <input type="submit" text="Save Problem">
+</form>
+
+{% endblock %}

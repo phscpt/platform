@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Catalogue</h1>
+<div class="grid">
+    {% for problem in problems %}
+    <div class="box">
+        <h2>{{ problem.title }}</h2>
+        <button onclick="location.href='problem?id='+'{{ problem.id }}'">View</button>
+    </div>
+    {% endfor %}
+</div>
+<br>
+<a href="upload">upload a problem</a>
+{% endblock %}

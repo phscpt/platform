@@ -1,0 +1,11 @@
+{
+    "title": "Hello World",
+    "description": "<b>Problem Statement</b><br>Print the text \"hello world!\" <i>N</i> times, with a newline after each line.<br><b>Input Format</b><br>A single integer <i>N</i>.<br><b>Output Format</b><br><i>N</i> lines of \"hello world!\", with a newline after each occurrence.<br>",
+    "testcases": [
+        ["1", "hello world!\n"],
+        ["2", "hello world!\nhello world!\n"],
+        ["3", "hello world!\nhello world!\nhello world!\n"],
+        ["4", "hello world!\nhello world!\nhello world!\nhello world!\n"],
+        ["5", "hello world!\nhello world!\nhello world!\nhello world!\nhello world!\n"]
+    ]
+}

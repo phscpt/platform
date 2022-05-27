@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ data.title }}</h1>
+<p class="box">
+    {{ data.description | safe }}
+</p>
+<h2>Submit solution</h2>
+<div class="box">
+    <form method="post" enctype=multipart/form-data>
+        <input type="file" accept = ".py" name="file" id="file" required>
+        <input type="submit">      
+    </form>
+</div>
+<h2>Results</h2>
+
+<div class="box">
+    {% if results %}
+    <div class="grid-tiny">
+        {% for result in results %}
+            {% if result == "AC" %}
+                <div class="result-box success">
+                    {{ loop.index }} <b>AC</b>
+                </div>
+            {% else %}
+                <div class="result-box fail">
+                    {{ loop.index }} <b>{{ result }}</b>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    Submit a program to view results
+    {% endif %}            
+</div>
+
+<br><br><br>
+{% endblock %}

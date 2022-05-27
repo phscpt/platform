@@ -1,0 +1,114 @@
+/* OVERALL */
+
+html, body {
+    background: rgb(250, 250, 250);
+    height: 100%;
+}
+
+#main {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 30px;
+}
+
+@media screen and (max-width: 600px) {
+    #main {
+        display: block;
+    }
+    #logo-main {
+        width: 50%;
+    }
+}
+
+/* ELEMENTS */
+
+img {
+    filter: drop-shadow(0px 0px 10px rgb(228, 228, 228));
+}
+
+img:hover {
+    filter: drop-shadow(0px 0px 10px rgb(191, 191, 191));
+}
+
+a {
+    cursor: pointer;
+}
+
+/* CONTAINER */
+.grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.grid-mini {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.grid-tiny {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+.box {
+    background-color: rgb(255, 255, 255);
+    border: 2px solid rgb(153, 153, 153);
+    border-radius: 5px;
+    padding: 10px;
+}
+.box button, .box input {
+    width: 100%;
+    box-sizing: border-box;
+}
+.result-box {
+    border: 2px solid black;
+    border-radius: 3px;
+    padding: 10px;
+    text-align: center;
+    font-size: 16pt;
+}
+
+/* FILE INPUTS AUGH WHY IS THIS SO HARD */
+input[type="file"] {
+    background-color: transparent;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 0px;
+}
+::-webkit-file-upload-button, ::file-selector-button {
+    color: #1d1d1d;
+    color: var(--form-text);
+    background-color: #efefef;
+    background-color: var(--background);
+    font-family: inherit;
+    font-size: inherit;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+    transition: 0.1s all;
+}
+
+::-webkit-file-upload-button:hover, ::file-selector-button:hover {
+    background: #9b9b9b;
+    background: var(--button-hover);
+}
+
+/* PRACTICE PLATFORM */
+table {
+    border-collapse: collapse;
+}
+.prob {
+    text-align: center;
+}
+.fail {
+    background-color: rgba(255, 83, 83, 0.5);
+    border-color: rgb(255, 83, 83);
+}
+.success {
+    background-color: rgba(81, 204, 85, 0.5);
+    border-color: rgba(81, 204, 85);
+}
