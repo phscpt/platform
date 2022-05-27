@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<br>
+<form method="post">
+    <h1>Edit Problem</h1>
+    <h2>Problem Identifier</h2>
+    <input name="id" placeholder = "Short Unique Text" value = {{ data.id }}>
+    <br>
+    <h2>Problem Title</h2>
+    <input name="title" placeholder = "Problem Title" value = {{ data.title }}>
+    <br>
+    <h2>Description</h2>
+    <p>Type in HTML.</p>
+    <textarea name="description">{{ data.description }}</textarea>
+    <br>
+    <h2>Testcases</h2>
+    {% for i in range(max_testcases) %}
+    <div class="grid-mini">
+        {% if data.testcases|length > i %}
+        <div class="box">
+            <h4>Input {{i}}</h4>
+            <textarea name="input{{ i }}">{{ data.testcases[i][0] }}</textarea>
+        </div>
+        <div class="box">
+            <h4>Output {{i}}</h4>
+            <textarea name="output{{ i }}">{{ data.testcases[i][1] }}</textarea>
+        </div>
+        {% else %}
+        <div class="box">
+            <h4>Input {{i}}</h4>
+            <textarea name="input{{ i }}"></textarea>
+        </div>
+        <div class="box">
+            <h4>Output {{i}}</h4>
+            <textarea name="output{{ i }}"></textarea>
+        </div>
+        {% endif %}
+    </div><br>
+    {% endfor %}
+    <br>
+    <input type="submit" text="Save Problem">
+</form>
+
+{% endblock %}

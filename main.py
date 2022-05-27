@@ -2,7 +2,7 @@ import grader
 import json
 import os
 import markdown
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 app = Flask(__name__)
 
 max_testcases = 10
@@ -31,8 +31,29 @@ def upload():
             if inp.rstrip() != "" and out.rstrip() != "":
                 testcases.append([inp, out])
         open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "description": description, "testcases": testcases}))
-
+        return redirect("/")
     return render_template("create.html", max_testcases=max_testcases)
+
+@app.route("/edit", methods=["GET", "POST"])
+def edit():
+    p = request.args.get("id")
+    with open("problems/" + p + ".json", encoding='utf-8') as f:
+        data = json.load(f)
+    data["id"] = p
+    if request.method == "POST":
+        id = request.form["id"]
+        title = request.form["title"]
+        description = markdown.markdown(request.form["description"])
+        testcases = []
+        for i in range(max_testcases):
+            inp = request.form["input" + str(i)]
+            out = request.form["output" + str(i)]
+            # check if empty
+            if inp.rstrip() != "" and out.rstrip() != "":
+                testcases.append([inp, out])
+        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "description": description, "testcases": testcases}))
+        return redirect("/")
+    return render_template("edit.html", max_testcases=max_testcases, data=data)
 
 @app.route('/problem', methods=["GET", "POST"])
 def problem():
