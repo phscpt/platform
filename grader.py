@@ -2,7 +2,7 @@ import subprocess, os
 from subprocess import Popen, PIPE
 import time
 
-TIME_LIMIT = 1
+
 
 def grade(file, tests, language):
     # Takes in a filename and testcases and runs it using each test case
@@ -16,21 +16,32 @@ def grade(file, tests, language):
     # compile
     if language == "java":
         Popen(["javac", file], stdout=PIPE, stderr=PIPE).communicate()
-        print("compilation successful")
+        print("java compilation successful")
+    elif language == "cpp":
+        Popen(["g++", file], stdout=PIPE, stderr=PIPE).communicate()
+        print("c++ compilation successful")
+
+    # execute
     for test in tests:
         data, solution = test
         time_start = time.perf_counter_ns()
         if language == "python":
             print(f"running {file} (python)")
             process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-        if language == "python2":
+            TIME_LIMIT = 2
+        elif language == "python2":
             print(f"running {file} (python)")
             process = Popen(["python", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-        if language == "java":
+            TIME_LIMIT = 2
+        elif language == "java":
             olddir = os.getcwd()
             os.chdir("tmp")
             process = Popen(["java", file.split(".")[0].split("/")[-1]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
             os.chdir(olddir)
+            TIME_LIMIT = 2
+        elif language == "cpp":
+            process = Popen(["./a.out"], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+            TIME_LIMIT = 1
         try:
             output = process.communicate(input = str(data), timeout = TIME_LIMIT)
             time_elapsed = (time.perf_counter_ns() - time_start)//1000000
@@ -49,4 +60,4 @@ def grade(file, tests, language):
     return results
 
 if __name__ == "__main__":
-    print(grade("hello.py", [[1,"hello world!\n"], [2,"hello world!\n"*2]]))
+    print(grade("hello.py", [[1,"hello world!\n"], [2,"hello world!\n"*2]], "python2"))
