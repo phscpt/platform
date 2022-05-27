@@ -67,6 +67,9 @@ a {
     text-align: center;
     font-size: 16pt;
 }
+.result-box p {
+    margin: 0px;
+}
 
 /* FILE INPUTS AUGH WHY IS THIS SO HARD */
 input[type="file"] {

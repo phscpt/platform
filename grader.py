@@ -15,21 +15,23 @@ def grade(file, tests):
     results = []
     for test in tests:
         data, solution = test
+        time_start = time.perf_counter_ns()
         process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
         try:
             output = process.communicate(input = str(data), timeout = TIME_LIMIT)
+            time_elapsed = (time.perf_counter_ns() - time_start)//1000000
         except subprocess.TimeoutExpired:
             process.kill()
-            results.append("TLE")
+            results.append(["TLE","--"])
             continue
         if output[1] != "": # Some error happened
-            results.append("RE")
+            results.append(["RE", time_elapsed])
             continue
         if output[0] == solution:
-            results.append("AC")
+            results.append(["AC", time_elapsed])
             continue
         else: # Output doesn't match
-            results.append("WA")
+            results.append(["WA", time_elapsed])
     return results
 
 if __name__ == "__main__":

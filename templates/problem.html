@@ -17,13 +17,25 @@
     {% if results %}
     <div class="grid-tiny">
         {% for result in results %}
-            {% if result == "AC" %}
-                <div class="result-box success">
+            {% if result[0] == "AC" %}
+                <div class="result-box success" title="Accepted">
                     {{ loop.index }} <b>AC</b>
+                    <p>{{ result[1] }}ms</p>
                 </div>
-            {% else %}
-                <div class="result-box fail">
-                    {{ loop.index }} <b>{{ result }}</b>
+            {% elif result[0] == "WA" %}
+                <div class="result-box fail" title="Wrong Answer">
+                    {{ loop.index }} <b>{{ result[0] }}</b>
+                    <p>{{ result[1] }}ms</p>
+                </div>
+            {% elif result[0] == "TLE" %}
+                <div class="result-box fail" title="Time Limit Exceeded">
+                    {{ loop.index }} <b>{{ result[0] }}</b>
+                    <p>{{ result[1] }}ms</p>
+                </div>
+            {% elif result[0] == "RE" %}
+                <div class="result-box fail" title="Runtime Error">
+                    {{ loop.index }} <b>{{ result[0] }}</b>
+                    <p>{{ result[1] }}ms</p>
                 </div>
             {% endif %}
         {% endfor %}
