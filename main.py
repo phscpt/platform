@@ -43,7 +43,8 @@ def problem():
         print(request.files)
         file = request.files['file']
         file.save("tmp.py")
-        results = grader.grade("tmp.py", data["testcases"])
+        lang = request.form["language"]
+        results = grader.grade("tmp.py", data["testcases"], lang)
         return render_template("problem.html", results=results, data=data)
     return render_template("problem.html", results=False, data=data)
 

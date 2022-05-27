@@ -4,7 +4,7 @@ import time
 
 TIME_LIMIT = 1
 
-def grade(file, tests):
+def grade(file, tests, language):
     # Takes in a filename and testcases and runs it using each test case
     # For each test case:
     #   If the program takes over TIME_LIMIT to execute, it returns "Time Limit Exceeded" for that testcase
@@ -16,7 +16,10 @@ def grade(file, tests):
     for test in tests:
         data, solution = test
         time_start = time.perf_counter_ns()
-        process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+        if language == "python":
+            process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+        if language == "java":
+            process = Popen(["java", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
         try:
             output = process.communicate(input = str(data), timeout = TIME_LIMIT)
             time_elapsed = (time.perf_counter_ns() - time_start)//1000000
