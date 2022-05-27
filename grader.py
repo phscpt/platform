@@ -16,10 +16,12 @@ def grade(file, tests, language):
     # compile
     if language == "java":
         Popen(["javac", file], stdout=PIPE, stderr=PIPE).communicate()
+        print("compilation successful")
     for test in tests:
         data, solution = test
         time_start = time.perf_counter_ns()
         if language == "python":
+            print(f"running {file} (python)")
             process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
         if language == "java":
             process = Popen(["java", file.split(".")[0]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
