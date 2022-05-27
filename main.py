@@ -42,9 +42,12 @@ def problem():
     if request.method == "POST":
         print(request.files)
         file = request.files['file']
-        file.save("tmp.py")
+
+        fname = "tmp/" + file.filename
+        file.save(fname)
         lang = request.form["language"]
-        results = grader.grade("tmp.py", data["testcases"], lang)
+
+        results = grader.grade(fname, data["testcases"], lang)
         return render_template("problem.html", results=results, data=data)
     return render_template("problem.html", results=False, data=data)
 
