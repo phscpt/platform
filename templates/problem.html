@@ -8,7 +8,34 @@
 <div class="box">
     <form method="post" enctype=multipart/form-data>
         <div class="grid-mini">
-            <input type="file" name="file" accept = ".py,.java,.cpp">
+            <input type="file" name="file" accept = ".py,.java,.cpp" id="file">
+            <script>
+
+                document.getElementById("file").onchange = function(){
+                    
+                    extention = String((document.getElementById("file")).value).split('.').pop();
+                    
+                    var i = 0;
+
+                    if (extention == "cpp"){
+                        var i = 0
+                    }
+                    if (extention == "java"){
+                        var i = 1
+                    }
+                    if (extention == "py"){
+                        var i = 3
+                    }
+                    
+                    alert(extention);
+
+                    document.getElementById("language").options[i].selected = true;
+
+                }
+
+                    
+                
+            </script>
             <div style="text-align:right;">
                 <select name="language" id="language" style="display:inline-block;width:auto">
                     <option value="cpp">C++</option>
