@@ -133,7 +133,7 @@ def index():
 @app.route("/select", methods=["GET", "POST"])
 def problem_select():
     if request.method == "POST":
-        game = Game(request.form["problems"].split("\n"))
+        game = Game(request.form["problems"].rstrip().split("\n"))
         games.append(game)
         return redirect(f"host_waiting?id={game.id}")
     return render_template("select.html", problems=get_problems())
