@@ -4,6 +4,7 @@
 <form method=post>
     <i>Type the ID of each problem to include, one on each line.</i>
     <br><br>
+<<<<<<< HEAD
 <div style="float:left;">
     </form>
     <form autocomplete="off" action="/action_page.php" display:inline-block>
@@ -135,4 +136,13 @@
         <input type="submit">
     </form>
 </div>
+=======
+    <textarea name="problems"></textarea>
+    <br>
+    <input type="submit">
+</form>
+<script>
+    let problems = {{ problems|safe }};
+</script>
+>>>>>>> b71715e2cd3487afec814225640f26b8f1a52074
 {% endblock %}

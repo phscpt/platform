@@ -11,15 +11,18 @@ games = []
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 
-@app.route("/list", methods=["GET"])
-def catalogue():
+def get_problems():
     problem_names = os.listdir("problems")
     problems = []
     for p in problem_names:
         prob = json.load(open("problems/" + p, encoding='utf-8'))
         prob["id"] = p.split(".")[0]
         problems.append(prob)
-    return render_template("list.html", problems = problems)
+    return problems
+
+@app.route("/list", methods=["GET"])
+def catalogue():    
+    return render_template("list.html", problems = get_problems())
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
@@ -133,7 +136,7 @@ def problem_select():
         game = Game(request.form["problems"].split("\n"))
         games.append(game)
         return redirect(f"host_waiting?id={game.id}")
-    return render_template("select.html")
+    return render_template("select.html", problems=get_problems())
 
 @app.route("/host_waiting", methods=["GET", "POST"])
 def host():
