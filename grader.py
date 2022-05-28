@@ -27,7 +27,7 @@ def grade(file, tests, language):
         time_start = time.perf_counter_ns()
         if language == "python":
             print(f"running {file} (python)")
-            process = Popen(["py", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+            process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
             TIME_LIMIT = 4
         elif language == "python2":
             print(f"running {file} (python)")
