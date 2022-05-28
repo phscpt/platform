@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
+<button id="scoreboard_button">Back to Scoreboard</button>
+<script>
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+    let p_id = params.player;
+    let g_id = params.g_id;
+    if (p_id != null && g_id != null) {
+        document.getElementById("scoreboard_button").addEventListener("click", function() {
+            location.href = "scoreboard?id=" + g_id + "&player=" + p_id;
+        });
+    }
+    else {
+        document.getElementById("scoreboard_button").style.display = "none";
+    }
+</script>
 <h1>{{ data.title }}</h1>
 <div class="box">
     {{ data.description | safe }}

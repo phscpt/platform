@@ -115,3 +115,14 @@ table {
     background-color: rgba(81, 204, 85, 0.5);
     border-color: rgba(81, 204, 85);
 }
+
+.autocomplete-suggestion {
+    cursor: pointer;
+    border: 2px solid #cecece;
+    border-radius:5px;
+    margin-top:3px;
+    margin-bottom: 8px;
+    margin-right: 3px;
+    display: inline-block;
+    padding:5px;
+}
