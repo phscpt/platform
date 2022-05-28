@@ -4,7 +4,6 @@
 <form method=post>
     <i>Type the ID of each problem to include, one on each line.</i>
     <br><br>
-<<<<<<< HEAD
 <div style="float:left;">
     </form>
     <form autocomplete="off" action="/action_page.php" display:inline-block>
@@ -13,22 +12,12 @@
         </div>
         <script>
 
-            const testFolder = './problems/';
-            const fs = require('fs');
-            var allProblems = [];
-
-            fs.readdir(testFolder, (err, files) => {
-                files.forEach(file => {
-                    allProblems.push(file)
-                });
-            });
-
-            problem_names = os.listdir("problems")
-            problems = []
-            for p in problem_names:
-                prob = json.load(open("problems/" + p, encoding='utf-8'))
-                prob["id"] = p.split(".")[0]
-                problems.append(prob)
+            // get the IDs of every problem
+            let problems = {{ problems|safe }}
+            // var allProblems = [];
+            // for (const element of problems){
+               //  allProblems.push(element["title"]);
+            // }
 
             function autocomplete(inp, arr) {
                 
@@ -51,14 +40,14 @@
                     /*for each item in the array...*/
                     for (i = 0; i < arr.length; i++) {
                     /*check if the item starts with the same letters as the text field value:*/
-                    if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    if (arr[i]["title"].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
                         /*create a DIV element for each matching element:*/
                         b = document.createElement("DIV");
                         /*make the matching letters bold:*/
-                        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-                        b.innerHTML += arr[i].substr(val.length);
+                        b.innerHTML = "<strong>" + arr[i]["title"].substr(0, val.length) + "</strong>";
+                        b.innerHTML += arr[i]["title"].substr(val.length);
                         /*insert a input field that will hold the current array item's value:*/
-                        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                        b.innerHTML += "<input type='hidden' value='" + arr[i]["title"] + "'>";
                         /*execute a function when someone clicks on the item value (DIV element):*/
                             b.addEventListener("click", function(e) {
                             /*insert the value for the autocomplete text field:*/
@@ -127,22 +116,53 @@
                 closeAllLists(e.target);
             });
             }
-        autocomplete(document.getElementById("inputProblems"), allProblems);
+        autocomplete(document.getElementById("inputProblems"), problems);
         </script>
     </form>
 </div>
 <div style="float:right;">
-    <form method=post display:inline-block>
-        <input type="submit">
-    </form>
+    <button id="addNextProb">Add</button>
+    <br><br>
+    
 </div>
-=======
-    <textarea name="problems"></textarea>
+<script>
+
+    var usingProblems = [];
+
+    document.getElementById("addNextProb").onclick = function(){
+
+        var thisQuestion;
+
+        for (let i = 0; i<problems.length; i++){
+            if (problems[i]["title"] == document.getElementById("inputProblems").value){
+                thisQuestion = problems[i];
+                break;
+            }
+        }
+
+        if (thisQuestion == null || usingProblems.includes(thisQuestion)){
+            document.getElementById("inputProblems").value = "";
+        }
+
+        else{
+            usingProblems.push(thisQuestion);
+
+            let box = document.createElement("div");
+            box.className = "box";
+            box.innerHTML = thisQuestion["title"];
+            document.getElementById("question-grid").appendChild(box);
+            document.getElementById("inputProblems").value = "";
+        }
+
+        
+    }
+   
+</script>
+<br clear=both>
+<div class="grid-mini" id="question-grid">
+</div>
+<form>
     <br>
     <input type="submit">
 </form>
-<script>
-    let problems = {{ problems|safe }};
-</script>
->>>>>>> b71715e2cd3487afec814225640f26b8f1a52074
 {% endblock %}
