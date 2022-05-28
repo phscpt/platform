@@ -3,4 +3,13 @@
 <h2><i>Waiting To Start...</i></h2>
 <h1>{{ player }}</h1>
 <h2>{{ id }}</h2>
+<script>
+    setInterval(function() {
+        fetch("/api/game_status?id={{ id }}").then(response => response.json()).then(function(data){
+            if (data.status == "started") {
+                location.href = "scoreboard?id={{ id }}&player={{ player_id }}";
+            }
+        });
+    }, 1000);
+</script>
 {% endblock %}

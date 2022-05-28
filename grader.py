@@ -27,7 +27,7 @@ def grade(file, tests, language):
         time_start = time.perf_counter_ns()
         if language == "python":
             print(f"running {file} (python)")
-            process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+            process = Popen(["py", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
             TIME_LIMIT = 4
         elif language == "python2":
             print(f"running {file} (python)")
@@ -50,6 +50,7 @@ def grade(file, tests, language):
             results.append(["TLE","--"])
             continue
         if output[1] != "": # Some error happened
+            print(output[1])
             results.append(["RE", time_elapsed])
             continue
         if output[0].rstrip() == solution.rstrip():

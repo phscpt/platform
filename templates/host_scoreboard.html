@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<table>
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th style="width: 20%">Name</th>
+            <th>Score</th>
+            {% for problem in problems %}
+            <th>{{ problem }}</th>
+            {% endfor %}
+        </tr>    
+    </thead>
+    <tbody id="player-list">
+    </tbody>
+</table>
+<script>
+    function update() {
+        fetch("/api/players?id={{ id }}")
+            .then(response => response.json())
+            .then(function(players){
+                for (let player of players) {
+                    player.push(player[2].reduce((a, b) => a + b, 0));
+                }
+                players.sort((a, b) => b[3] - a[3]);
+
+                document.getElementById("player-list").innerHTML = "";
+                for (let i=0; i<players.length; i++) {
+                    let row = document.createElement("tr");
+                    row.innerHTML = `
+                    <td>${i+1}</td>
+                    <td>${players[i][1]}</td>
+                    <td>${players[i][3]}</td>
+                    `;
+                    for (let j=0; j<players[i][2].length; j++) {
+                        let cell = document.createElement("td");
+                        cell.innerHTML = players[i][2][j];
+                        row.appendChild(cell);
+                    }
+                    document.getElementById("player-list").appendChild(row);
+                }
+            });
+    }
+    setInterval(update, 1000);
+    update();
+</script>
+{% endblock %}

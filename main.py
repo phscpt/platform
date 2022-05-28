@@ -7,6 +7,7 @@ from flask import Flask, request, render_template, redirect
 app = Flask(__name__)
 
 max_testcases = 10
+games = []
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 
@@ -72,6 +73,21 @@ def problem():
         lang = request.form["language"]
 
         results = grader.grade(fname, data["testcases"], lang)
+
+        for res in results:
+            if res[0] != "AC":
+                return render_template("problem.html", results=results, data=data)
+        
+        g_id = request.args.get("g_id")
+        p_id = request.args.get("player")
+        if (g_id != None) and (p_id != None):
+            print("giving score to", p_id, "from game", g_id)
+            for game in games:
+                if game.id == g_id:
+                    for pl in game.players:
+                        if pl[0] == p_id:
+                            game.give_points(p_id, p, 100)
+
         return render_template("problem.html", results=results, data=data)
     return render_template("problem.html", results=False, data=data)
 
@@ -79,18 +95,23 @@ def problem():
 def random_id():
     return "".join([random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(6)])
 
-games = []
-
 class Game:
     def __init__(self, problems):
         self.id = random_id()
         self.players = []
         self.status = "waiting"
-        self.problems = problems
-    def addPlayer(self, name):
+        self.problems = [problem.rstrip() for problem in problems]
+        print("created game", self.id)
+        print("problems:", problems)
+    def add_player(self, name):
         player_id = random_id()
         self.players.append([player_id, name, [0] * len(self.problems)])
         return player_id
+    def give_points(self, player, problem, points):
+        problem_index = self.problems.index(problem)
+        for pl in self.players:
+            if pl[0] == player:
+                pl[2][problem_index] = points
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -102,7 +123,7 @@ def index():
             return render_template("index.html")
         for game in games:
             if game.id == id:
-                player = game.addPlayer(name)
+                player = game.add_player(name)
                 return redirect(f"/waiting?id={id}&player={player}")
     return render_template("index.html")
 
@@ -135,14 +156,14 @@ def waiting():
             for p in game.players:
                 if p[0] == player:
                     player_name = p[1]
-    return render_template("waiting.html", id=request.args.get("id"), player=player_name)
+    return render_template("waiting.html", id=request.args.get("id"), player=player_name, player_id=player)
 
 @app.route("/api/game_status", methods=["GET"])
 def get_game_status():
     id = request.args.get("id")
     for game in games:
         if game.id == id:
-            return game.status
+            return '{"status":"%s"}' % game.status
 
 @app.route("/api/players", methods=["GET"])
 def get_players():
@@ -156,11 +177,21 @@ def get_players():
 
 @app.route("/scoreboard", methods=["GET"])
 def scoreboard():
-    pass
+    id = request.args.get("id")
+    player = request.args.get("player")
+    for game in games:
+        if game.id == id:
+            for p in game.players:
+                if p[0] == player:
+                    return render_template("scoreboard.html", id=id, player=player, problems=game.problems)
 
 @app.route("/host_scoreboard", methods=["GET"])
 def scoreboard_host():
-    pass
+    id = request.args.get("id")
+    for game in games:
+        if game.id == id:
+            return render_template("host_scoreboard.html", id=id, problems=game.problems)
+    return "error"
 
 if __name__ == "__main__":
     app.run("0.0.0.0")

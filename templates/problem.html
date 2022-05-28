@@ -10,29 +10,20 @@
         <div class="grid-mini">
             <input type="file" name="file" accept = ".py,.java,.cpp" id="file">
             <script>
-
                 document.getElementById("file").onchange = function(){
-                    
-                    extention = String((document.getElementById("file")).value).split('.').pop();
-                    
+                    extension = String((document.getElementById("file")).value).split('.').pop();
                     var i = 0;
-
-                    if (extention == "cpp"){
-                        var i = 0
+                    if (extension == "cpp"){
+                        i = 0
                     }
-                    if (extention == "java"){
-                        var i = 1
+                    if (extension == "java"){
+                        i = 1
                     }
-                    if (extention == "py"){
-                        var i = 3
+                    if (extension == "py"){
+                        i = 3
                     }
-
                     document.getElementById("language").options[i].selected = true;
-
                 }
-
-                    
-                
             </script>
             <div style="text-align:right;">
                 <select name="language" id="language" style="display:inline-block;width:auto">
