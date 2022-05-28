@@ -9,11 +9,12 @@
             {% for problem in problems %}
             <th><a href="problem?id={{ problem }}&g_id={{ id }}&player={{ player }}">{{ loop.index }}</a></th>
             {% endfor %}
-        </tr>    
+        </tr>
     </thead>
     <tbody id="player-list">
     </tbody>
 </table>
+<h2 style="position:fixed;right:20px;bottom:20px;box-sizing:border-box">{{ player_name }}</h2>
 <script>
     function update() {
         fetch("/api/players?id={{ id }}")
@@ -35,6 +36,12 @@
                     for (let j=0; j<players[i][2].length; j++) {
                         let cell = document.createElement("td");
                         cell.innerHTML = players[i][2][j];
+                        if (players[i][2][j] == 100) {
+                            cell.style.color == "green";
+                        }
+                        else if (players[i][2][j] >= 0) {
+                            cell.style.color == "yellow";
+                        }
                         row.appendChild(cell);
                     }
                     document.getElementById("player-list").appendChild(row);

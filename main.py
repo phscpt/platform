@@ -124,6 +124,7 @@ def index():
             id = request.form["game_id"]
         except:
             return render_template("index.html")
+        id = id.rstrip().upper()
         for game in games:
             if game.id == id:
                 player = game.add_player(name)
@@ -186,7 +187,7 @@ def scoreboard():
         if game.id == id:
             for p in game.players:
                 if p[0] == player:
-                    return render_template("scoreboard.html", id=id, player=player, problems=game.problems)
+                    return render_template("scoreboard.html", id=id, player=player, player_name=p[1], problems=game.problems)
 
 @app.route("/host_scoreboard", methods=["GET"])
 def scoreboard_host():
