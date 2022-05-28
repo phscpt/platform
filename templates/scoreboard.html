@@ -7,7 +7,7 @@
             <th style="width: 20%">Name</th>
             <th>Score</th>
             {% for problem in problems %}
-            <th><a href="problem?id={{ problem }}&g_id={{ id }}&player={{ player }}">{{ problem }}</a></th>
+            <th><a href="problem?id={{ problem }}&g_id={{ id }}&player={{ player }}">{{ loop.index }}</a></th>
             {% endfor %}
         </tr>    
     </thead>
