@@ -67,8 +67,20 @@
                     for (let j=0; j<players[i][2].length; j++) {
                         let cell = document.createElement("td");
                         cell.innerHTML = players[i][2][j];
+                        if (players[i][2][j] == 100) {
+                            cell.className = "prob success";
+                        }
+                        else if (players[i][2][j] > 0) {
+                            cell.className = "prob partial";
+                        }
+                        else if (players[i][2][j] == 0) {
+                            cell.className = "prob";
+                        }
+                        else {
+                            cell.className = "prob fail";
+                        }
                         row.appendChild(cell);
-                    }   
+                    }
                     document.getElementById("player-list").appendChild(row);
                 }
             });
