@@ -117,7 +117,7 @@ def random_id():
     return "".join([random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(6)])
 
 class Game:
-    def __init__(self, problems, totalTime, doTeams):
+    def __init__(self, problems, totalTime, freezeTime, doTeams):
         self.id = random_id()
         self.players = []
         self.status = "waiting"
@@ -126,6 +126,10 @@ class Game:
             self.time = int(totalTime) * 60
         except:
             self.time = -1
+        try:
+            self.freeze = int(freezeTime) * 60
+        except:
+            self.freeze = 0
         self.teams = doTeams
         self.problems = [problem.rstrip() for problem in problems]
         print("created game", self.id)
@@ -165,7 +169,7 @@ def index():
 @app.route("/select", methods=["GET", "POST"])
 def problem_select():
     if request.method == "POST":
-        game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form.get("teams"))
+        game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form["freezer"], request.form.get("teams"))
         games.append(game)
         return redirect(f"host_waiting?id={game.id}")
     return render_template("select.html", problems=get_problems())
@@ -224,6 +228,7 @@ def scoreboard():
                         player = player,
                         player_name = p[1],
                         problems = game.problems,
+                        freezeTime = game.freeze,
                         time = game.time_remaining()
                     )
 
@@ -236,6 +241,7 @@ def scoreboard_host():
                 "host_scoreboard.html",
                 id = id,
                 problems = game.problems,
+                freezeTime = game.freeze,
                 time = game.time_remaining()
             )
     return "error"
