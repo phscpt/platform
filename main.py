@@ -98,8 +98,18 @@ def problem():
                             else:
                                 num_points = -1
                             game.give_points(p_id, p, num_points)
-
+                            pl[3][p] = results
         return render_template("problem.html", results=results, data=data)
+    g_id = request.args.get("g_id")
+    p_id = request.args.get("player")
+    if (g_id != None) and (p_id != None):
+        for game in games:
+                if game.id == g_id:
+                    for pl in game.players:
+                        if pl[0] == p_id:
+                            if p in pl[3]:
+                                return render_template("problem.html", results=pl[3][p], data=data)
+                            return render_template("problem.html", results=False, data=data)
     return render_template("problem.html", results=False, data=data)
 
 # GAME CREATION/JOINING
@@ -122,7 +132,7 @@ class Game:
         print("problems:", problems)
     def add_player(self, name):
         player_id = random_id()
-        self.players.append([player_id, name, [0] * len(self.problems)])
+        self.players.append([player_id, name, [0] * len(self.problems), {}])
         return player_id
     def start(self):
         self.status = "started"
@@ -132,6 +142,10 @@ class Game:
         for pl in self.players:
             if pl[0] == player:
                 pl[2][problem_index] = points
+    def time_remaining(self):
+        if self.time == -1:
+            return -1
+        return self.time - (time.time() - self.start_time)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -206,10 +220,11 @@ def scoreboard():
                 if p[0] == player:
                     return render_template(
                         "scoreboard.html",
-                        id=id, player=player,
-                        player_name=p[1],
-                        problems=game.problems,
-                        time = game.time - (time.time() - game.start_time)
+                        id=id,
+                        player = player,
+                        player_name = p[1],
+                        problems = game.problems,
+                        time = game.time_remaining()
                     )
 
 @app.route("/host_scoreboard", methods=["GET"])
@@ -219,9 +234,9 @@ def scoreboard_host():
         if game.id == id:
             return render_template(
                 "host_scoreboard.html",
-                id=id,
-                problems=game.problems,
-                time = game.time - (time.time() - game.start_time)
+                id = id,
+                problems = game.problems,
+                time = game.time_remaining()
             )
     return "error"
 
