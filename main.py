@@ -4,12 +4,16 @@ import os
 import random
 import time
 import markdown
+import uuid 
+import hashlib
+import glob
 from flask import Flask, request, render_template, redirect
 app = Flask(__name__)
 
 max_testcases = 10
 games = []
 users = []
+adminPass = []
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 
@@ -166,25 +170,6 @@ class Game:
                 return True
         print("false")
         return False
-    
-class User:
-    def __init__(self, email, username, password):
-        user_ID = id(str(email)+str(username)+str(password))
-        self.credentials = [email, username, password, user_ID]
-        if (email == "nicholas.d.hagedorn@gmail.com" and password == "testpass"):
-            self.isAdmin = True
-        else:
-            self.isAdmin = False
-    def is_account(self, email_or_username, password):
-        if password == self.credentials[2] and (email_or_username == self.credentials[0] or email_or_username == self.credentials[1]):
-            return True
-        return False
-    def is_repeat(self, users):
-        for otherUser in users:
-            if otherUser.credentials[0] == self.credentials[0] or otherUser.credentials[1] == self.credentials[1] or otherUser.credentials[2] == self.credentials[2]:
-                return True
-        return False
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -200,18 +185,57 @@ def index():
                 return redirect(f"/waiting?id={id}&player={player}")
     return render_template("index.html")
 
+def hash_password(password):
+    salt = uuid.uuid4().hex 
+    return hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
+
+def check_password(hashed_password, user_password): 
+    password, salt = hashed_password.split(':') 
+    return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
+
+def is_admin(email, username, hashedPass):
+    if email == "jierueic@gmail.com" and username == "knosmos" and check_password("c8cd035724dd2cc48f87c17f21c4cb7f9bdf9cf767bc88e5fcefefbf8f73dd0f:533a7722507f4d1da1bdfca16bf70675", hashedPass):
+        return True
+    if email == "nicholas.d.hagedorn@gmail.com" and username == "Nickname" and check_password("6d6438706baee7793b76597a15628859cf9b47c0097f814d06187247d120ceb7:6316c3b35173482db353c2a2baa8301e", hashedPass):
+        return True
+    
+    return False
+
+def is_account(cred, email_or_username, password):
+    return check_password( cred[2], password) and (email_or_username == cred[0] or email_or_username == cred[1])
+    
+class User:
+    def __init__(self, email, username, password):
+        self.user_ID = str(id(str(email)+str(username)+str(hash_password(password))))
+        self.isAdmin = is_admin(email, username, password)
+        self.credentials = [email, username, hash_password(password), self.user_ID, self.isAdmin] 
+    
+    def is_repeat(self, users):
+        for otherUser in users:
+            if otherUser.credentials[0] == self.credentials[0] or otherUser.credentials[1] == self.credentials[1]:
+                return True
+        return False
+    
+    def store_account(self):
+        open("users/" + self.user_ID + ".json", "w", encoding='utf-8').write(json.dumps(self.credentials))
+
 @app.route("/log_in", methods=["GET", "POST"])
 def log_in():
     if request.method == "POST":
         try:
             emailUsername = request.form["emailUsername"].strip()
             password = request.form["password"].strip()
-            for user in users:
-                if user.is_account(emailUsername, password):
-                    userID = user.credentials[3]
-                    return redirect(f"/") #change to put userID in the URL
+            
+            for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.      
+                with open(filename, encoding='utf-8') as currentFile:
+                    data = json.load(currentFile)
+                    if is_account(data, emailUsername, password):
+
+                        userID = data[3]
+                        print(userID)
+                        return redirect(f"/") #change to put userID in the URL
         except:
-            return render_template("log_in.html")
+            pass
 
     return render_template("log_in.html")
 
@@ -221,9 +245,11 @@ def sign_up():
         email = request.form["email"].strip()
         username = request.form["username"].strip()
         password = request.form["password"].strip()
+
         user = User(email, username, password)
         if "@" in email and len(username) > 4 and len(password) > 4 and not user.is_repeat(users):
-            users.append(user)
+            print(user.isAdmin)
+            user.store_account()
             userID = user.credentials[3]
             return redirect(f"/") #change to put userID in the URL
     return render_template("sign_up.html")
