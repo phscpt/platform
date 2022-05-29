@@ -145,7 +145,10 @@ class Game:
         problem_index = self.problems.index(problem)
         for pl in self.players:
             if pl[0] == player:
-                pl[2][problem_index] = points
+                if pl[2][problem_index] != 0:
+                    pl[2][problem_index] = max(pl[2][problem_index], points)
+                else:
+                    pl[2][problem_index] = points
     def time_remaining(self):
         if self.time == -1:
             return -1

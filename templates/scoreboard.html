@@ -23,7 +23,7 @@
 
     function update() {
 
-        if (duration != -1){
+        if (timerActive()){
             if (duration >= 0){
                 hours = parseInt(duration / 3600, 10)
                 minutes = parseInt(duration / 60 % 60, 10);
@@ -37,9 +37,12 @@
         
                 duration--;
             }
+            else {
+                document.getElementById("timer").innerHTML = "Contest Over";
+            }
         }
 
-        if (duration >= -1){
+        if (duration >= 0 || !timerActive){
 
             //update table
             fetch("/api/players?id={{ id }}")

@@ -56,7 +56,7 @@
             }
         }
 
-        if (duration >= -1){
+        if (duration >= 0 || !timerActive){
 
             //update table
             fetch("/api/players?id={{ id }}")
