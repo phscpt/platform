@@ -153,6 +153,18 @@ class Game:
         if self.time == -1:
             return -1
         return self.time - (time.time() - self.start_time)
+    def is_duplicate_name(self, name):
+        print(name)
+        print(self.players)
+        print("triggered")
+        for player in self.players:
+            print(player)
+            print(player[1])
+            if name.strip() == player[1].strip():
+                print("true")
+                return True
+        print("false")
+        return False
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -164,7 +176,7 @@ def index():
             return render_template("index.html")
         id = id.rstrip().upper()
         for game in games:
-            if game.id == id:
+            if game.id == id and not game.is_duplicate_name(name):
                 player = game.add_player(name)
                 return redirect(f"/waiting?id={id}&player={player}")
     return render_template("index.html")
