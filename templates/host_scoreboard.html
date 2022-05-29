@@ -1,10 +1,7 @@
-{% extends "base_no_text.html" %}
+{% extends "base.html" %}
 {% block content %}
 <div id="panic-inducer"></div>
-<h2>
-    <span style="float: left">Practice Contest Platform</span>
-    <span style="float: right">Game Code: {{ id }}</span>
-</h2>
+<h2 style="position:fixed;right:40px;bottom:20px;box-sizing:border-box">Game Code: {{ id }}</h2>
 <table>
     <thead>
         <tr>
@@ -19,7 +16,7 @@
     <tbody id="player-list">
     </tbody>
 </table>
-<h1 id="timer" style="position:absolute;top:0;right:0"></h1>
+<h1 id="timer" style="position:absolute;top:0px;right:40px"></h1>
 <script>
     let duration = parseInt("{{ time | safe }}");
     let timerActive = (duration != -1);
