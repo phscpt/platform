@@ -1,10 +1,10 @@
 {% extends "base_no_text.html" %}
 {% block content %}
+<div id="panic-inducer"></div>
 <h2>
     <span style="float: left">Practice Contest Platform</span>
     <span style="float: right">Game Code: {{ id }}</span>
-</h2> 
-
+</h2>
 <table>
     <thead>
         <tr>
@@ -19,11 +19,7 @@
     <tbody id="player-list">
     </tbody>
 </table>
-<h2><center>Time Remaining</center></h2>
-<body>
-    <h1><center id="timer" style="padding: 10px; border: 2px solid black;"></center></h1>
-</body>
-<div id="panic-inducer" style="position:absolute;z-index:-1;left:0;top:0;width:100vw;height:100vh;background-color:red;opacity:0"></div>
+<h1 id="timer" style="position:absolute;top:0;right:0"</h1>
 <script>
 
     var totalTime = 1 * 60; //in seconds
@@ -46,7 +42,7 @@
         }
         console.log(parseFloat(duration) / parseFloat(totalTime));
         if ( parseFloat(duration) / parseFloat(totalTime) < 0.5){
-            document.getElementById("panic-inducer").style.opacity = 1 - 2 * parseFloat(duration) / parseFloat(totalTime);
+            document.getElementById("panic-inducer").style.opacity = Math.min(0.5, 1 - 2 * parseFloat(duration) / parseFloat(totalTime));
         }
 
         if (duration >= 0){
@@ -98,36 +94,24 @@
                         for (let j=0; j<players[i][2].length; j++) {
                             let cell = document.createElement("td");
                             cell.innerHTML = players[i][2][j];
+                            if (players[i][2][j] == 100) {
+                                cell.className = "prob success";
+                            }
+                            else if (players[i][2][j] > 0) {
+                                cell.className = "prob partial";
+                            }
+                            else if (players[i][2][j] == 0) {
+                                cell.className = "prob";
+                            }
+                            else {
+                                cell.className = "prob fail";
+                            }
                             row.appendChild(cell);
-                        }   
+                        }
                         document.getElementById("player-list").appendChild(row);
                     }
                 });
-
-<<<<<<< HEAD
         }
-=======
-                    for (let j=0; j<players[i][2].length; j++) {
-                        let cell = document.createElement("td");
-                        cell.innerHTML = players[i][2][j];
-                        if (players[i][2][j] == 100) {
-                            cell.className = "prob success";
-                        }
-                        else if (players[i][2][j] > 0) {
-                            cell.className = "prob partial";
-                        }
-                        else if (players[i][2][j] == 0) {
-                            cell.className = "prob";
-                        }
-                        else {
-                            cell.className = "prob fail";
-                        }
-                        row.appendChild(cell);
-                    }
-                    document.getElementById("player-list").appendChild(row);
-                }
-            });
->>>>>>> cdbab59be3b0f55032baf1a50a0bcbebbead2eab
     }
     setInterval(update, 1000);
     update();

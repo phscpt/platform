@@ -128,3 +128,15 @@ td, th {
     display: inline-block;
     padding:5px;
 }
+
+#panic-inducer {
+    pointer-events: none;
+    position:fixed;
+    left:0;
+    top:0;
+    width:100vw;
+    height:100vh;
+    background-color:red;
+    opacity:0;
+    transition: 1s background-color;
+}
