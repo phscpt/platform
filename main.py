@@ -77,9 +77,10 @@ def problem():
 
         results = grader.grade(fname, data["testcases"], lang)
 
+        num_ac = 0
         for res in results:
-            if res[0] != "AC":
-                return render_template("problem.html", results=results, data=data)
+            if res[0] == "AC":
+                num_ac += 1
         
         g_id = request.args.get("g_id")
         p_id = request.args.get("player")
@@ -89,7 +90,13 @@ def problem():
                 if game.id == g_id:
                     for pl in game.players:
                         if pl[0] == p_id:
-                            game.give_points(p_id, p, 100)
+                            if num_ac == len(results):
+                                num_points = 100
+                            elif num_ac > 1:
+                                num_points = 30
+                            else:
+                                num_points = -1
+                            game.give_points(p_id, p, num_points)
 
         return render_template("problem.html", results=results, data=data)
     return render_template("problem.html", results=False, data=data)

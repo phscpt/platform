@@ -64,10 +64,16 @@
                         let cell = document.createElement("td");
                         cell.innerHTML = players[i][2][j];
                         if (players[i][2][j] == 100) {
-                            cell.style.color == "green";
+                            cell.className = "prob success";
                         }
-                        else if (players[i][2][j] >= 0) {
-                            cell.style.color == "yellow";
+                        else if (players[i][2][j] > 0) {
+                            cell.className = "prob partial";
+                        }
+                        else if (players[i][2][j] == 0) {
+                            cell.className = "prob";
+                        }
+                        else {
+                            cell.className = "prob fail";
                         }
                         row.appendChild(cell);
                     }

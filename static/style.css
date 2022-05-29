@@ -103,7 +103,7 @@ input[type="file"] {
 table {
     border-collapse: collapse;
 }
-.prob {
+td, th {
     text-align: center;
 }
 .fail {
@@ -113,6 +113,9 @@ table {
 .success {
     background-color: rgba(81, 204, 85, 0.5);
     border-color: rgba(81, 204, 85);
+}
+.partial {
+    background-color: #e6ab2192;
 }
 
 .autocomplete-suggestion {
