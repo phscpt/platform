@@ -106,10 +106,16 @@ def random_id():
     return "".join([random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(6)])
 
 class Game:
-    def __init__(self, problems):
+    def __init__(self, problems, totalTime, doTeams):
         self.id = random_id()
         self.players = []
         self.status = "waiting"
+        #time is in minutes
+        try:
+            self.time = int(totalTime)
+        except:
+            self.time = -1
+        self.teams = doTeams
         self.problems = [problem.rstrip() for problem in problems]
         print("created game", self.id)
         print("problems:", problems)
@@ -141,7 +147,7 @@ def index():
 @app.route("/select", methods=["GET", "POST"])
 def problem_select():
     if request.method == "POST":
-        game = Game(request.form["problems"].rstrip().split("\n"))
+        game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form.get("teams"))
         games.append(game)
         return redirect(f"host_waiting?id={game.id}")
     return render_template("select.html", problems=get_problems())
@@ -201,7 +207,7 @@ def scoreboard_host():
     id = request.args.get("id")
     for game in games:
         if game.id == id:
-            return render_template("host_scoreboard.html", id=id, problems=game.problems)
+            return render_template("host_scoreboard.html", id=id, problems=game.problems, time=game.time)
     return "error"
 
 if __name__ == "__main__":

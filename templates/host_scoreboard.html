@@ -21,28 +21,35 @@
 </table>
 <h1 id="timer" style="position:absolute;top:0;right:0"</h1>
 <script>
-
-    var totalTime = 1 * 60; //in seconds
-    var duration = totalTime; //in seconds
+    let time = {{ time | safe }};
+    if (time != -1){
+        var totalTime = time * 60; //in seconds
+        var duration = totalTime; //in seconds
+    }
+    else{
+        duration = 10;
+    }
 
     function update() {
 
-        if (duration >= 0){
-            hours = parseInt(duration / 3600, 10)
-            minutes = parseInt(duration / 60 % 60, 10);
-            seconds = parseInt(duration % 60, 10);
-    
-            hours = hours < 10 ? "0" + hours : hours;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-    
-            document.getElementById("timer").innerHTML =  hours + ":" + minutes + ":" + seconds;
-    
-            duration--;
-        }
-        console.log(parseFloat(duration) / parseFloat(totalTime));
-        if ( parseFloat(duration) / parseFloat(totalTime) < 0.5){
-            document.getElementById("panic-inducer").style.opacity = Math.min(0.5, 1 - 2 * parseFloat(duration) / parseFloat(totalTime));
+        if (time != -1){
+            if (duration >= 0){
+                hours = parseInt(duration / 3600, 10)
+                minutes = parseInt(duration / 60 % 60, 10);
+                seconds = parseInt(duration % 60, 10);
+        
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+        
+                document.getElementById("timer").innerHTML =  hours + ":" + minutes + ":" + seconds;
+        
+                duration--;
+            }
+
+            if ( parseFloat(duration) / parseFloat(totalTime) < 0.1){
+                document.getElementById("panic-inducer").style.opacity = Math.min(0.5, 1 - 10 * parseFloat(duration) / parseFloat(totalTime));
+            }
         }
 
         if (duration >= 0){
