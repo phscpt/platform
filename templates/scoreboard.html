@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+<h1 id="timer" style="position:absolute;top:0;right:0"></h1>
 <table>
     <thead>
         <tr>
@@ -16,70 +17,95 @@
 </table>
 <h2 style="position:fixed;right:20px;bottom:20px;box-sizing:border-box">{{ player_name }}</h2>
 <script>
+    let time = parseInt("{{ time | safe }}");
+    let duration = time * 60;
+    let totalTime = duration;
+
     function update() {
-        fetch("/api/players?id={{ id }}")
-            .then(response => response.json())
-            .then(function(players){
-                for (let player of players) {
-                    player.push(player[2].reduce((a, b) => a + b, 0));
-                }
-                players.sort((a, b) => b[3] - a[3]);
 
-                document.getElementById("player-list").innerHTML = "";
-                for (let i=0; i<players.length; i++) {
-                    let row = document.createElement("tr");
-                    if (i == 0){
-                        row.innerHTML = `
-                        <td style="color:#E6AB21;"> ${i+1}</td>
-                        <td style="color:#E6AB21;"><b>${players[i][1]}</b></td>
-                        <td style="color:#000000;">${players[i][3]}</td>
-                        `;
-                    }
+        if (time != -1){
+            if (duration >= 0){
+                hours = parseInt(duration / 3600, 10)
+                minutes = parseInt(duration / 60 % 60, 10);
+                seconds = parseInt(duration % 60, 10);
+        
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+        
+                document.getElementById("timer").innerHTML =  hours + ":" + minutes + ":" + seconds;
+        
+                duration--;
+            }
+        }
 
-                    if (i == 1){
-                        row.innerHTML = `
-                        <td style="color:#D81159;"> ${i+1}</td>
-                        <td style="color:#D81159;"><b>${players[i][1]}</b></td>
-                        <td style="color:#000000;">${players[i][3]}</td>
-                        `;
-                    }
+        if (duration >= 0){
 
-                    if (i == 2){
-                        row.innerHTML = `
-                        <td style="color:#324376;"> ${i+1}</td>
-                        <td style="color:#324376;"><b>${players[i][1]}</b></td>
-                        <td style="color:#000000;">${players[i][3]}</td>
-                        `;
+            //update table
+            fetch("/api/players?id={{ id }}")
+                .then(response => response.json())
+                .then(function(players){
+                    for (let player of players) {
+                        player.push(player[2].reduce((a, b) => a + b, 0));
                     }
+                    players.sort((a, b) => b[3] - a[3]);
 
-                    if (i > 2){
-                        row.innerHTML = `
-                        <td> ${i+1}</td>
-                        <td><b> ${players[i][1]}</b></td>
-                        <td> ${players[i][3]}</td>
-                        `;
+                    document.getElementById("player-list").innerHTML = "";
+                    for (let i=0; i<players.length; i++) {
+                        let row = document.createElement("tr");
+                        if (i == 0){
+                            row.innerHTML = `
+                            <td style="color:#E6AB21;"> ${i+1}</td>
+                            <td style="color:#E6AB21;"><b>${players[i][1]}</b></td>
+                            <td style="color:#000000;">${players[i][3]}</td>
+                            `;
+                        }
+
+                        if (i == 1){
+                            row.innerHTML = `
+                            <td style="color:#D81159;"> ${i+1}</td>
+                            <td style="color:#D81159;"><b>${players[i][1]}</b></td>
+                            <td style="color:#000000;">${players[i][3]}</td>
+                            `;
+                        }
+
+                        if (i == 2){
+                            row.innerHTML = `
+                            <td style="color:#324376;"> ${i+1}</td>
+                            <td style="color:#324376;"><b>${players[i][1]}</b></td>
+                            <td style="color:#000000;">${players[i][3]}</td>
+                            `;
+                        }
+
+                        if (i > 2){
+                            row.innerHTML = `
+                            <td> ${i+1}</td>
+                            <td><b> ${players[i][1]}</b></td>
+                            <td> ${players[i][3]}</td>
+                            `;
+                        }
+
+                        for (let j=0; j<players[i][2].length; j++) {
+                            let cell = document.createElement("td");
+                            cell.innerHTML = players[i][2][j];
+                            if (players[i][2][j] == 100) {
+                                cell.className = "prob success";
+                            }
+                            else if (players[i][2][j] > 0) {
+                                cell.className = "prob partial";
+                            }
+                            else if (players[i][2][j] == 0) {
+                                cell.className = "prob";
+                            }
+                            else {
+                                cell.className = "prob fail";
+                            }
+                            row.appendChild(cell);
+                        }
+                        document.getElementById("player-list").appendChild(row);
                     }
-                    
-                    for (let j=0; j<players[i][2].length; j++) {
-                        let cell = document.createElement("td");
-                        cell.innerHTML = players[i][2][j];
-                        if (players[i][2][j] == 100) {
-                            cell.className = "prob success";
-                        }
-                        else if (players[i][2][j] > 0) {
-                            cell.className = "prob partial";
-                        }
-                        else if (players[i][2][j] == 0) {
-                            cell.className = "prob";
-                        }
-                        else {
-                            cell.className = "prob fail";
-                        }
-                        row.appendChild(cell);
-                    }
-                    document.getElementById("player-list").appendChild(row);
-                }
-            });
+                });
+        }
     }
     setInterval(update, 1000);
     update();

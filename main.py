@@ -2,6 +2,7 @@ import grader
 import json
 import os
 import random
+import time
 import markdown
 from flask import Flask, request, render_template, redirect
 app = Flask(__name__)
@@ -112,7 +113,7 @@ class Game:
         self.status = "waiting"
         #time is in minutes
         try:
-            self.time = int(totalTime)
+            self.time = int(totalTime) * 60
         except:
             self.time = -1
         self.teams = doTeams
@@ -123,6 +124,9 @@ class Game:
         player_id = random_id()
         self.players.append([player_id, name, [0] * len(self.problems)])
         return player_id
+    def start():
+        self.status = "started"
+        self.start_time = time.time()
     def give_points(self, player, problem, points):
         problem_index = self.problems.index(problem)
         for pl in self.players:
@@ -158,7 +162,7 @@ def host():
     if request.method == "POST":
         for game in games:
             if game.id == id:
-                game.status = "started"
+                game.start()
                 break
         return redirect(f"/host_scoreboard?id={id}")
     return render_template("host_waiting.html", id=id)
@@ -200,7 +204,13 @@ def scoreboard():
         if game.id == id:
             for p in game.players:
                 if p[0] == player:
-                    return render_template("scoreboard.html", id=id, player=player, player_name=p[1], problems=game.problems)
+                    return render_template(
+                        "scoreboard.html",
+                        id=id, player=player,
+                        player_name=p[1],
+                        problems=game.problems,
+                        time=game.time
+                    )
 
 @app.route("/host_scoreboard", methods=["GET"])
 def scoreboard_host():

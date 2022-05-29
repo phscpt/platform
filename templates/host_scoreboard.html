@@ -19,16 +19,11 @@
     <tbody id="player-list">
     </tbody>
 </table>
-<h1 id="timer" style="position:absolute;top:0;right:0"</h1>
+<h1 id="timer" style="position:absolute;top:0;right:0"></h1>
 <script>
-    let time = {{ time | safe }};
-    if (time != -1){
-        var totalTime = time * 60; //in seconds
-        var duration = totalTime; //in seconds
-    }
-    else{
-        duration = 10;
-    }
+    let time = parseInt("{{ time | safe }}");
+    let duration = time * 60;
+    let totalTime = duration;
 
     function update() {
 
