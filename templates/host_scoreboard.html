@@ -26,9 +26,10 @@
         var totalTime = time * 60; //in seconds
         var duration = totalTime; //in seconds
     }
-    else{
+    if (time == -1){
         duration = 10;
     }
+    var opac = 0;
 
     function update() {
 
@@ -44,11 +45,17 @@
         
                 document.getElementById("timer").innerHTML =  hours + ":" + minutes + ":" + seconds;
         
-                duration--;
             }
 
-            if ( parseFloat(duration) / parseFloat(totalTime) < 0.1){
-                document.getElementById("panic-inducer").style.opacity = Math.min(0.5, 1 - 10 * parseFloat(duration) / parseFloat(totalTime));
+            duration--;
+
+            if ( parseFloat(duration) < 0){
+                opac -= 0.1;
+                document.getElementById("panic-inducer").style.opacity = Math.max(opac, 0);
+            }
+            else if ( parseFloat(duration) / parseFloat(totalTime) < 0.1){
+                opac = .6 - 6 * parseFloat(duration) / parseFloat(totalTime);
+                document.getElementById("panic-inducer").style.opacity = opac;
             }
         }
 
