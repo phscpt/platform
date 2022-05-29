@@ -56,7 +56,7 @@ a {
     border-radius: 5px;
     padding: 10px;
 }
-.box button, .box input {
+.box button, .box input[type=text], .box input[type=number], .box input[type=submit] {
     width: 100%;
     box-sizing: border-box;
 }

@@ -157,17 +157,15 @@
 </script>
 <hr>
 <br>
+<h3>Selected Problems</h3>
 <div class="grid-mini" id="question-grid">
-</div>
-<div style="float:left;">
-    <input id="amountOfTime" type="text" size="33" name="timer" placeholder="Contest Duration in Minutes (Optional)">
-</div>
-<div>
-    <input type="checkbox" id="doTeams">
-    <label for="doTeams">Enable Teams</label><br>
 </div>
 <form method="post">
     <textarea name="problems" id="problems" style="display:none"></textarea>
+    <h3>Contest Options</h3>
+    <input id="amountOfTime" type="text" name="timer" style="width:100%" placeholder="Contest Duration in Minutes (Optional)">
+    <input type="checkbox" id="doTeams" name="teams">
+    <label for="doTeams">Enable Teams</label><br>
     <br>
     <input type="submit">
 </form>
