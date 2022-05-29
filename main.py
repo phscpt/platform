@@ -124,7 +124,7 @@ class Game:
         player_id = random_id()
         self.players.append([player_id, name, [0] * len(self.problems)])
         return player_id
-    def start():
+    def start(self):
         self.status = "started"
         self.start_time = time.time()
     def give_points(self, player, problem, points):
@@ -209,7 +209,7 @@ def scoreboard():
                         id=id, player=player,
                         player_name=p[1],
                         problems=game.problems,
-                        time=game.time
+                        time = game.time - (time.time() - game.start_time)
                     )
 
 @app.route("/host_scoreboard", methods=["GET"])
@@ -217,7 +217,12 @@ def scoreboard_host():
     id = request.args.get("id")
     for game in games:
         if game.id == id:
-            return render_template("host_scoreboard.html", id=id, problems=game.problems, time=game.time)
+            return render_template(
+                "host_scoreboard.html",
+                id=id,
+                problems=game.problems,
+                time = game.time - (time.time() - game.start_time)
+            )
     return "error"
 
 if __name__ == "__main__":

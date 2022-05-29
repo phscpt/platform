@@ -138,5 +138,5 @@ td, th {
     height:100vh;
     background-color:red;
     opacity:0;
-    transition: 1s background-color;
+    /*transition: 0.5s all;*/
 }

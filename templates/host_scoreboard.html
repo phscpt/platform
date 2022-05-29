@@ -21,14 +21,14 @@
 </table>
 <h1 id="timer" style="position:absolute;top:0;right:0"></h1>
 <script>
-    let time = parseInt("{{ time | safe }}");
-    let duration = time * 60;
+    let duration = parseInt("{{ time | safe }}");
+    let timerActive = (duration != -1);
     let totalTime = duration;
     let opac = 0;
 
     function update() {
 
-        if (time != -1){
+        if (timerActive){
             if (duration >= 0){
                 hours = parseInt(duration / 3600, 10)
                 minutes = parseInt(duration / 60 % 60, 10);
@@ -39,7 +39,9 @@
                 seconds = seconds < 10 ? "0" + seconds : seconds;
         
                 document.getElementById("timer").innerHTML =  hours + ":" + minutes + ":" + seconds;
-        
+            }
+            else {
+                document.getElementById("timer").innerHTML = "Contest Over";
             }
 
             duration--;
