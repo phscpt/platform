@@ -162,8 +162,10 @@
 <form method="post">
     <textarea name="problems" id="problems" style="display:none"></textarea>
     <h3>Contest Options</h3>
-    <input id="amountOfTime" type="text" style="float:left" name="timer" size="43" placeholder="Contest Duration in Minutes (Optional)">
-    <input id="freezer" type="text" style="float:left" name="freezer" size="43" placeholder="Scoreboard Freeze Time in Minutes (Optional)">
+    <div class="grid-mini">
+        <input id="amountOfTime" type="text" name="timer" size="43" placeholder="Contest Duration in Minutes (Optional)">
+        <input id="freezer" type="text" name="freezer" size="43" placeholder="Scoreboard Freeze Time in Minutes (Optional)">
+    </div>
     <input type="checkbox" id="doTeams" name="teams">
     <label for="doTeams">Enable Teams</label><br>
     <br>
