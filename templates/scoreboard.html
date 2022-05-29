@@ -55,10 +55,18 @@
 
                     document.getElementById("player-list").innerHTML = "";
                     for (let i=0; i<players.length; i++) {
+
+                        if (players[i][1] == "{{ player_name | safe}}"){
+                            rank = "→ "+String(i+1);
+                        }
+                        else{
+                            rank = i+1;
+                        }
+
                         let row = document.createElement("tr");
                         if (i == 0){
                             row.innerHTML = `
-                            <td style="color:#E6AB21;"> ${i+1}</td>
+                            <td style="color:#E6AB21;"> ${rank}</td>
                             <td style="color:#E6AB21;"><b>${players[i][1]}</b></td>
                             <td style="color:#000000;">${players[i][4]}</td>
                             `;
@@ -66,7 +74,7 @@
 
                         if (i == 1){
                             row.innerHTML = `
-                            <td style="color:#D81159;"> ${i+1}</td>
+                            <td style="color:#D81159;"> ${rank}</td>
                             <td style="color:#D81159;"><b>${players[i][1]}</b></td>
                             <td style="color:#000000;">${players[i][4]}</td>
                             `;
@@ -74,7 +82,7 @@
 
                         if (i == 2){
                             row.innerHTML = `
-                            <td style="color:#324376;"> ${i+1}</td>
+                            <td style="color:#324376;"> ${rank}</td>
                             <td style="color:#324376;"><b>${players[i][1]}</b></td>
                             <td style="color:#000000;">${players[i][4]}</td>
                             `;
