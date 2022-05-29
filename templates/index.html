@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<form action="log_in" style="position:absolute;top:30px;right:170px"> <!---Change right px to 170 when adding back sign up-->
+<form action="log_in" style="position:absolute;top:30px;right:40px"> <!---Change right px to 170 when adding back sign up-->
     <input type="submit" value="Admin Log In" />
 </form>
+<!--
 <form action="sign_up" style="position:absolute;top:30px;right:40px">
     <input type="submit" class="button-emphasis" value="Sign Up" />
-</form>
+</form>-->
 <div class="grid">
     <div class="box">
         <h2>Host Contest</h2>
@@ -16,7 +17,7 @@
             <h2>Join Contest</h2>
             <input name=game_id placeholder="Enter Join Code">
             <input name=player_name placeholder="Enter Name">
-            <input type="submit" value="Join">
+            <input type="submit" value="Join" class="button-emphasis">
         </form>
     </div>
 </div>
