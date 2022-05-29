@@ -57,7 +57,7 @@
                     for (let i=0; i<players.length; i++) {
 
                         if (players[i][1] == "{{ player_name | safe}}"){
-                            rank = "→ "+String(i+1);
+                            rank = "🡆 "+String(i+1);
                         }
                         else{
                             rank = i+1;
@@ -68,7 +68,7 @@
                             row.innerHTML = `
                             <td style="color:#E6AB21;"> ${rank}</td>
                             <td style="color:#E6AB21;"><b>${players[i][1]}</b></td>
-                            <td style="color:#000000;">${players[i][4]}</td>
+                            <td style="color:#000000;">${Math.round(players[i][4])}</td>
                             `;
                         }
 
@@ -76,7 +76,7 @@
                             row.innerHTML = `
                             <td style="color:#D81159;"> ${rank}</td>
                             <td style="color:#D81159;"><b>${players[i][1]}</b></td>
-                            <td style="color:#000000;">${players[i][4]}</td>
+                            <td style="color:#000000;">${Math.round(players[i][4])}</td>
                             `;
                         }
 
@@ -84,7 +84,7 @@
                             row.innerHTML = `
                             <td style="color:#324376;"> ${rank}</td>
                             <td style="color:#324376;"><b>${players[i][1]}</b></td>
-                            <td style="color:#000000;">${players[i][4]}</td>
+                            <td style="color:#000000;">${Math.round(players[i][4])}</td>
                             `;
                         }
 
@@ -92,13 +92,13 @@
                             row.innerHTML = `
                             <td> ${i+1}</td>
                             <td><b> ${players[i][1]}</b></td>
-                            <td> ${players[i][4]}</td>
+                            <td> ${Math.round(players[i][4])}</td>
                             `;
                         }
 
                         for (let j=0; j<players[i][2].length; j++) {
                             let cell = document.createElement("td");
-                            cell.innerHTML = players[i][2][j];
+                            cell.innerHTML = Math.round(players[i][2][j]);
                             if (players[i][2][j] == 100) {
                                 cell.className = "prob success";
                             }
