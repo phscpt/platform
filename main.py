@@ -99,7 +99,7 @@ def problem():
                             if num_ac == len(results):
                                 num_points = 100
                             elif num_ac > 1:
-                                num_points = 100 * (num_ac - 1)/(len(results) - 1)
+                                num_points = 80 * (num_ac - 1)/(len(results) - 1)
                             else:
                                 num_points = -0.1
                             game.give_points(p_id, p, num_points)
