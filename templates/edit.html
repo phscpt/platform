@@ -9,6 +9,16 @@
     <h2>Problem Title</h2>
     <input name="title" placeholder = "Problem Title" value = "{{ data.title }}">
     <br>
+    <h2>Status</h2>
+    <div>
+        {% if data.status == "public" %}
+            <input type="radio" name="status" value="public" checked> Public<br>
+            <input type="radio" name="status" value="private"> Private<br>
+        {% else %}
+            <input type="radio" name="status" value="public"> Public<br>
+            <input type="radio" name="status" value="private" checked> Private<br>
+        {% endif %}
+    </div>
     <h2>Description</h2>
     <p>Type in HTML.</p>
     <textarea name="description">{{ data.description }}</textarea>

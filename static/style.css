@@ -59,14 +59,14 @@ a {
     width: 100%;
     box-sizing: border-box;
 }
-.button-emphasis {
+button.button-emphasis, input.button-emphasis {
     color: rgb(255, 255, 255);
     background:#324376 !important; 
     border:0 none;
     cursor:pointer;
 }
-.button-emphasis:hover {
-    background:#1d2a54 !important !important;
+button.button-emphasis:hover, input.button-emphasis:hover {
+    background:#1d2a54 !important;
 }
 
 .result-box {

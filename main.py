@@ -40,6 +40,10 @@ def catalogue():
         return render_template("list.html", problems = get_problems())
     return "You are not authorized to access this page."
 
+@app.route("/public", methods=["GET","POST"])
+def public_catalogue():
+    return render_template("list_public.html", problems = get_problems())
+
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     # ensure only admin can access this page
@@ -49,6 +53,7 @@ def upload():
     if request.method == "POST":
         id = request.form["id"]
         title = request.form["title"]
+        status = request.form["status"]
         description = markdown.markdown(request.form["description"])
         testcases = []
         for i in range(max_testcases):
@@ -57,7 +62,7 @@ def upload():
             # check if empty
             if inp.rstrip() != "" and out.rstrip() != "":
                 testcases.append([inp, out])
-        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "description": description, "testcases": testcases}))
+        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "status": status, "description": description, "testcases": testcases}))
         return redirect("/")
     return render_template("create.html", max_testcases=max_testcases)
 
@@ -72,6 +77,7 @@ def edit():
     if request.method == "POST":
         id = request.form["id"]
         title = request.form["title"]
+        status = request.form["status"]
         description = markdown.markdown(request.form["description"])
         testcases = []
         for i in range(max_testcases):
@@ -80,7 +86,7 @@ def edit():
             # check if empty
             if inp.rstrip() != "" and out.rstrip() != "":
                 testcases.append([inp, out])
-        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "description": description, "testcases": testcases}))
+        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "status": status, "description": description, "testcases": testcases}))
         return redirect("/")
     return render_template("edit.html", max_testcases=max_testcases, data=data)
 
