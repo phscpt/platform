@@ -251,7 +251,7 @@ def log_in():
                         isAdmin = data[4]
                         
                         return render_template(
-                            "index.html",
+                            "log_in.html",
                             admin = isAdmin,
                             userid = userID
                         )

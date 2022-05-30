@@ -28,7 +28,6 @@
     <input type="submit" id="catalogue" value="Problem Catalogue">
 </form>
 <script>
-
     function setCookie(cname,cvalue,exdays) {
         const d = new Date();
         d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -53,38 +52,15 @@
     }
       
     function checkCookie() {
-        let user = getCookie("username");
-        console.log("out");
-        console.log(user);
-
-        if (user == "" || user == null || "{{ admin | safe }}" != "") {
-            console.log("in");
-            let isAdmin = "{{ admin | safe }}";
-
-            if (isAdmin == ""){
-                if (user == "" || user == null){
-                    setCookie("username", "NotIn", 30);
-                }
-            }
-            else {
-                setCookie("username", isAdmin, 30);
-                // sorry for the hacky way of doing this
-                {% if userid %}
-                    setCookie("userid", "{{ userid }}", 30);
-                {% endif %}
-            }
-        }
         return getCookie("username");
     }
-
-    
 
     updateLogInOut();
 
     function updateLogInOut(){
 
         thisAdmin = checkCookie();
-        document.getElementById("userid").value = getCookie("userid")
+        document.getElementById("userid").value = getCookie("userid");
         console.log(String(thisAdmin));
 
         if ( thisAdmin == "True" ){ // If user is an admin
