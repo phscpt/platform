@@ -57,7 +57,7 @@
                     for (let i=0; i<players.length; i++) {
 
                         if (players[i][1] == "{{ player_name | safe}}"){
-                            rank = "🡆 "+String(i+1);
+                            rank = "→ "+String(i+1);
                         }
                         else{
                             rank = i+1;
@@ -90,7 +90,7 @@
 
                         if (i > 2){
                             row.innerHTML = `
-                            <td> ${i+1}</td>
+                            <td> ${rank}</td>
                             <td><b> ${players[i][1]}</b></td>
                             <td> ${Math.round(players[i][4])}</td>
                             `;
