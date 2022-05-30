@@ -26,12 +26,27 @@ def get_problems():
         problems.append(prob)
     return problems
 
-@app.route("/list", methods=["GET"])
-def catalogue():    
-    return render_template("list.html", problems = get_problems())
+@app.route("/list", methods=["GET","POST"])
+def catalogue():
+    # ensure only admin can access this page
+    for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.      
+        with open(filename, encoding='utf-8') as currentFile:
+            data = json.load(currentFile)
+            if request.form.get("userid") == data[3]:
+                return render_template("list.html", problems = get_problems())
+    return "You are not authorized to access this page."
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
+    # ensure only admin can access this page
+    for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.      
+        with open(filename, encoding='utf-8') as currentFile:
+            data = json.load(currentFile)
+            if request.args.get("userid") == data[3]:
+                break
+    else:
+        return "You are not authorized to access this page."
+
     if request.method == "POST":
         id = request.form["id"]
         title = request.form["title"]
@@ -170,6 +185,7 @@ class Game:
                 return True
         print("false")
         return False
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -236,9 +252,10 @@ def log_in():
                         
                         return render_template(
                             "index.html",
-                            admin = isAdmin
+                            admin = isAdmin,
+                            userid = userID
                         )
-                        return redirect(f"/?id={userID}") #change to put userID in the URL
+                        # return redirect(f"/?id={userID}") #change to put userID in the URL
         except:
             pass
 

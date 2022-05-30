@@ -23,7 +23,10 @@
     </div>
 </div>
 <br>
-<a href="list" id="catalogue">Problem Catalogue</a>
+<form method="post" action="list">
+    <input type="text" name="userid" id="userid" hidden style="display:none"> <!-- very cursed userid transfer -->
+    <input type="submit" id="catalogue" value="Problem Catalogue">
+</form>
 <script>
 
     function setCookie(cname,cvalue,exdays) {
@@ -62,13 +65,15 @@
                 if (user == "" || user == null){
                     setCookie("username", "NotIn", 30);
                 }
-                
             }
             else {
                 setCookie("username", isAdmin, 30);
+                // sorry for the hacky way of doing this
+                {% if userid %}
+                    setCookie("userid", "{{ userid }}", 30);
+                {% endif %}
             }
         }
-
         return getCookie("username");
     }
 
@@ -79,7 +84,7 @@
     function updateLogInOut(){
 
         thisAdmin = checkCookie();
-        
+        document.getElementById("userid").value = getCookie("userid")
         console.log(String(thisAdmin));
 
         if ( thisAdmin == "True" ){ // If user is an admin
@@ -102,21 +107,8 @@
 
     function signOut(){
         setCookie("username", "NotIn", 30);
+        setCookie("userid", "NotIn", 30);
         updateLogInOut();
     }
-
-    /*
-    url = window.location.href
-    if (url.indexOf("=") != -1){
-        var id = url.substring(url.lastIndexOf('=') + 1);
-        console.log(id);
-        console.log('/users/'+id+'.json')
-        let isAdmin = fetch('./users/'+id+'.json')
-            .then(response => response.json())
-            .then(json => json[4]);
-        console.log(isAdmin);
-    }
-    */
-    
 </script>
 {% endblock %}

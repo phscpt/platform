@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Catalogue</h1>
+<a id="upload-link">Upload a Problem</a>
+<br><br>
 <div class="grid">
     {% for problem in problems %}
     <div class="box">
@@ -9,6 +11,23 @@
     </div>
     {% endfor %}
 </div>
+<script>
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+    document.getElementById("upload-link").href = "upload?userid=" + getCookie("userid");
+</script>
 <br>
-<a href="upload">Upload a Problem</a>
 {% endblock %}
