@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<form action="log_in" style="position:absolute;top:30px;right:40px"> <!---Change right px to 170 when adding back sign up-->
+<form action="log_in" id="log_in" style="position:absolute;top:30px;right:40px"> <!---Change right px to 170 when adding back sign up-->
     <input type="submit" value="Admin Log In" />
 </form>
+<button id="sign_out" onclick="signOut()" style="position:absolute;top:30px;right:40px">Sign Out</button> <!---Change right px to 170 when adding back sign up-->
 <!--
 <form action="sign_up" style="position:absolute;top:30px;right:40px">
     <input type="submit" class="button-emphasis" value="Sign Up" />
@@ -22,5 +23,100 @@
     </div>
 </div>
 <br>
-<a href="list">Problem Catalogue</a>
+<a href="list" id="catalogue">Problem Catalogue</a>
+<script>
+
+    function setCookie(cname,cvalue,exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+      
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+      
+    function checkCookie() {
+        let user = getCookie("username");
+        console.log("out");
+        console.log(user);
+
+        if (user == "" || user == null || "{{ admin | safe }}" != "") {
+            console.log("in");
+            let isAdmin = "{{ admin | safe }}";
+
+            if (isAdmin == ""){
+                if (user == "" || user == null){
+                    setCookie("username", "NotIn", 30);
+                }
+                
+            }
+            else {
+                setCookie("username", isAdmin, 30);
+            }
+        }
+
+        return getCookie("username");
+    }
+
+    
+
+    updateLogInOut();
+
+    function updateLogInOut(){
+
+        thisAdmin = checkCookie();
+        
+        console.log(String(thisAdmin));
+
+        if ( thisAdmin == "True" ){ // If user is an admin
+            document.getElementById("catalogue").style.display = "initial";
+        }
+
+        else { // If user is not admin
+            document.getElementById("catalogue").style.display = "none";
+        }
+        
+        if ( thisAdmin == "NotIn" || thisAdmin == "" ){ // If user hasn't logged in
+            document.getElementById("sign_out").style.display = "none";
+            document.getElementById("log_in").style.display = "initial";
+        }
+        else{ // If user has logged in
+            document.getElementById("log_in").style.display = "none";
+            document.getElementById("sign_out").style.display = "initial";
+        }    
+    }
+
+    function signOut(){
+        setCookie("username", "NotIn", 30);
+        updateLogInOut();
+    }
+
+    /*
+    url = window.location.href
+    if (url.indexOf("=") != -1){
+        var id = url.substring(url.lastIndexOf('=') + 1);
+        console.log(id);
+        console.log('/users/'+id+'.json')
+        let isAdmin = fetch('./users/'+id+'.json')
+            .then(response => response.json())
+            .then(json => json[4]);
+        console.log(isAdmin);
+    }
+    */
+    
+</script>
 {% endblock %}

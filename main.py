@@ -232,8 +232,13 @@ def log_in():
                     if is_account(data, emailUsername, password):
 
                         userID = data[3]
-                        print(userID)
-                        return redirect(f"/") #change to put userID in the URL
+                        isAdmin = data[4]
+                        
+                        return render_template(
+                            "index.html",
+                            admin = isAdmin
+                        )
+                        return redirect(f"/?id={userID}") #change to put userID in the URL
         except:
             pass
 
@@ -248,7 +253,6 @@ def sign_up():
 
         user = User(email, username, password)
         if "@" in email and len(username) > 4 and len(password) > 4 and not user.is_repeat(users):
-            print(user.isAdmin)
             user.store_account()
             userID = user.credentials[3]
             return redirect(f"/") #change to put userID in the URL
