@@ -61,12 +61,12 @@ a {
 }
 .button-emphasis {
     color: rgb(255, 255, 255);
-    background:#324376; 
+    background:#324376 !important; 
     border:0 none;
     cursor:pointer;
 }
 .button-emphasis:hover {
-    background:#1d2a54; 
+    background:#1d2a54 !important !important;
 }
 
 .result-box {
