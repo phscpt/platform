@@ -60,11 +60,14 @@ a {
     box-sizing: border-box;
 }
 .button-emphasis {
-    background-color: rgb(255, 255, 255);
-    background: rgb(255, 255, 255);
     color: rgb(255, 255, 255);
+    background:#324376; 
+    border:0 none;
+    cursor:pointer;
 }
-
+.button-emphasis:hover {
+    background:#1d2a54; 
+}
 
 .result-box {
     border: 2px solid black;
@@ -78,16 +81,6 @@ a {
 }
 
 /* FILE INPUTS AUGH WHY IS THIS SO HARD */
-input[class="button-emphasis"] {
-    background:#324376; 
-    border:0 none;
-    cursor:pointer;
-}
-input[class="button-emphasis"]:hover {
-    background:#1d2a54; 
-    border:0 none;
-    cursor:pointer;
-}
 input[type="file"] {
     background-color: transparent;
     margin-left: 0px;
