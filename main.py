@@ -26,25 +26,24 @@ def get_problems():
         problems.append(prob)
     return problems
 
-@app.route("/list", methods=["GET","POST"])
-def catalogue():
-    # ensure only admin can access this page
+def admin_check(req):
     for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.      
         with open(filename, encoding='utf-8') as currentFile:
             data = json.load(currentFile)
-            if request.form.get("userid") == data[3]:
-                return render_template("list.html", problems = get_problems())
+            if req.cookies.get("userid") == data[3] and data[4]:
+                return data
+    return False
+
+@app.route("/list", methods=["GET","POST"])
+def catalogue():
+    if admin_check(request):
+        return render_template("list.html", problems = get_problems())
     return "You are not authorized to access this page."
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     # ensure only admin can access this page
-    for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.      
-        with open(filename, encoding='utf-8') as currentFile:
-            data = json.load(currentFile)
-            if request.args.get("userid") == data[3]:
-                break
-    else:
+    if not admin_check(request):
         return "You are not authorized to access this page."
 
     if request.method == "POST":
@@ -64,6 +63,8 @@ def upload():
 
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
+    if not admin_check(request):
+        return "You are not authorized to access this page."
     p = request.args.get("id")
     with open("problems/" + p + ".json", encoding='utf-8') as f:
         data = json.load(f)

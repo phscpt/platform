@@ -23,10 +23,11 @@
     </div>
 </div>
 <br>
-<form method="post" action="list">
-    <input type="text" name="userid" id="userid" hidden style="display:none"> <!-- very cursed userid transfer -->
+<!--<form method="post" action="list">
+    <input type="text" name="userid" id="userid" hidden style="display:none"> <!-- very cursed userid transfer --
     <input type="submit" id="catalogue" value="Problem Catalogue">
-</form>
+</form>-->
+<button id="catalogue" onclick="location.href='list'">Problem Catalogue</button>
 <script>
     function setCookie(cname,cvalue,exdays) {
         const d = new Date();
@@ -60,7 +61,7 @@
     function updateLogInOut(){
 
         thisAdmin = checkCookie();
-        document.getElementById("userid").value = getCookie("userid");
+        //document.getElementById("userid").value = getCookie("userid");
         console.log(String(thisAdmin));
 
         if ( thisAdmin == "True" ){ // If user is an admin
