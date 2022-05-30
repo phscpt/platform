@@ -163,7 +163,8 @@ class Game:
         print("problems:", problems)
     def add_player(self, name):
         player_id = random_id()
-        self.players.append([player_id, name, [0] * len(self.problems), {}])
+        # [player id, player name, score for each problem, results for each problem, time of last successful submission]
+        self.players.append([player_id, name, [0] * len(self.problems), {}, 0])
         return player_id
     def start(self):
         self.status = "started"
@@ -173,9 +174,13 @@ class Game:
         for pl in self.players:
             if pl[0] == player:
                 if pl[2][problem_index] != 0:
-                    pl[2][problem_index] = max(pl[2][problem_index], points)
+                    if pl[2][problem_index] < points:
+                        pl[2][problem_index] = points
+                        pl[4] = time.time()
                 else:
                     pl[2][problem_index] = points
+                    if points > 0:
+                        pl[4] = time.time()
     def time_remaining(self):
         if self.time == -1:
             return -1
