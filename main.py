@@ -87,7 +87,7 @@ def edit():
             if inp.rstrip() != "" and out.rstrip() != "":
                 testcases.append([inp, out])
         open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "status": status, "description": description, "testcases": testcases}))
-        return redirect("/")
+        return redirect("/list")
     return render_template("edit.html", max_testcases=max_testcases, data=data)
 
 @app.route('/problem', methods=["GET", "POST"])
@@ -288,7 +288,12 @@ def problem_select():
         game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form["freezer"], request.form.get("teams"))
         games.append(game)
         return redirect(f"host_waiting?id={game.id}")
-    return render_template("select.html", problems=get_problems())
+    problems = get_problems()
+    public_problems = []
+    for problem in problems:
+        if problem["status"] == "public":
+            public_problems.append(problem)
+    return render_template("select.html", problems = public_problems)
 
 @app.route("/host_waiting", methods=["GET", "POST"])
 def host():
