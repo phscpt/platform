@@ -53,10 +53,12 @@ def grade(file, tests, language):
             print(output[1])
             results.append(["RE", time_elapsed])
             continue
-        if output[0].rstrip() == solution.rstrip():
+        if output[0].rstrip().replace("\r","") == solution.rstrip().replace("\r",""):
             results.append(["AC", time_elapsed])
             continue
         else: # Output doesn't match
+            print("program outputted:", output[0])
+            print("correct solution:", solution)
             results.append(["WA", time_elapsed])
     return results
 
