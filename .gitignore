@@ -1,3 +1,6 @@
 __pycache__/
 *.py[cod]
+tmp/*.py
+tmp/*.java
+tmp/*.cpp
 tmp.py
