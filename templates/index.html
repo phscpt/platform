@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<form action="log_in" id="log_in" style="position:absolute;top:30px;right:40px"> <!---Change right px to 170 when adding back sign up-->
-    <input type="submit" value="Admin Log In" />
+<form action="log_in" id="log_in"> <!---Change right px to 170 when adding back sign up-->
+    <input type="submit" value="Admin Log In" style="top:30px;right:40px" class="absolute-button">
 </form>
-<button id="sign_out" onclick="signOut()" style="position:absolute;top:30px;right:40px">Sign Out</button> <!---Change right px to 170 when adding back sign up-->
-<button id="addQuestion" onclick=" window.open('https://forms.gle/WTtjz5tkhXwH98hW9','_blank')" style="position:absolute;bottom:30px;right:40px">Suggest Problem</button>
+<button id="sign_out" onclick="signOut()" style=top:30px;right:40px" class="absolute-button">Sign Out</button> <!---Change right px to 170 when adding back sign up-->
 <!--
 <form action="sign_up" style="position:absolute;top:30px;right:40px">
     <input type="submit" class="button-emphasis" value="Sign Up" />
 </form>-->
+<br>
 <div class="grid">
     <div class="box">
         <h2>Host Contest</h2>
@@ -30,6 +30,7 @@
 </form>-->
 <button id="public_catalogue" onclick="location.href='public'">Problem Catalogue</button>
 <button id="catalogue" onclick="location.href='list'">Admin Catalogue</button>
+<button id="addQuestion" onclick="window.open('https:\/\/forms.gle/WTtjz5tkhXwH98hW9','_blank')" style="bottom:30px;right:40px;" class="absolute-button">Suggest Problem</button>
 <script>
     function setCookie(cname,cvalue,exdays) {
         const d = new Date();
