@@ -31,7 +31,7 @@ def grade(file, tests, language):
             TIME_LIMIT = 4
         elif language == "python2":
             print(f"running {file} (python)")
-            process = Popen(["python", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+            process = Popen(["python2.7", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
             TIME_LIMIT = 4
         elif language == "java":
             olddir = os.getcwd()
