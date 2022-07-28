@@ -215,6 +215,21 @@ def index():
                 return redirect(f"/waiting?id={id}&player={player}")
     return render_template("index.html")
 
+@app.route("/join", methods=["GET", "POST"])
+def join():
+    id = request.args.get("id")
+    if request.method == "POST":
+        try:
+            name = request.form["player_name"]
+        except:
+            return render_template("join.html", id=id)
+        id = id.rstrip().upper()
+        for game in games:
+            if game.id == id and not game.is_duplicate_name(name):
+                player = game.add_player(name)
+                return redirect(f"/waiting?id={id}&player={player}")
+    return render_template("join.html", id=id)
+
 def hash_password(password):
     salt = uuid.uuid4().hex 
     return hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
