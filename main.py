@@ -54,7 +54,8 @@ def upload():
         id = request.form["id"]
         title = request.form["title"]
         status = request.form["status"]
-        description = markdown.markdown(request.form["description"])
+        #description = markdown.markdown(request.form["description"])
+        description = request.form["description"]
         testcases = []
         for i in range(max_testcases):
             inp = request.form["input" + str(i)]
@@ -78,7 +79,7 @@ def edit():
         id = request.form["id"]
         title = request.form["title"]
         status = request.form["status"]
-        description = markdown.markdown(request.form["description"])
+        description = request.form["description"]
         testcases = []
         for i in range(max_testcases):
             inp = request.form["input" + str(i)]
@@ -95,6 +96,7 @@ def problem():
     p = request.args.get("id")
     with open("problems/" + p + ".json", encoding='utf-8') as f:
         data = json.load(f)
+        data["description"] = markdown.markdown(data["description"])
     if request.method == "POST":
         print(request.files)
         file = request.files['file']
