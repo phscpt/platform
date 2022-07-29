@@ -7,6 +7,7 @@
     });
 </script>
 <button id="scoreboard_button">Back to Scoreboard</button>
+<button id="catalog_button" onclick="location.href='public'">Back to Catalogue</button>
 <script>
     const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
@@ -17,9 +18,11 @@
         document.getElementById("scoreboard_button").addEventListener("click", function() {
             location.href = "scoreboard?id=" + g_id + "&player=" + p_id;
         });
+        document.getElementById("catalog_button").style.display = "none";
     }
     else {
         document.getElementById("scoreboard_button").style.display = "none";
+        document.getElementById("catalog_button").style.display = "block";
     }
 </script>
 <h1>{{ data.title }}</h1>
