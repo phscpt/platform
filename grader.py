@@ -35,7 +35,7 @@ def grade(file, tests, language):
             TIME_LIMIT = 4
         elif language == "java":
             olddir = os.getcwd()
-            os.chdir("tmp")
+            os.chdir("".join(file.split("/")[:-1]))
             process = Popen(["java", file.split(".")[0].split("/")[-1]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
             os.chdir(olddir)
             TIME_LIMIT = 2

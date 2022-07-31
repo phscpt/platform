@@ -101,7 +101,10 @@ def problem():
         print(request.files)
         file = request.files['file']
 
-        fname = "tmp/" + file.filename
+        rand = random_id()
+        os.mkdir("tmp/" + rand)
+
+        fname = "tmp/" + rand + "/" + file.filename
         file.save(fname)
         lang = request.form["language"]
 

@@ -31,9 +31,9 @@
 </div>
 <h2>Submit solution</h2>
 <div class="box">
-    <form method="post" enctype=multipart/form-data>
+    <form method="post" enctype=multipart/form-data onSubmit="document.getElementById('submit').disabled=true;">
         <div class="grid-mini">
-            <input type="file" name="file" accept = ".py,.java,.cpp" id="file">
+            <input type="file" name="file" accept = ".py,.java,.cpp" id="file" required>
             <script>
                 document.getElementById("file").onchange = function(){
                     extension = String((document.getElementById("file")).value).split('.').pop();
@@ -51,7 +51,7 @@
                 }
             </script>
             <div style="text-align:right;">
-                <select name="language" id="language" style="display:inline-block;width:auto">
+                <select name="language" id="language" style="display:inline-block;width:auto" required>
                     <option value="cpp">C++</option>
                     <option value="java">Java</option>
                     <option value="python2">Python 2.7.18</option>
@@ -59,7 +59,7 @@
                 </select>        
             </div>
         </div>
-        <input type="submit">
+        <input type="submit" id="submit">
     </form>
 </div>
 
