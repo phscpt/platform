@@ -14,7 +14,7 @@ def grade(file, tests, language):
 
     results = []
     olddir = os.getcwd()
-    os.chdir("".join(file.split("/")[:-1]))
+    os.chdir("/".join(file.split("/")[:-1]))
 
     # compile
     if language == "java":
