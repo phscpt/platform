@@ -13,6 +13,9 @@ def grade(file, tests, language):
     #   Otherwise, it returns "Accepted"
 
     results = []
+    olddir = os.getcwd()
+    os.chdir("".join(file.split("/")[:-1]))
+
     # compile
     if language == "java":
         Popen(["javac", file], stdout=PIPE, stderr=PIPE).communicate()
@@ -34,10 +37,7 @@ def grade(file, tests, language):
             process = Popen(["python2.7", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
             TIME_LIMIT = 4
         elif language == "java":
-            olddir = os.getcwd()
-            os.chdir("".join(file.split("/")[:-1]))
             process = Popen(["java", file.split(".")[0].split("/")[-1]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-            os.chdir(olddir)
             TIME_LIMIT = 2
         elif language == "cpp":
             process = Popen(["./a.out"], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
@@ -60,6 +60,7 @@ def grade(file, tests, language):
             print("program outputted:", output[0])
             print("correct solution:", solution)
             results.append(["WA", time_elapsed])
+        os.chdir(olddir)
     return results
 
 if __name__ == "__main__":
