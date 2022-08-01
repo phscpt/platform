@@ -2,8 +2,6 @@ import subprocess, os
 from subprocess import Popen, PIPE
 import time
 
-
-
 def grade(file, tests, language):
     # Takes in a filename and testcases and runs it using each test case
     # For each test case:
@@ -62,7 +60,7 @@ def grade(file, tests, language):
             print("program outputted:", output[0])
             print("correct solution:", solution)
             results.append(["WA", time_elapsed])
-        os.chdir(olddir)
+    os.chdir(olddir)
     return results
 
 if __name__ == "__main__":

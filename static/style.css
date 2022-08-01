@@ -4,6 +4,10 @@ html, body {
     background: rgb(250, 250, 250);
 }
 
+p, ul, pre, h3 {
+    font-size: 1.1em;
+}
+
 #main {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
