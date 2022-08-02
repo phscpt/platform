@@ -2,7 +2,4 @@ __pycache__/
 *.py[cod]
 tmp/*
 problems/*
-tmp/*.py
-tmp/*.java
-tmp/*.cpp
-tmp.py
+!tmp/readme.txt

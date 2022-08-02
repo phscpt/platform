@@ -1,8 +1,0 @@
-{
-    "status":"public",
-    "title": "Summation Game",
-    "description": "<b>Problem Statement</b><br>Nick is playing a card game in which there are N (1 ≤ N ≤ 10^3) cards arranged in a line, each containing a (not necessarily positive) integer. He can choose any contiguous subset of the cards, and will receive points equal to the sum of the integers on each of the cards. Please help him determine the maximum number of points he can receive if he plays optimally.<br>",
-    "testcases": [
-        ["4\n-1 8 -3 4", "9\n"]
-    ]
-}
