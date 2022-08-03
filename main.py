@@ -21,6 +21,8 @@ def get_problems():
     problem_names = os.listdir("problems")
     problems = []
     for p in problem_names:
+        if not ".json" in p:
+            continue
         prob = json.load(open("problems/" + p, encoding='utf-8'))
         prob["id"] = p.split(".")[0]
         problems.append(prob)
@@ -216,7 +218,7 @@ def index():
             if game.id == id and not game.is_duplicate_name(name):
                 player = game.add_player(name)
                 return redirect(f"/waiting?id={id}&player={player}")
-    return render_template("index.html")
+    return render_template("index2.html")
 
 @app.route("/join", methods=["GET", "POST"])
 def join():
