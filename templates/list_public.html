@@ -6,7 +6,7 @@
     {% for problem in problems %}
         {% if problem.status == "public" %}
         <div class="box">
-            <h2>{{ problem.title }}</h2>
+            <h2 style="margin-top:10px">{{ problem.title }}</h2>
             <button onclick="location.href='problem?id='+'{{ problem.id }}'" class="button-emphasis">View</button>
         </div>
         {% endif %}
