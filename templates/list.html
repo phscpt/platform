@@ -3,13 +3,30 @@
 <h1>Admin Catalogue</h1>
 <a id="upload-link" href="upload">Upload a Problem</a>
 <br><br>
+<h2>Public</h2>
 <div class="grid">
     {% for problem in problems %}
+    {% if problem.status == "public" %}
     <div class="box">
         <h2 style="margin-top:10px">{{ problem.title }}</h2>
         <button onclick="location.href='problem?id='+'{{ problem.id }}'" class="button-emphasis">View</button>
         <button onclick="location.href='edit?id='+'{{ problem.id }}'">Edit</button>
     </div>
+    {% endif %}
+    {% endfor %}
+</div>
+<br><br>
+<hr>
+<h2>Private</h2>
+<div class="grid">
+    {% for problem in problems %}
+    {% if problem.status == "private" %}
+    <div class="box">
+        <h2 style="margin-top:10px">{{ problem.title }}</h2>
+        <button onclick="location.href='problem?id='+'{{ problem.id }}'" class="button-emphasis">View</button>
+        <button onclick="location.href='edit?id='+'{{ problem.id }}'">Edit</button>
+    </div>
+    {% endif %}
     {% endfor %}
 </div>
 <br>
