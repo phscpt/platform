@@ -12,11 +12,17 @@
     <h2>Status</h2>
     <div>
         {% if data.status == "public" %}
-            <input type="radio" name="status" value="public" checked> Public<br>
-            <input type="radio" name="status" value="private"> Private<br>
+            <input type="radio" name="status" value="public" checked> Used in Competition<br>
+            <input type="radio" name="status" value="publvate"> Ready for Competition<br>
+            <input type="radio" name="status" value="private"> Not Ready for Competition<br>
+        {% elif data.status == "publvate" %}
+            <input type="radio" name="status" value="public"> Used in Competition<br>
+            <input type="radio" name="status" value="publvate" checked> Ready for Competition<br>
+            <input type="radio" name="status" value="private"> Not Ready for Competition<br>
         {% else %}
-            <input type="radio" name="status" value="public"> Public<br>
-            <input type="radio" name="status" value="private" checked> Private<br>
+            <input type="radio" name="status" value="public"> Used in Competition<br>
+            <input type="radio" name="status" value="publvate"> Ready for Competition<br>
+            <input type="radio" name="status" value="private" checked> Not Ready for Competition<br>
         {% endif %}
     </div>
     <h2>Description</h2>
