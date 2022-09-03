@@ -28,6 +28,21 @@ def get_problems():
         problems.append(prob)
     return problems
 
+def get_problem_names():
+    problem_names = os.listdir("problems")
+    problems = []
+    for p in problem_names:
+        if not ".json" in p:
+            continue
+        prob = json.load(open("problems/" + p, encoding='utf-8'))
+        prob["id"] = p.split(".")[0]
+        problems.append({
+            "id": prob["id"],
+            "status": prob["status"],
+            "title": prob["title"]
+        })
+    return problems
+
 def admin_check(req):
     for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.      
         with open(filename, encoding='utf-8') as currentFile:
@@ -39,12 +54,12 @@ def admin_check(req):
 @app.route("/list", methods=["GET","POST"])
 def catalogue():
     if admin_check(request):
-        return render_template("list.html", problems = get_problems())
+        return render_template("list.html", problems = get_problem_names())
     return "You are not authorized to access this page."
 
 @app.route("/public", methods=["GET","POST"])
 def public_catalogue():
-    return render_template("list_public.html", problems = get_problems())
+    return render_template("list_public.html", problems = get_problem_names())
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
@@ -315,7 +330,7 @@ def problem_select():
         game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form["freezer"], request.form.get("teams"))
         games.append(game)
         return redirect(f"host_waiting?id={game.id}")
-    problems = get_problems()
+    problems = get_problem_names()
     public_problems = []
     for problem in problems:
         if problem["status"] == "public":
