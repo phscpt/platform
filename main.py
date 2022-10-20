@@ -116,9 +116,8 @@ def problem():
         data = json.load(f)
         data["description"] = markdown.markdown(data["description"])
     if request.method == "POST":
-        print(f"received problem submission for {p}:", file.filename)
-        
         file = request.files['file']
+        print(f"received problem submission for {p}:", file.filename)
         now = datetime.now()
         date = now.strftime("%m-%d-%Y-%H-%M-%S-")
 
