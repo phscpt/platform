@@ -10,4 +10,4 @@ https://phscpt.pythonanywhere.com
 - [ ] Future support for user accounts
 
 ## Dependencies
-Requires python `markdown` library and `g++`, `java`, `python2.7` and `python3.9`.
+Requires python `markdown` and `flask` libraries, as well as `g++`, `java`, `python2.7` and `python3.9`.

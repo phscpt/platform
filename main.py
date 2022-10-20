@@ -7,6 +7,7 @@ import markdown
 import uuid 
 import hashlib
 import glob
+from datetime import datetime
 from flask import Flask, request, render_template, redirect
 app = Flask(__name__)
 
@@ -18,7 +19,7 @@ adminPass = []
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 
 def get_problems():
-    problem_names = os.listdir("problems")
+    problem_names = sorted(os.listdir("problems"))
     problems = []
     for p in problem_names:
         if not ".json" in p:
@@ -115,13 +116,16 @@ def problem():
         data = json.load(f)
         data["description"] = markdown.markdown(data["description"])
     if request.method == "POST":
-        print(request.files)
+        print(f"received problem submission for {p}:", file.filename)
+        
         file = request.files['file']
+        now = datetime.now()
+        date = now.strftime("%m-%d-%Y-%H-%M-%S-")
 
         rand = random_id()
-        os.mkdir("tmp/" + rand)
+        os.mkdir("tmp/" + date + rand)
 
-        fname = "tmp/" + rand + "/" + file.filename
+        fname = "tmp/" + date + rand + "/" + file.filename
         file.save(fname)
         lang = request.form["language"]
 
