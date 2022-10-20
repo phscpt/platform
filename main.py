@@ -30,7 +30,7 @@ def get_problems():
     return problems
 
 def get_problem_names():
-    problem_names = os.listdir("problems")
+    problem_names = sorted(os.listdir("problems"))
     problems = []
     for p in problem_names:
         if not ".json" in p:
