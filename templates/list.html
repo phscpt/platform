@@ -16,7 +16,7 @@
     {% endif %}
     {% endfor %}
 </div>-->
-<table style="font-size: 14pt">
+<table style="font-size: 14pt; table-layout: auto">
     <thead>
         <tr>
             <th>Problem</th>
@@ -44,6 +44,9 @@
                     N/A
                 {% endif %}
             </td>
+            <td>
+                <a href="edit?id={{ problem.id }}">Edit</a>
+            </td>
         </tr>
         {% endif %}
     {% endfor %}
@@ -62,7 +65,7 @@
     {% endif %}
     {% endfor %}
 </div>-->
-<table style="font-size: 14pt">
+<table style="font-size: 14pt; table-layout: auto">
     <thead>
         <tr>
             <th>Problem</th>
@@ -90,6 +93,9 @@
                     N/A
                 {% endif %}
             </td>
+            <td>
+                <a href="edit?id={{ problem.id }}">Edit</a>
+            </td>
         </tr>
         {% endif %}
     {% endfor %}
@@ -108,12 +114,13 @@
     {% endif %}
     {% endfor %}
 </div>-->
-<table style="font-size: 14pt">
+<table style="font-size: 14pt; table-layout: auto">
     <thead>
         <tr>
             <th>Problem</th>
             <th>Difficulty</th>
             <th>Tags</th>
+            <th>Edit</th>
         </tr>
     </thead>
     {% for problem in problems %}
@@ -135,6 +142,9 @@
                 {% else %}
                     N/A
                 {% endif %}
+            </td>
+            <td>
+                <a href="edit?id={{ problem.id }}">Edit</a>
             </td>
         </tr>
         {% endif %}
