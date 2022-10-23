@@ -1,7 +1,7 @@
 /* OVERALL */
 
 html, body {
-    background: rgb(0, 0, 0);
+    background: rgb(32, 32, 31);
 }
 
 p, ul, pre, h3 {
@@ -29,13 +29,13 @@ title, p, a, ul, pre, h1, h2, h3, h4 {
 
 /* ELEMENTS */
 
-img {
+/* img {
     filter: drop-shadow(0px 0px 10px rgb(235, 97, 35));
 }
 
 img:hover {
     filter: drop-shadow(0px 0px 10px rgb(255, 154, 0));
-}
+} */
 
 a {
     cursor: pointer;
