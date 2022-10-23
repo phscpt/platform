@@ -49,6 +49,7 @@ def get_problem_names():
         if "tags" in prob:
             new_prob["tags"] = prob["tags"]
         problems.append(new_prob)
+    problems.sort(key = lambda x: x["title"])
     problems.sort(key = lambda x:
         {
             "Trivial": 0, "Easy": 1, "Medium": 2, "Hard": 3, "Very Hard": 4
