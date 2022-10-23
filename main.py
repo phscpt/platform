@@ -18,6 +18,7 @@ adminPass = []
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 
+'''
 def get_problems():
     problem_names = sorted(os.listdir("problems"))
     problems = []
@@ -28,20 +29,30 @@ def get_problems():
         prob["id"] = p.split(".")[0]
         problems.append(prob)
     return problems
+'''
 
 def get_problem_names():
-    problem_names = sorted(os.listdir("problems"))
+    problem_names = os.listdir("problems")
     problems = []
     for p in problem_names:
         if not ".json" in p:
             continue
         prob = json.load(open("problems/" + p, encoding='utf-8'))
         prob["id"] = p.split(".")[0]
-        problems.append({
+        new_prob = {
             "id": prob["id"],
             "status": prob["status"],
-            "title": prob["title"]
-        })
+            "title": prob["title"],
+        }
+        if "difficulty" in prob:
+            new_prob["difficulty"] = prob["difficulty"]
+        if "tags" in prob:
+            new_prob["tags"] = prob["tags"]
+        problems.append(new_prob)
+    problems.sort(key = lambda x:
+        {
+            "Trivial": 0, "Easy": 1, "Medium": 2, "Hard": 3, "Very Hard": 4
+        }[x["difficulty"]] if "difficulty" in x else 5)
     return problems
 
 def admin_check(req):
@@ -81,7 +92,16 @@ def upload():
             # check if empty
             if inp.rstrip() != "" and out.rstrip() != "":
                 testcases.append([inp, out])
-        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "status": status, "description": description, "testcases": testcases}))
+        open("problems/" + id + ".json", "w", encoding='utf-8').write(
+            json.dumps({
+                "title": title,
+                "status": status,
+                "difficulty": request.form["difficulty"],
+                "tags": request.form["tags"],
+                "description": description,
+                "testcases": testcases
+            })
+        )
         return redirect("/")
     return render_template("create.html", max_testcases=max_testcases)
 
@@ -105,7 +125,14 @@ def edit():
             # check if empty
             if inp.rstrip() != "" and out.rstrip() != "":
                 testcases.append([inp, out])
-        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({"title": title, "status": status, "description": description, "testcases": testcases}))
+        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({
+            "title": title,
+            "status": status,
+            "difficulty": request.form["difficulty"],
+            "tags": request.form["tags"],
+            "description": description,
+            "testcases": testcases
+        }))
         return redirect("/list")
     return render_template("edit.html", max_testcases=max_testcases, data=data)
 
@@ -156,12 +183,12 @@ def problem():
     p_id = request.args.get("player")
     if (g_id != None) and (p_id != None):
         for game in games:
-                if game.id == g_id:
-                    for pl in game.players:
-                        if pl[0] == p_id:
-                            if p in pl[3]:
-                                return render_template("problem.html", results=pl[3][p], data=data)
-                            return render_template("problem.html", results=False, data=data)
+            if game.id == g_id:
+                for pl in game.players:
+                    if pl[0] == p_id:
+                        if p in pl[3]:
+                            return render_template("problem.html", results=pl[3][p], data=data)
+                        return render_template("problem.html", results=False, data=data)
     return render_template("problem.html", results=False, data=data)
 
 # GAME CREATION/JOINING

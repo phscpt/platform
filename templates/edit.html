@@ -25,6 +25,13 @@
             <input type="radio" name="status" value="private" checked> Not Ready for Competition<br>
         {% endif %}
     </div>
+    <br>
+    <h2>Difficulty</h2>
+    <input name="difficulty" placeholder="Difficulty" value="{{ data.difficulty }}">
+    <br>
+    <h2>Tags</h2>
+    <input name="tags" placeholder="Tags" value="{{ data.tags }}">
+    <br>
     <h2>Description</h2>
     <p>Type in markdown.</p>
     <textarea name="description">{{ data.description }}</textarea>
