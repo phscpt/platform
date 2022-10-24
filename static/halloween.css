@@ -1,5 +1,13 @@
 /* OVERALL */
 
+:root {
+    --text-main: white;
+    --text-bright: white;
+    --background-body: white;
+    --background: white;
+    --background-alt: transparent;
+}
+
 html, body {
     background: rgb(33, 33, 33);
 }
@@ -31,11 +39,11 @@ title, p, a, ul, pre, h1, h2, h3, h4 {
 
 /* img {
     filter: drop-shadow(0px 0px 10px rgb(235, 97, 35));
-}
+}*/
 
 img:hover {
-    filter: drop-shadow(0px 0px 10px rgb(255, 154, 0));
-} */
+    filter: hue-rotate(50deg) saturate(110%) drop-shadow(0px 0px 10px rgb(0, 0, 0));
+}
 
 img {
     filter: hue-rotate(50deg) saturate(110%);
@@ -125,8 +133,12 @@ input[type="file"] {
 table {
     border-collapse: collapse;
 }
+tr {
+    background-color: transparent !important;
+}
 td, th {
     text-align: center;
+    color: white;
 }
 .fail {
     background-color: rgba(255, 83, 83, 0.5);

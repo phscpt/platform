@@ -19,10 +19,20 @@ def grade(file, tests, language):
     # compile
     if language == "java":
         Popen(["javac", file], stdout=PIPE, stderr=PIPE).communicate()
+        # test if compilation was successful
+        if not os.path.isfile(file.split(".")[0] + ".class"):
+            print("java compilation error")
+            os.chdir(olddir)
+            return [["RE", "Compile Error"]]
         print("java compilation successful")
     elif language == "cpp":
         Popen(["g++", file], stdout=PIPE, stderr=PIPE).communicate()
-        print("c++ compilation successful")
+        # test if compilation was successful
+        if not os.path.isfile("a.out"):
+            print("c++ compilation failed")
+            os.chdir(olddir)
+            return [["RE","Compile Error"]]
+        print("cpp compilation successful")
 
     # execute
     for test in tests:
