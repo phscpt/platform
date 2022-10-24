@@ -23,7 +23,7 @@ def grade(file, tests, language):
         if not os.path.isfile(file.split(".")[0] + ".class"):
             print("java compilation error")
             os.chdir(olddir)
-            return [["RE", "Compile Error"]]
+            return [["CE", "Compile Error"]]
         print("java compilation successful")
     elif language == "cpp":
         Popen(["g++", file], stdout=PIPE, stderr=PIPE).communicate()
@@ -31,7 +31,7 @@ def grade(file, tests, language):
         if not os.path.isfile("a.out"):
             print("c++ compilation failed")
             os.chdir(olddir)
-            return [["RE","Compile Error"]]
+            return [["CE","Compile Error"]]
         print("cpp compilation successful")
 
     # execute

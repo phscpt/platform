@@ -89,6 +89,11 @@
                     {{ loop.index }} <b>{{ result[0] }}</b>
                     <p>{{ result[1] }}ms</p>
                 </div>
+            {% elif result[0] == "CE" %}
+                <div class="result-box fail" title="Compilation Error">
+                    {{ loop.index }} <b>{{ result[0] }}</b>
+                    <p>Compile Error</p>
+                </div>
             {% endif %}
         {% endfor %}
     </div>
