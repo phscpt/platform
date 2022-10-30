@@ -44,16 +44,16 @@ def get_problem_names():
             "status": prob["status"],
             "title": prob["title"],
         }
-        if "difficulty" in prob:
+        if "difficulty" in prob and prob["difficulty"] != "":
             new_prob["difficulty"] = prob["difficulty"]
-        if "tags" in prob:
+        if "tags" in prob and prob["tags"] != "":
             new_prob["tags"] = prob["tags"]
         problems.append(new_prob)
     problems.sort(key = lambda x: x["title"])
     problems.sort(key = lambda x:
         {
-            "Trivial": 0, "Easy": 1, "Medium": 2, "Hard": 3, "Very Hard": 4
-        }[x["difficulty"]] if "difficulty" in x else 5)
+            "trivial": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4
+        }[lower(x["difficulty"])] if "difficulty" in x else 5)
     return problems
 
 def admin_check(req):

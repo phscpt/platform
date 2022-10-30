@@ -57,6 +57,7 @@ def grade(file, tests, language):
             time_elapsed = (time.perf_counter_ns() - time_start)//1000000
         except subprocess.TimeoutExpired:
             process.kill()
+            print("time limit exceeded on test", len(results))
             results.append(["TLE","--"])
             continue
         if output[1] != "": # Some error happened
@@ -67,8 +68,9 @@ def grade(file, tests, language):
             results.append(["AC", time_elapsed])
             continue
         else: # Output doesn't match
-            print("program outputted:", output[0])
-            print("correct solution:", solution)
+            #print("program outputted:", output[0])
+            #print("correct solution:", solution)
+            print("wrong answer on test", len(results))
             results.append(["WA", time_elapsed])
     os.chdir(olddir)
     return results
