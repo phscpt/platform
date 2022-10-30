@@ -53,7 +53,7 @@ def get_problem_names():
     problems.sort(key = lambda x:
         {
             "trivial": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4
-        }[lower(x["difficulty"])] if "difficulty" in x else 5)
+        }[x["difficulty"].lower()] if "difficulty" in x else 5)
     return problems
 
 def admin_check(req):
