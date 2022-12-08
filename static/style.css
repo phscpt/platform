@@ -55,7 +55,8 @@ a {
 }
 .box {
     background-color: rgb(255, 255, 255);
-    border: 2px solid rgb(153, 153, 153);
+    border: 1px solid rgb(194, 194, 194);
+    box-shadow: 5px 5px 15px rgb(240, 240, 240);
     border-radius: 5px;
     padding: 10px;
 }
@@ -63,10 +64,19 @@ a {
     width: 100%;
     box-sizing: border-box;
 }
+
+input {
+    border: 1px solid #d6d6d6;
+}
+
+button, input[type="submit"] {
+    border: 1px solid var(--button-hover);
+    box-shadow: 5px 5px 15px rgb(240, 240, 240);
+}
 button.button-emphasis, input.button-emphasis {
     color: rgb(255, 255, 255);
     background:#324376 !important; 
-    border:0 none;
+    border:1px solid #12182b;
     cursor:pointer;
 }
 button.button-emphasis:hover, input.button-emphasis:hover {
@@ -101,8 +111,8 @@ input[type="file"] {
     margin-right: 6px;
     margin-bottom: 6px;
     padding: 10px;
-    border: none;
-    border-radius: 6px;
+    border: 1px solid var(--button-hover);
+    border-radius: 5px;
     outline: none;
     cursor: pointer;
     transition: 0.1s all;
