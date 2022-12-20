@@ -7,9 +7,12 @@ import markdown
 import uuid 
 import hashlib
 import glob
+from sys import argv
 from datetime import datetime
 from flask import Flask, request, render_template, redirect
 app = Flask(__name__)
+
+port = int(argv[1]) if len(argv) > 1 else 5000
 
 max_testcases = 10
 games = []
@@ -287,7 +290,8 @@ def hash_password(password):
 
 def check_password(hashed_password, user_password): 
     password, salt = hashed_password.split(':') 
-    return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
+    actual_pass = hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
+    return password == actual_pass
 
 def is_admin(email, username, hashedPass):
     if email == "jierueic@gmail.com" and username == "knosmos" and check_password("c8cd035724dd2cc48f87c17f21c4cb7f9bdf9cf767bc88e5fcefefbf8f73dd0f:533a7722507f4d1da1bdfca16bf70675", hashedPass):
@@ -441,4 +445,4 @@ def scoreboard_host():
     return "error"
 
 if __name__ == "__main__":
-    app.run("0.0.0.0")
+    app.run("0.0.0.0", port)
