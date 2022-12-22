@@ -1,6 +1,44 @@
 import subprocess, os
 from subprocess import Popen, PIPE
 import time
+from global_pool import get_global_pool
+
+cwd = os.getcwd()
+
+# n, file, data, solution, language
+def test(data: tuple[int, str, str, str, str]) -> tuple[int, str, str]:
+    n, file, data, solution, language = data
+    if language == "python":
+        print(f"running {file} (python)")
+        process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+        TIME_LIMIT = 4
+    elif language == "python2":
+        print(f"running {file} (python)")
+        process = Popen(["python2.7", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+        TIME_LIMIT = 4
+    elif language == "java":
+        process = Popen(["java", file.split(".")[0]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+        TIME_LIMIT = 2
+    elif language == "cpp":
+        process = Popen(["./a.out"], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+        TIME_LIMIT = 1
+        
+    try:
+        time_start = time.perf_counter_ns()
+        output = process.communicate(input = str(data), timeout = TIME_LIMIT)
+        time_elapsed = (time.perf_counter_ns() - time_start)//1000000
+    except subprocess.TimeoutExpired:
+        process.kill()
+        return (n, "TLE", "--")
+    if output[1] != "": # Some error happened
+        print(output[1])
+        return (n, "RE", time_elapsed)
+    if output[0].rstrip().replace("\r","") == solution.rstrip().replace("\r",""):
+        return (n, "AC", time_elapsed)
+    else: # Output doesn't match
+        #print("program outputted:", output[0])
+        #print("correct solution:", solution)
+        return (n, "WA", time_elapsed)
 
 def grade(file, tests, language):
     # Takes in a filename and testcases and runs it using each test case
@@ -9,9 +47,7 @@ def grade(file, tests, language):
     #   If the program produces incorrect output, it returns "Wrong Answer"
     #   If the program crashes, it returns "Runtime Error"
     #   Otherwise, it returns "Accepted"
-
-    results = []
-    olddir = os.getcwd()
+    start_time = time.time()
     os.chdir("/".join(file.split("/")[:-1]))
 
     file = file.split("/")[-1]
@@ -22,58 +58,27 @@ def grade(file, tests, language):
         # test if compilation was successful
         if not os.path.isfile(file.split(".")[0] + ".class"):
             print("java compilation error")
-            os.chdir(olddir)
-            return [["CE", "Compile Error"]]
+            os.chdir(cwd)
+            return {start_time: start_time, "tests": [["CE", "Compile Error"]]}
         print("java compilation successful")
     elif language == "cpp":
         Popen(["g++", file], stdout=PIPE, stderr=PIPE).communicate()
         # test if compilation was successful
         if not os.path.isfile("a.out"):
             print("c++ compilation failed")
-            os.chdir(olddir)
-            return [["CE","Compile Error"]]
+            os.chdir(cwd)
+            return {start_time: start_time, "tests": [["CE", "Compile Error"]]}
         print("cpp compilation successful")
 
     # execute
-    for test in tests:
-        data, solution = test
-        time_start = time.perf_counter_ns()
-        if language == "python":
-            print(f"running {file} (python)")
-            process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-            TIME_LIMIT = 4
-        elif language == "python2":
-            print(f"running {file} (python)")
-            process = Popen(["python2.7", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-            TIME_LIMIT = 4
-        elif language == "java":
-            process = Popen(["java", file.split(".")[0]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-            TIME_LIMIT = 2
-        elif language == "cpp":
-            process = Popen(["./a.out"], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-            TIME_LIMIT = 1
-        try:
-            output = process.communicate(input = str(data), timeout = TIME_LIMIT)
-            time_elapsed = (time.perf_counter_ns() - time_start)//1000000
-        except subprocess.TimeoutExpired:
-            process.kill()
-            print("time limit exceeded on test", len(results))
-            results.append(["TLE","--"])
-            continue
-        if output[1] != "": # Some error happened
-            print(output[1])
-            results.append(["RE", time_elapsed])
-            continue
-        if output[0].rstrip().replace("\r","") == solution.rstrip().replace("\r",""):
-            results.append(["AC", time_elapsed])
-            continue
-        else: # Output doesn't match
-            #print("program outputted:", output[0])
-            #print("correct solution:", solution)
-            print("wrong answer on test", len(results))
-            results.append(["WA", time_elapsed])
-    os.chdir(olddir)
-    return results
+    tests = [(n, file, data, solution, language) for n, (data, solution) in enumerate(tests)]
+    # TODO: MULTITHREADING COMMENTED OUT HERE
+    # tests = get_global_pool().map(test, tests)
+    tests = list(map(test, tests))
+    tests.sort(key=lambda r: r[0])
+    tests = [[r[1], r[2]] for r in tests]
+    os.chdir(cwd)
+    return {start_time: start_time, "tests": tests}
 
 if __name__ == "__main__":
     print(grade("hello.py", [[1,"hello world!\n"], [2,"hello world!\n"*2]], "python2"))

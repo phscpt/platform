@@ -7,10 +7,13 @@ import markdown
 import uuid 
 import hashlib
 import glob
+from sys import argv
 import string
 from datetime import datetime
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, make_response
 app = Flask(__name__)
+
+port = int(argv[1]) if len(argv) > 1 else 5000
 
 max_testcases = 10
 games = []
@@ -120,6 +123,12 @@ def edit():
         return redirect("/list")
     return render_template("edit.html", max_testcases=max_testcases, data=data)
 
+def get_old_results(p: str):
+    cookie = request.cookies.get(f"results_{p}")
+    if cookie is None:
+        return False
+    cookie = json.loads(cookie)
+
 @app.route('/problem', methods=["GET", "POST"])
 def problem():
     p = request.args.get("id")
@@ -142,7 +151,7 @@ def problem():
         results = grader.grade(fname, data["testcases"], lang)
 
         num_ac = 0
-        for res in results:
+        for res in results["tests"]:
             if res[0] == "AC":
                 num_ac += 1
         
@@ -154,26 +163,30 @@ def problem():
                 if game.id == g_id:
                     for pl in game.players:
                         if pl[0] == p_id:
-                            if num_ac == len(results):
+                            if num_ac == len(results["tests"]):
                                 num_points = 100
                             elif num_ac > 1:
-                                num_points = 80 * (num_ac - 1)/(len(results) - 1)
+                                num_points = 80 * (num_ac - 1)/(len(results["tests"]) - 1)
                             else:
                                 num_points = -0.1
                             game.give_points(p_id, p, num_points)
                             pl[3][p] = results
-        return render_template("problem.html", results=results, data=data)
-    g_id = request.args.get("g_id")
-    p_id = request.args.get("player")
-    if (g_id != None) and (p_id != None):
-        for game in games:
-            if game.id == g_id:
-                for pl in game.players:
-                    if pl[0] == p_id:
-                        if p in pl[3]:
-                            return render_template("problem.html", results=pl[3][p], data=data)
-                        return render_template("problem.html", results=False, data=data)
-    return render_template("problem.html", results=False, data=data)
+        response = make_response(render_template("problem.html", results=results, data=data))
+        response.set_cookie(f"results_{p}", json.dumps(results), max_age=60*60*24)
+        return response
+    else:
+        g_id = request.args.get("g_id")
+        p_id = request.args.get("player")
+        if (g_id != None) and (p_id != None):
+            for game in games:
+                if game.id == g_id:
+                    for pl in game.players:
+                        if pl[0] == p_id:
+                            if p in pl[3]:
+                                return render_template("problem.html", results=pl[3][p], data=data)
+                            return render_template("problem.html", results=get_old_results(p), data=data)
+
+        return render_template("problem.html", results=get_old_results(p), data=data)
 
 # GAME CREATION/JOINING
 def random_id():
@@ -270,7 +283,8 @@ def hash_password(password):
 
 def check_password(hashed_password, user_password): 
     password, salt = hashed_password.split(':') 
-    return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
+    actual_pass = hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
+    return password == actual_pass
 
 def is_admin(email, username, hashedPass):
     if email == "jierueic@gmail.com" and username == "knosmos" and check_password("c8cd035724dd2cc48f87c17f21c4cb7f9bdf9cf767bc88e5fcefefbf8f73dd0f:533a7722507f4d1da1bdfca16bf70675", hashedPass):
@@ -424,4 +438,4 @@ def scoreboard_host():
     return "error"
 
 if __name__ == "__main__":
-    app.run("0.0.0.0")
+    app.run("0.0.0.0", port)
