@@ -8,7 +8,7 @@
 </script>
 <button id="scoreboard_button">Back to Scoreboard</button>
 <button id="catalog_button" onclick="location.href='public'">Back to Catalogue</button>
-<script>
+<script defer>
     const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
     });
@@ -24,6 +24,12 @@
         document.getElementById("scoreboard_button").style.display = "none";
         document.getElementById("catalog_button").style.display = "block";
     }
+    
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const resultsHeader = document.getElementById("results");
+        const startTime = {{results.start_time}} * 1000;
+        resultsHeader.innerText += " " + new Date(startTime).toLocaleString();
+    });
 </script>
 <h1>{{ data.title }}</h1>
 <div class="box">
@@ -63,35 +69,35 @@
     </form>
 </div>
 
-<h2>Results</h2>
+<h2 id="results">Results for solution at</h2>
 
 <div class="box">
     {% if results %}
     <div class="grid-tiny">
-        {% for result in results %}
-            {% if result[0] == "AC" %}
+        {% for test in results.tests %}
+            {% if test[0] == "AC" %}
                 <div class="result-box success" title="Accepted">
                     {{ loop.index }} <b>AC</b>
-                    <p>{{ result[1] }}ms</p>
+                    <p>{{ test[1] }}ms</p>
                 </div>
-            {% elif result[0] == "WA" %}
+            {% elif test[0] == "WA" %}
                 <div class="result-box fail" title="Wrong Answer">
-                    {{ loop.index }} <b>{{ result[0] }}</b>
-                    <p>{{ result[1] }}ms</p>
+                    {{ loop.index }} <b>{{ test[0] }}</b>
+                    <p>{{ test[1] }}ms</p>
                 </div>
-            {% elif result[0] == "TLE" %}
+            {% elif test[0] == "TLE" %}
                 <div class="result-box fail" title="Time Limit Exceeded">
-                    {{ loop.index }} <b>{{ result[0] }}</b>
-                    <p>{{ result[1] }}ms</p>
+                    {{ loop.index }} <b>{{ test[0] }}</b>
+                    <p>{{ test[1] }}ms</p>
                 </div>
-            {% elif result[0] == "RE" %}
+            {% elif test[0] == "RE" %}
                 <div class="result-box fail" title="Runtime Error">
-                    {{ loop.index }} <b>{{ result[0] }}</b>
-                    <p>{{ result[1] }}ms</p>
+                    {{ loop.index }} <b>{{ test[0] }}</b>
+                    <p>{{ test[1] }}ms</p>
                 </div>
-            {% elif result[0] == "CE" %}
+            {% elif test[0] == "CE" %}
                 <div class="result-box fail" title="Compilation Error">
-                    {{ loop.index }} <b>{{ result[0] }}</b>
+                    {{ loop.index }} <b>{{ test[0] }}</b>
                     <p>Compile Error</p>
                 </div>
             {% endif %}

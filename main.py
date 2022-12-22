@@ -9,7 +9,7 @@ import hashlib
 import glob
 from sys import argv
 from datetime import datetime
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, make_response
 app = Flask(__name__)
 
 port = int(argv[1]) if len(argv) > 1 else 5000
@@ -140,6 +140,13 @@ def edit():
         return redirect("/list")
     return render_template("edit.html", max_testcases=max_testcases, data=data)
 
+def get_old_results(p: str) -> grader.Results:
+    cookie = request.cookies.get(f"results_{p}")
+    if cookie is None:
+        return False
+    cookie = json.loads(cookie)
+    return grader.Results(cookie["start_time"], cookie["tests"])
+
 @app.route('/problem', methods=["GET", "POST"])
 def problem():
     p = request.args.get("id")
@@ -162,7 +169,7 @@ def problem():
         results = grader.grade(fname, data["testcases"], lang)
 
         num_ac = 0
-        for res in results:
+        for res in results.tests:
             if res[0] == "AC":
                 num_ac += 1
         
@@ -182,18 +189,22 @@ def problem():
                                 num_points = -0.1
                             game.give_points(p_id, p, num_points)
                             pl[3][p] = results
-        return render_template("problem.html", results=results, data=data)
-    g_id = request.args.get("g_id")
-    p_id = request.args.get("player")
-    if (g_id != None) and (p_id != None):
-        for game in games:
-            if game.id == g_id:
-                for pl in game.players:
-                    if pl[0] == p_id:
-                        if p in pl[3]:
-                            return render_template("problem.html", results=pl[3][p], data=data)
-                        return render_template("problem.html", results=False, data=data)
-    return render_template("problem.html", results=False, data=data)
+        response = make_response(render_template("problem.html", results=results, data=data))
+        response.set_cookie(f"results_{p}", json.dumps(results.__dict__), max_age=60*60*24)
+        return response
+    else:
+        g_id = request.args.get("g_id")
+        p_id = request.args.get("player")
+        if (g_id != None) and (p_id != None):
+            for game in games:
+                if game.id == g_id:
+                    for pl in game.players:
+                        if pl[0] == p_id:
+                            if p in pl[3]:
+                                return render_template("problem.html", results=pl[3][p], data=data)
+                            return render_template("problem.html", results=get_old_results(p), data=data)
+
+        return render_template("problem.html", results=get_old_results(p), data=data)
 
 # GAME CREATION/JOINING
 def random_id():
