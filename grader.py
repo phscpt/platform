@@ -82,8 +82,9 @@ def grade(file, tests, language) -> Results:
 
     # execute
     tests = [(n, file, data, solution, language) for n, (data, solution) in enumerate(tests)]
-    
-    tests = get_global_pool().map(test, tests)
+    # TODO: MULTITHREADING COMMENTED OUT HERE
+    # tests = get_global_pool().map(test, tests)
+    tests = list(map(test, tests))
     tests.sort(key=lambda r: r[0])
     tests = [[r[1], r[2]] for r in tests]
     os.chdir(olddir)
