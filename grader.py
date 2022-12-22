@@ -3,14 +3,6 @@ from subprocess import Popen, PIPE
 import time
 from global_pool import get_global_pool
 
-class Results:
-    start_time: int
-    tests: list[str, str]
-
-    def __init__(self, start_time: int, tests: list[str, str]):
-        self.start_time = start_time
-        self.tests = tests
-
 # n, file, data, solution, language
 def test(data: tuple[int, str, str, str, str]) -> tuple[int, str, str]:
     n, file, data, solution, language = data
@@ -49,7 +41,7 @@ def test(data: tuple[int, str, str, str, str]) -> tuple[int, str, str]:
         #print("correct solution:", solution)
         return (n, "WA", time_elapsed)
 
-def grade(file, tests, language) -> Results:
+def grade(file, tests, language):
     # Takes in a filename and testcases and runs it using each test case
     # For each test case:
     #   If the program takes over TIME_LIMIT to execute, it returns "Time Limit Exceeded" for that testcase
@@ -69,7 +61,7 @@ def grade(file, tests, language) -> Results:
         if not os.path.isfile(file.split(".")[0] + ".class"):
             print("java compilation error")
             os.chdir(olddir)
-            return Results(start_time, [["CE", "Compile Error"]])
+            return {start_time: start_time, tests: [["CE", "Compile Error"]]}
         print("java compilation successful")
     elif language == "cpp":
         Popen(["g++", file], stdout=PIPE, stderr=PIPE).communicate()
@@ -77,7 +69,7 @@ def grade(file, tests, language) -> Results:
         if not os.path.isfile("a.out"):
             print("c++ compilation failed")
             os.chdir(olddir)
-            return Results(start_time, [["CE","Compile Error"]])
+            return {start_time: start_time, tests: [["CE", "Compile Error"]]}
         print("cpp compilation successful")
 
     # execute
@@ -88,7 +80,7 @@ def grade(file, tests, language) -> Results:
     tests.sort(key=lambda r: r[0])
     tests = [[r[1], r[2]] for r in tests]
     os.chdir(olddir)
-    return Results(start_time, tests)
+    return {start_time: start_time, "tests": tests}
 
 if __name__ == "__main__":
     print(grade("hello.py", [[1,"hello world!\n"], [2,"hello world!\n"*2]], "python2"))

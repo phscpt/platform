@@ -140,12 +140,11 @@ def edit():
         return redirect("/list")
     return render_template("edit.html", max_testcases=max_testcases, data=data)
 
-def get_old_results(p: str) -> grader.Results:
+def get_old_results(p: str):
     cookie = request.cookies.get(f"results_{p}")
     if cookie is None:
         return False
     cookie = json.loads(cookie)
-    return grader.Results(cookie["start_time"], cookie["tests"])
 
 @app.route('/problem', methods=["GET", "POST"])
 def problem():
@@ -169,7 +168,7 @@ def problem():
         results = grader.grade(fname, data["testcases"], lang)
 
         num_ac = 0
-        for res in results.tests:
+        for res in results["tests"]:
             if res[0] == "AC":
                 num_ac += 1
         
@@ -181,16 +180,16 @@ def problem():
                 if game.id == g_id:
                     for pl in game.players:
                         if pl[0] == p_id:
-                            if num_ac == len(results.tests):
+                            if num_ac == len(results["tests"]):
                                 num_points = 100
                             elif num_ac > 1:
-                                num_points = 80 * (num_ac - 1)/(len(results.tests) - 1)
+                                num_points = 80 * (num_ac - 1)/(len(results["tests"]) - 1)
                             else:
                                 num_points = -0.1
                             game.give_points(p_id, p, num_points)
                             pl[3][p] = results
         response = make_response(render_template("problem.html", results=results, data=data))
-        response.set_cookie(f"results_{p}", json.dumps(results.__dict__), max_age=60*60*24)
+        response.set_cookie(f"results_{p}", json.dumps(results), max_age=60*60*24)
         return response
     else:
         g_id = request.args.get("g_id")
@@ -418,12 +417,7 @@ def get_players():
     id = request.args.get("id")
     for game in games:
         if game.id == id:
-            print(game.players)
-            new_players = []
-            # TODO: THIS IS SO EVIL AND HORRIBLE BUT IT'S HERE BECAUSE THE PLAYERS ARE STORED IN SUCH A SPAGHETTI WAY
-            for player in game.players:
-                new_players.append([player[0], player[1], player[2], {k: r.__dict__ for k, r in player[3].items()}, player[4]])
-            return json.dumps(new_players)
+            return json.dumps(game.players)
     return "error"
 
 # SCOREBOARD
