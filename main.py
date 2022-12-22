@@ -48,7 +48,7 @@ def get_problem_names():
     return problems
 
 def admin_check(req):
-    return (req.cookies.get("userid") == adminPass):
+    return req.cookies.get("userid") == adminPass
 
 @app.route("/list", methods=["GET","POST"])
 def catalogue():
