@@ -3,6 +3,8 @@ from subprocess import Popen, PIPE
 import time
 from global_pool import get_global_pool
 
+cwd = os.getcwd()
+
 # n, file, data, solution, language
 def test(data: tuple[int, str, str, str, str]) -> tuple[int, str, str]:
     n, file, data, solution, language = data
@@ -46,7 +48,6 @@ def grade(file, tests, language):
     #   If the program crashes, it returns "Runtime Error"
     #   Otherwise, it returns "Accepted"
     start_time = time.time()
-    olddir = os.getcwd()
     os.chdir("/".join(file.split("/")[:-1]))
 
     file = file.split("/")[-1]
@@ -57,7 +58,7 @@ def grade(file, tests, language):
         # test if compilation was successful
         if not os.path.isfile(file.split(".")[0] + ".class"):
             print("java compilation error")
-            os.chdir(olddir)
+            os.chdir(cwd)
             return {start_time: start_time, "tests": [["CE", "Compile Error"]]}
         print("java compilation successful")
     elif language == "cpp":
@@ -65,7 +66,7 @@ def grade(file, tests, language):
         # test if compilation was successful
         if not os.path.isfile("a.out"):
             print("c++ compilation failed")
-            os.chdir(olddir)
+            os.chdir(cwd)
             return {start_time: start_time, "tests": [["CE", "Compile Error"]]}
         print("cpp compilation successful")
 
@@ -76,7 +77,7 @@ def grade(file, tests, language):
     tests = list(map(test, tests))
     tests.sort(key=lambda r: r[0])
     tests = [[r[1], r[2]] for r in tests]
-    os.chdir(olddir)
+    os.chdir(cwd)
     return {start_time: start_time, "tests": tests}
 
 if __name__ == "__main__":
