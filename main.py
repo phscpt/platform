@@ -245,7 +245,7 @@ def index():
                     player = game.add_player(name)
                     return redirect(f"/waiting?id={id}&player={player}")
                 elif game.teams:
-                    for player in games.players:
+                    for player in game.players:
                         if player[1] == name:
                             return redirect(f"/waiting?id={id}&player={player[0]}")
     return render_template("index2.html")
@@ -347,8 +347,17 @@ def problem_select():
         return redirect(f"host_waiting?id={game.id}")
     problems = get_problem_names()
     public_problems = []
+    if not admin_check(request):
+        print("not admin")
+        for problem in problems:
+            if problem["status"] == "public":
+                public_problems.append(problem)
+        return render_template("select.html", problems = public_problems)
+    
+    # admins have access to all problems
     for problem in problems:
-        if problem["status"] == "public":
+        print(problem["status"])
+        if problem["status"] == "public" or problem["status"] == "publvate":
             public_problems.append(problem)
     return render_template("select.html", problems = public_problems)
 
