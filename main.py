@@ -179,6 +179,9 @@ def problem():
 def random_id():
     return "".join([random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(6)])
 
+def random_player_id():
+    return "".join([random.choice(string.ascii_uppercase + string.ascii_lowercase + "1234567890") for _ in range(20)])
+
 class Game:
     def __init__(self, problems, totalTime, freezeTime, doTeams):
         self.id = random_id()
@@ -198,7 +201,7 @@ class Game:
         print("created game", self.id)
         print("problems:", problems)
     def add_player(self, name):
-        player_id = random_id()
+        player_id = random_player_id()
         # [player id, player name, score for each problem, results for each problem, time of last successful submission]
         self.players.append([player_id, name, [0] * len(self.problems), {}, 0])
         return player_id
@@ -222,16 +225,9 @@ class Game:
             return -1
         return self.time - (time.time() - self.start_time)
     def is_duplicate_name(self, name):
-        print(name)
-        print(self.players)
-        print("triggered")
         for player in self.players:
-            print(player)
-            print(player[1])
             if name.strip() == player[1].strip():
-                print("true")
                 return True
-        print("false")
         return False
 
 @app.route("/", methods=["GET", "POST"])
@@ -244,9 +240,14 @@ def index():
             return render_template("index.html")
         id = id.rstrip().upper()
         for game in games:
-            if game.id == id and not game.is_duplicate_name(name):
-                player = game.add_player(name)
-                return redirect(f"/waiting?id={id}&player={player}")
+            if game.id == id :
+                if not game.is_duplicate_name(name):
+                    player = game.add_player(name)
+                    return redirect(f"/waiting?id={id}&player={player}")
+                elif game.teams:
+                    for player in games.players:
+                        if player[1] == name:
+                            return redirect(f"/waiting?id={id}&player={player[0]}")
     return render_template("index2.html")
 
 @app.route("/join", methods=["GET", "POST"])
