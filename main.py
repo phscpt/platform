@@ -15,22 +15,9 @@ app = Flask(__name__)
 max_testcases = 10
 games = []
 users = []
-adminPass = result_str = ''.join(random.choice(string.ascii_lowercase) for i in range(40))
+adminPass = ''.join(random.choice(string.ascii_lowercase) for i in range(40))
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
-
-'''
-def get_problems():
-    problem_names = sorted(os.listdir("problems"))
-    problems = []
-    for p in problem_names:
-        if not ".json" in p:
-            continue
-        prob = json.load(open("problems/" + p, encoding='utf-8'))
-        prob["id"] = p.split(".")[0]
-        problems.append(prob)
-    return problems
-'''
 
 def get_problem_names():
     problem_names = os.listdir("problems")
@@ -58,9 +45,7 @@ def get_problem_names():
     return problems
 
 def admin_check(req):
-    if req.cookies.get("userid") == adminPass:
-        return True
-    return False
+    return (req.cookies.get("userid") == adminPass):
 
 @app.route("/list", methods=["GET","POST"])
 def catalogue():
