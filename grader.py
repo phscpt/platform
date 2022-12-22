@@ -9,23 +9,20 @@ def test(data: tuple[int, str, str, str, str]) -> tuple[int, str, str]:
     if language == "python":
         print(f"running {file} (python)")
         process = Popen(["python3", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-        time_start = time.perf_counter_ns()
         TIME_LIMIT = 4
     elif language == "python2":
         print(f"running {file} (python)")
         process = Popen(["python2.7", file], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-        time_start = time.perf_counter_ns()
         TIME_LIMIT = 4
     elif language == "java":
         process = Popen(["java", file.split(".")[0]], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-        time_start = time.perf_counter_ns()
         TIME_LIMIT = 2
     elif language == "cpp":
         process = Popen(["./a.out"], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
-        time_start = time.perf_counter_ns()
         TIME_LIMIT = 1
         
     try:
+        time_start = time.perf_counter_ns()
         output = process.communicate(input = str(data), timeout = TIME_LIMIT)
         time_elapsed = (time.perf_counter_ns() - time_start)//1000000
     except subprocess.TimeoutExpired:
