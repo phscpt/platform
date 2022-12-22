@@ -8,7 +8,7 @@
 </script>
 <button id="scoreboard_button">Back to Scoreboard</button>
 <button id="catalog_button" onclick="location.href='public'">Back to Catalogue</button>
-<script defer>
+<script>
     const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
     });
@@ -24,12 +24,13 @@
         document.getElementById("scoreboard_button").style.display = "none";
         document.getElementById("catalog_button").style.display = "block";
     }
-    
+    {% if results  %}
     window.addEventListener('DOMContentLoaded', (event) => {
         const resultsHeader = document.getElementById("results");
         const startTime = {{results.start_time}} * 1000;
-        resultsHeader.innerText += " " + new Date(startTime).toLocaleString();
+        resultsHeader.innerText = "Results for " + new Date(startTime).toLocaleString();
     });
+    {% endif %}
 </script>
 <h1>{{ data.title }}</h1>
 <div class="box">
@@ -69,7 +70,7 @@
     </form>
 </div>
 
-<h2 id="results">Results for solution at</h2>
+<h2 id="results">Results</h2>
 
 <div class="box">
     {% if results %}

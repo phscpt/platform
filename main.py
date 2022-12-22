@@ -181,10 +181,10 @@ def problem():
                 if game.id == g_id:
                     for pl in game.players:
                         if pl[0] == p_id:
-                            if num_ac == len(results):
+                            if num_ac == len(results.tests):
                                 num_points = 100
                             elif num_ac > 1:
-                                num_points = 80 * (num_ac - 1)/(len(results) - 1)
+                                num_points = 80 * (num_ac - 1)/(len(results.tests) - 1)
                             else:
                                 num_points = -0.1
                             game.give_points(p_id, p, num_points)
@@ -418,7 +418,12 @@ def get_players():
     id = request.args.get("id")
     for game in games:
         if game.id == id:
-            return json.dumps(game.players)
+            print(game.players)
+            new_players = []
+            # TODO: THIS IS SO EVIL AND HORRIBLE BUT IT'S HERE BECAUSE THE PLAYERS ARE STORED IN SUCH A SPAGHETTI WAY
+            for player in game.players:
+                new_players.append([player[0], player[1], player[2], {k: r.__dict__ for k, r in player[3].items()}, player[4]])
+            return json.dumps(new_players)
     return "error"
 
 # SCOREBOARD
