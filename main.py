@@ -8,6 +8,7 @@ import uuid
 import hashlib
 import glob
 from sys import argv
+import string
 from datetime import datetime
 from flask import Flask, request, render_template, redirect, make_response
 app = Flask(__name__)
@@ -17,22 +18,9 @@ port = int(argv[1]) if len(argv) > 1 else 5000
 max_testcases = 10
 games = []
 users = []
-adminPass = []
+adminPass = ''.join(random.choice(string.ascii_lowercase) for i in range(40))
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
-
-'''
-def get_problems():
-    problem_names = sorted(os.listdir("problems"))
-    problems = []
-    for p in problem_names:
-        if not ".json" in p:
-            continue
-        prob = json.load(open("problems/" + p, encoding='utf-8'))
-        prob["id"] = p.split(".")[0]
-        problems.append(prob)
-    return problems
-'''
 
 def get_problem_names():
     problem_names = os.listdir("problems")
@@ -60,12 +48,7 @@ def get_problem_names():
     return problems
 
 def admin_check(req):
-    for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.      
-        with open(filename, encoding='utf-8') as currentFile:
-            data = json.load(currentFile)
-            if req.cookies.get("userid") == data[3] and data[4]:
-                return data
-    return False
+    return (req.cookies.get("userid") == adminPass):
 
 @app.route("/list", methods=["GET","POST"])
 def catalogue():
@@ -341,7 +324,7 @@ def log_in():
                     data = json.load(currentFile)
                     if is_account(data, emailUsername, password):
 
-                        userID = data[3]
+                        userID = adminPass
                         isAdmin = data[4]
                         
                         return render_template(
