@@ -2,6 +2,8 @@ import subprocess, os
 from subprocess import Popen, PIPE
 import time
 
+olddir = os.getcwd()
+
 def grade(file, tests, language):
     # Takes in a filename and testcases and runs it using each test case
     # For each test case:
@@ -11,7 +13,8 @@ def grade(file, tests, language):
     #   Otherwise, it returns "Accepted"
 
     results = []
-    olddir = os.getcwd()
+    
+    os.chdir(olddir)
     os.chdir("/".join(file.split("/")[:-1]))
 
     file = file.split("/")[-1]
