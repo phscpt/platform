@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
-        <link rel="stylesheet" href="static/style.css">
+        <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+        <link id="custom_css" rel="stylesheet" href="static/style.css">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>PHSCPT Practice Platform</title>
@@ -11,6 +11,8 @@
     <body>
         <br>
         <a href="/"><img src="static/logo_christmas.png" style="width: 30%"></a>
+        <br>
+        <a onclick="switchColorMode()">[switch color mode]</a>
         <h2>Practice Contest Platform</h2>
         {% block content %}{% endblock %}
     </body>
@@ -18,11 +20,34 @@
     <script>
         snowStorm.excludeMobile = false;
         snowStorm.followMouse = false;
-        snowStorm.snowColor = '#dcebfc'; //give the snowflakes another colour
-        snowStorm.snowStick = true; //if true, the snow will stick to the bottom of the screen
+        snowStorm.snowCharacter = '&#10052;'; //snowflake character
+        snowStorm.snowColor = '#9a9ea1'; //give the snowflakes another colour
+        snowStorm.snowStick = false; //if true, the snow will stick to the bottom of the screen
         snowStorm.animationInterval = 30; //milliseconds per frame, the higher the less CPU load
         snowStorm.flakesMaxActive = 30; //maximum number of active snow flakes, the lower the less CPU/GPU is needed to draw them
         snowStorm.freezeOnBlur = true; //recommended: stops the snow effect when the user switches to another tab or window
         snowStorm.usePositionFixed = true; //if the user scrolls, the snow is not affected by the window scroll. Disable to prevent extra CPU load
+        snowStorm.vMaxX = 5;
+        snowStorm.vMaxY = 2;
+        snowStorm.flakeWidth = 20;
+        snowStorm.flakeHeight = 20;
+    </script>
+    <script>
+        let mode = parseInt(localStorage.getItem("mode") * -1) || -1;
+        let messages = ["Are you sure you want to join the dark side?", "smh using dark mode", "Do you want to make text less readable?"];
+        function switchColorMode() {
+            if (mode == 1) {
+                alert(messages[Math.floor(Math.random() * messages.length)]);
+                document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css";
+                document.getElementById("custom_css").href = "static/style_dark.css";
+            }
+            else {
+                document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/light.css";
+                document.getElementById("custom_css").href = "static/style.css";
+            }
+            mode *= -1;
+            localStorage.setItem("mode", mode);
+        }
+        switchColorMode();
     </script>
 </html>

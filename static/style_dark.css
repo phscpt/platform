@@ -1,0 +1,176 @@
+/* OVERALL */
+
+p, ul, pre, h3 {
+    font-size: 1.1em;
+}
+
+#main {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 30px;
+}
+
+@media screen and (max-width: 600px) {
+    #main {
+        display: block;
+    }
+    #logo-main {
+        width: 50%;
+    }
+}
+
+/* ELEMENTS */
+
+img {
+    filter: drop-shadow(0px 0px 10px rgb(21, 33, 58));
+}
+
+img:hover {
+    filter: drop-shadow(0px 0px 10px rgb(19, 24, 63));
+}
+
+a {
+    cursor: pointer;
+}
+
+/* CONTAINER */
+.grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.grid-mini {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.grid-tiny {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+.box {
+    border: 1px solid rgb(194, 194, 194);
+    box-shadow: 5px 5px 15px rgb(31, 27, 55);
+    border-radius: 5px;
+    padding: 10px;
+}
+.box button, .box input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input {
+    border: 1px solid #d6d6d6;
+}
+
+button, input[type="submit"], select {
+    background-color: #700447;
+    border: 1px solid var(--button-hover);
+    box-shadow: 5px 5px 15px rgb(31, 27, 55);
+}
+button.button-emphasis, input.button-emphasis {
+    color: rgb(255, 255, 255);
+    background:#324376 !important; 
+    border:1px solid #12182b;
+    cursor:pointer;
+}
+button.button-emphasis:hover, input.button-emphasis:hover {
+    background:#1d2a54 !important;
+}
+
+.result-box {
+    border: 1px solid black;
+    box-shadow: 5px 5px 15px rgb(240, 240, 240);
+    border-radius: 3px;
+    padding: 10px;
+    text-align: center;
+    font-size: 16pt;
+}
+.result-box p {
+    margin: 0px;
+}
+
+/* FILE INPUTS AUGH WHY IS THIS SO HARD */
+input[type="file"] {
+    background-color: transparent;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 0px;
+    border: none;
+}
+::-webkit-file-upload-button, ::file-selector-button {
+    color: #1d1d1d;
+    color: var(--form-text);
+    background-color: #efefef;
+    background-color: var(--background);
+    font-family: inherit;
+    font-size: inherit;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    padding: 10px;
+    border: 1px solid var(--button-hover);
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    transition: 0.1s all;
+}
+
+::-webkit-file-upload-button:hover, ::file-selector-button:hover {
+    background: #9b9b9b;
+    background: var(--button-hover);
+}
+
+/* PRACTICE PLATFORM */
+table {
+    border-collapse: collapse;
+}
+td, th {
+    text-align: center;
+}
+.fail {
+    background-color: rgba(255, 83, 83, 0.5);
+    border-color: rgb(255, 83, 83);
+}
+.success {
+    background-color: rgba(81, 204, 85, 0.5);
+    border-color: rgba(81, 204, 85);
+}
+.partial {
+    background-color: #e6ab2192;
+}
+
+.autocomplete-suggestion {
+    cursor: pointer;
+    border: 2px solid #cecece;
+    border-radius:5px;
+    margin-top:3px;
+    margin-bottom: 8px;
+    margin-right: 3px;
+    display: inline-block;
+    padding:5px;
+}
+
+#panic-inducer {
+    pointer-events: none;
+    position:fixed;
+    left:0;
+    top:0;
+    width:100vw;
+    height:100vh;
+    background-color:red;
+    opacity:0;
+    /*transition: 0.5s all;*/
+}
+
+.absolute-button {
+    position: absolute;
+}
+
+@media screen and (max-width: 600px) {
+    .absolute-button {
+        position: relative;
+        top: 0px !important;
+        left: 0px !important;
+    }
+}
