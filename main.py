@@ -122,10 +122,15 @@ def edit():
 
 @app.route('/problem', methods=["GET", "POST"])
 def problem():
+    # Get problem id
     p = request.args.get("id")
+
+    # Load problem description + convert to html
     with open("problems/" + p + ".json", encoding='utf-8') as f:
         data = json.load(f)
-        data["description"] = markdown.markdown(data["description"])
+        data["description"] = markdown.markdown(data["description"], extensions=['fenced_code'])
+    
+    # Run grader if problem is submitted
     if request.method == "POST":
         file = request.files['file']
         print(f"received problem submission for {p}:", file.filename)
@@ -146,6 +151,7 @@ def problem():
             if res[0] == "AC":
                 num_ac += 1
         
+        # give points to player if playing a game
         g_id = request.args.get("g_id")
         p_id = request.args.get("player")
         if (g_id != None) and (p_id != None):

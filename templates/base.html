@@ -33,10 +33,16 @@
         snowStorm.flakeHeight = 20;
     </script>
     <script>
-        let mode = parseInt(localStorage.getItem("mode") * -1) || -1;
+        let mode = parseInt(localStorage.getItem("mode")) || 1;
         let messages = ["Are you sure you want to join the dark side?", "smh using dark mode", "Do you want to make text less readable?"];
         function switchColorMode() {
-            if (mode == 1) {
+            mode *= -1;
+            localStorage.setItem("mode", mode);
+            setColorMode();
+        }
+
+        function setColorMode() {
+            if (mode == -1) {
                 alert(messages[Math.floor(Math.random() * messages.length)]);
                 document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css";
                 document.getElementById("custom_css").href = "static/style_dark.css";
@@ -44,10 +50,11 @@
             else {
                 document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/light.css";
                 document.getElementById("custom_css").href = "static/style.css";
-            }
-            mode *= -1;
-            localStorage.setItem("mode", mode);
+            }            
         }
-        switchColorMode();
+
+        if (mode == -1) {
+            setColorMode();
+        }
     </script>
 </html>
