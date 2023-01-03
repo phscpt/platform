@@ -18,8 +18,17 @@ users = []
 adminPass = ''.join(random.choice(string.ascii_lowercase) for i in range(40))
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
+def sortByDifficulty(x):
+    # comparator used to sort problems in increasing difficulty
+    mapping = {
+        "trivial": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4
+    }
+    if "difficulty" in x and x["difficulty"] in mapping:
+        return mapping[x["difficulty"].lower()]
+    return 5
 
 def get_problem_names():
+    # Get all problems, in sorted order
     problem_names = os.listdir("problems")
     problems = []
     for p in problem_names:
@@ -38,10 +47,7 @@ def get_problem_names():
             new_prob["tags"] = prob["tags"]
         problems.append(new_prob)
     problems.sort(key = lambda x: x["title"])
-    problems.sort(key = lambda x:
-        {
-            "trivial": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4
-        }[x["difficulty"].lower()] if "difficulty" in x else 5)
+    problems.sort(key = sortByDifficulty)
     return problems
 
 def admin_check(req):
@@ -236,6 +242,7 @@ class Game:
                 return True
         return False
 
+# MAIN
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -256,6 +263,12 @@ def index():
                             return redirect(f"/waiting?id={id}&player={player[0]}")
     return render_template("index2.html")
 
+# ABOUT
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+# JOIN
 @app.route("/join", methods=["GET", "POST"])
 def join():
     id = request.args.get("id")

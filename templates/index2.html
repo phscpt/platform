@@ -86,7 +86,16 @@
         updateLogInOut();
     }
 </script>
-<br><br>
-<footer>Made by <a href="https://jierueichang.github.io" style="color:var(--text-muted);">Jieruei Chang</a> and <a href="https://nicholashagedorn.com" style="color:var(--text-muted);">Nick Hagedorn</a></footer>
+<br>
+<footer>
+    Made by <a href="https://jierueichang.github.io" style="color:var(--text-muted);">Jieruei Chang</a> and <a href="https://nicholashagedorn.com" style="color:var(--text-muted);">Nick Hagedorn</a>
+    •
+    <a href="about" style="color:var(--text-muted);">About</a>
+    <br>
+    Copyright © <span id="year"></span> PHS Competitive Programming Team
+</footer>
+<script>
+    document.getElementById("year").innerHTML = new Date().getFullYear();
+</script>
 <br>
 {% endblock %}
