@@ -23,7 +23,7 @@ def sortByDifficulty(x):
     mapping = {
         "trivial": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4
     }
-    if "difficulty" in x and x["difficulty"] in mapping:
+    if "difficulty" in x and x["difficulty"].lower() in mapping:
         return mapping[x["difficulty"].lower()]
     return 5
 
