@@ -8,6 +8,10 @@ p, li, pre, h3 {
     font-size: 18px;
 }
 
+p {
+    line-height: 28px;
+}
+
 #main {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
