@@ -7,7 +7,8 @@ https://phscpt.pythonanywhere.com
 - [x] Hosting contests, with live-updating scoreboards
 - [x] Intuitive problem-setting interface
 - [x] Grader support for Python, Java and C++
-- [ ] Persistent Scoreboards across system restarts
+- [x] Persistent Scoreboards across system restarts
+- [ ] Client-side storage of problem results
 - [ ] Future support for user accounts
 
 ## Dependencies

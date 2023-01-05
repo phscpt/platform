@@ -8,6 +8,7 @@ import uuid
 import hashlib
 import glob
 import string
+import pickle
 from datetime import datetime
 from flask import Flask, request, render_template, redirect
 app = Flask(__name__)
@@ -212,14 +213,17 @@ class Game:
         self.problems = [problem.rstrip() for problem in problems]
         print("created game", self.id)
         print("problems:", problems)
+        save_game()
     def add_player(self, name):
         player_id = random_player_id()
         # [player id, player name, score for each problem, results for each problem, time of last successful submission]
         self.players.append([player_id, name, [0] * len(self.problems), {}, 0])
+        save_game()
         return player_id
     def start(self):
         self.status = "started"
         self.start_time = time.time()
+        save_game()
     def give_points(self, player, problem, points):
         problem_index = self.problems.index(problem)
         for pl in self.players:
@@ -232,6 +236,7 @@ class Game:
                     pl[2][problem_index] = points
                     if points > 0:
                         pl[4] = time.time()
+        save_game()
     def time_remaining(self):
         if self.time == -1:
             return -1
@@ -241,6 +246,10 @@ class Game:
             if name.strip() == player[1].strip():
                 return True
         return False
+
+def save_game():
+    with open(GAME_FILE, "wb") as f:
+        pickle.dump(games, f)
 
 # MAIN
 @app.route("/", methods=["GET", "POST"])
@@ -451,6 +460,17 @@ def scoreboard_host():
                 time = game.time_remaining()
             )
     return "error"
+
+# Load games
+GAME_FILE = "games/game.pkl"
+if os.path.exists(GAME_FILE):
+    with open(GAME_FILE, "rb") as f:
+        games = pickle.load(f)
+running_games = []
+for game in games:
+    if game.time_remaining() >= -1:
+        running_games.append(game)
+games = running_games
 
 if __name__ == "__main__":
     app.run("0.0.0.0")

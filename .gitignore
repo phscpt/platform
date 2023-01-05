@@ -1,6 +1,11 @@
 __pycache__/
 *.py[cod]
-tmp/*
-problems/*
-!tmp/readme.txt
 .DS_Store
+
+tmp/*
+!tmp/readme.txt
+
+problems/*
+
+games/*
+!games/readme.txt

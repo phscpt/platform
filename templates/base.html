@@ -44,9 +44,10 @@
 
         function setColorMode() {
             if (mode == -1) {
-                alert(messages[Math.floor(Math.random() * messages.length)]);
-                document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css";
-                document.getElementById("custom_css").href = "static/style_dark.css";
+                if (confirm(messages[Math.floor(Math.random() * messages.length)])) {
+                    document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css";
+                    document.getElementById("custom_css").href = "static/style_dark.css";                    
+                }
             }
             else {
                 document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/light.css";
