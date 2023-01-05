@@ -1,20 +1,14 @@
 /* OVERALL */
-
-@font-face {
-    font-family: "Inter";
-    src: url("Inter-VariableFont_slnt\,wght.ttf");
-}
-
 body {
-    font-family: "Inter";
+    font-family: 'Asap', sans-serif;
 }
 
-p, li, pre, h3 {
-    font-size: 18px;
+h1, h2 {
+    font-weight: lighter;
 }
 
-p {
-    line-height: 28px;
+h3 {
+    letter-spacing: 1px;
 }
 
 #main {
