@@ -4,6 +4,15 @@ html, body {
     background: rgb(250, 250, 250);
 }
 
+@font-face {
+    font-family: "Inter";
+    src: url("Inter-VariableFont_slnt\,wght.ttf");
+}
+
+body {
+    font-family: "Inter";
+}
+
 p, li, pre, h3 {
     font-size: 18px;
 }

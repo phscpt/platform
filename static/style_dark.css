@@ -1,7 +1,20 @@
 /* OVERALL */
 
-p, ul, pre, h3 {
-    font-size: 1.1em;
+@font-face {
+    font-family: "Inter";
+    src: url("Inter-VariableFont_slnt\,wght.ttf");
+}
+
+body {
+    font-family: "Inter";
+}
+
+p, li, pre, h3 {
+    font-size: 18px;
+}
+
+p {
+    line-height: 28px;
 }
 
 #main {
