@@ -1,0 +1,1 @@
+This holds the game file as sort of an adhoc database, allowing for persistent storage of game states even in the event of server crashes.
