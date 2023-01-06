@@ -48,6 +48,10 @@
                     document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css";
                     document.getElementById("custom_css").href = "static/style_dark.css";                    
                 }
+                else {
+                    mode = 1;
+                    localStorage.setItem("mode", mode);
+                }
             }
             else {
                 document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/light.css";
