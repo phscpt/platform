@@ -10,6 +10,7 @@ import glob
 import string
 import pickle
 from datetime import datetime
+import traceback
 from flask import Flask, request, render_template, redirect
 app = Flask(__name__)
 
@@ -311,7 +312,8 @@ def is_admin(email, username, hashedPass):
 
 def is_account(cred, email_or_username, password):
     return check_password( cred[2], password) and (email_or_username == cred[0] or email_or_username == cred[1])
-    
+
+# This class is unused; it remains in the code in case user accounts are implented in the future
 class User:
     def __init__(self, email, username, password):
         self.user_ID = str(id(str(email)+str(username)+str(hash_password(password))))
@@ -460,6 +462,20 @@ def scoreboard_host():
                 time = game.time_remaining()
             )
     return "error"
+
+# ERROR PAGES
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html', data = traceback.format_exc()), 500
+
+@app.route("/crash")
+def crash():
+    raise Exception("Intentional crash tester function triggered")
+    return
 
 # Load games
 GAME_FILE = "games/game.pkl"

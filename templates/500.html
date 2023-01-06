@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>500</h1>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+</script>
+<h2>Internal Server Error</h2>
+<p>We've crashed the website. Don't worry, $N$ $(1\leq N\leq 10^5)$ highly intelligent monkeys with typewriters are doing the best they can to resolve the situation.</p>
+<pre>
+<code>
+                        .="=.
+                      _/.-.-.\_     _
+                     ( ( o o ) )    ))
+                      |/  "  \|    //
+      .-------.        \'---'/    //
+     _|~~ ~~  |_       /`"""`\\  ((
+   =(_|_______|_)=    / /_,_\ \\  \\
+     |:::::::::|      \_\\_'__/ \  ))
+     |:::::::[]|       /`  /`~\  |//
+     |o=======.|      /   /    \  /
+     `"""""""""`  ,--`,--'\/\    /
+                   '-- "--'  '--'
+</code>
+</pre>
+
+<h4>Error details:</h4>
+<pre>
+<code>
+{{ data }}
+</code>
+</pre>
+{% endblock %}
