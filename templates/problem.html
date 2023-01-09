@@ -49,6 +49,23 @@
                     }
                     document.getElementById("language").options[i].selected = true;
                 }
+
+                function copyToClipboard(text) {
+                    var textarea = document.createElement("textarea");
+                    textarea.textContent = text;
+                    textarea.style.position = "fixed";
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textarea);
+                }
+                
+                // copy function for input/output
+                for (codeblock of document.getElementsByTagName("pre")) {
+                    codeblock.onclick = function() {
+                        copyToClipboard(this.innerText);
+                    }.bind(codeblock);
+                }
             </script>
             <div style="text-align:right;">
                 <select name="language" id="language" style="display:inline-block;width:auto;margin-right:0px" required>

@@ -181,3 +181,18 @@ td, th {
         left: 0px !important;
     }
 }
+
+/* Copy Paste button */
+pre>code {
+    position: relative;
+    cursor: pointer;
+}
+
+pre>code::before {
+    content: "click to copy";
+    display: block;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-style: italic;
+    text-align: right;
+}
