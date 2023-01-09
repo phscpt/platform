@@ -134,9 +134,12 @@ def problem():
     p = request.args.get("id")
 
     # Load problem description + convert to html
-    with open("problems/" + p + ".json", encoding='utf-8') as f:
-        data = json.load(f)
-        data["description"] = markdown.markdown(data["description"], extensions=['fenced_code'])
+    try:
+        with open("problems/" + p + ".json", encoding='utf-8') as f:
+            data = json.load(f)
+            data["description"] = markdown.markdown(data["description"], extensions=['fenced_code'])
+    except:
+        return render_template('404.html'), 404
     
     # Run grader if problem is submitted
     if request.method == "POST":
