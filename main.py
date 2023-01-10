@@ -11,7 +11,7 @@ import string
 import pickle
 from datetime import datetime
 import traceback
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, abort
 app = Flask(__name__)
 
 max_testcases = 10
@@ -59,7 +59,7 @@ def admin_check(req):
 def catalogue():
     if admin_check(request):
         return render_template("list.html", problems = get_problem_names())
-    return "You are not authorized to access this page."
+    abort(401)
 
 @app.route("/public", methods=["GET","POST"])
 def public_catalogue():
@@ -69,7 +69,7 @@ def public_catalogue():
 def upload():
     # ensure only admin can access this page
     if not admin_check(request):
-        return "You are not authorized to access this page."
+        abort(401)
 
     if request.method == "POST":
         id = request.form["id"]
@@ -100,7 +100,7 @@ def upload():
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
     if not admin_check(request):
-        return "You are not authorized to access this page."
+        abort(401)
     p = request.args.get("id")
     with open("problems/" + p + ".json", encoding='utf-8') as f:
         data = json.load(f)
@@ -139,7 +139,7 @@ def problem():
             data = json.load(f)
             data["description"] = markdown.markdown(data["description"], extensions=['fenced_code'])
     except:
-        return render_template('404.html'), 404
+        abort(404)
     
     # Run grader if problem is submitted
     if request.method == "POST":
@@ -451,6 +451,7 @@ def scoreboard():
                         freezeTime = game.freeze,
                         time = game.time_remaining()
                     )
+    abort(404)
 
 @app.route("/host_scoreboard", methods=["GET"])
 def scoreboard_host():
@@ -464,7 +465,7 @@ def scoreboard_host():
                 freezeTime = game.freeze,
                 time = game.time_remaining()
             )
-    return "error"
+    abort(404)
 
 # ERROR PAGES
 @app.errorhandler(404)
@@ -474,6 +475,10 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html', data = traceback.format_exc()), 500
+
+@app.errorhandler(401)
+def unauthorized(e):
+    return render_template('401.html'), 401
 
 @app.route("/crash")
 def crash():
