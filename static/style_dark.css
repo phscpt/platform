@@ -192,6 +192,9 @@ pre>code::before {
     content: "click to copy";
     display: block;
     color: var(--text-muted);
+    position: absolute;
+    top: 4px;
+    right: 6px;
     font-size: 10px;
     font-style: italic;
     text-align: right;
