@@ -200,7 +200,7 @@ def random_player_id():
     return "".join([random.choice(string.ascii_uppercase + string.ascii_lowercase + "1234567890") for _ in range(20)])
 
 class Game:
-    def __init__(self, problems, totalTime, freezeTime, doTeams):
+    def __init__(self, problems, totalTime, tst, doTeams):
         self.id = random_id()
         self.players = []
         self.status = "waiting"
@@ -209,11 +209,12 @@ class Game:
             self.time = int(totalTime) * 60
         except:
             self.time = -1
-        try:
-            self.freeze = int(freezeTime) * 60
-        except:
-            self.freeze = 0
         self.teams = doTeams
+        if tst == "on":
+            self.tst = "true"
+        else:
+            self.tst = "false"
+        print(self.tst)
         self.problems = [problem.rstrip() for problem in problems]
         print("created game", self.id)
         print("problems:", problems)
@@ -375,7 +376,9 @@ def sign_up():
 @app.route("/select", methods=["GET", "POST"])
 def problem_select():
     if request.method == "POST":
-        game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form["freezer"], request.form.get("teams"))
+        print("value is")
+        print(request.form.get("tst"))
+        game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form.get("tst"), request.form.get("teams"))
         games.append(game)
         return redirect(f"host_waiting?id={game.id}")
     problems = get_problem_names()
@@ -448,7 +451,7 @@ def scoreboard():
                         player = player,
                         player_name = p[1],
                         problems = game.problems,
-                        freezeTime = game.freeze,
+                        tst = game.tst,
                         time = game.time_remaining()
                     )
     abort(404)
@@ -462,7 +465,7 @@ def scoreboard_host():
                 "host_scoreboard.html",
                 id = id,
                 problems = game.problems,
-                freezeTime = game.freeze,
+                tst = game.tst,
                 time = game.time_remaining()
             )
     abort(404)

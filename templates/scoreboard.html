@@ -18,6 +18,7 @@
 <h2 style="position:fixed;right:40px;bottom:20px;box-sizing:border-box">{{ player_name }}</h2>
 <script>
     let duration = parseInt("{{ time | safe }}");
+    let tst = "{{ tst | safe}}";
     let timerActive = (duration != -1);
     let totalTime = duration;
 
@@ -65,6 +66,14 @@
                         }
                         else{
                             rank = i+1;
+                        }
+
+                        if (tst == "true" && players[i][1] != "{{ player_name | safe}}"){
+                            continue;
+                        }
+
+                        if (tst == "true"){
+                            rank = "?";
                         }
 
                         let row = document.createElement("tr");
