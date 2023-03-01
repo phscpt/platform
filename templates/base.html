@@ -11,13 +11,13 @@
     </head>
     <body>
         <br>
-        <a href="/"><img src="static/logo_christmas.png" style="width: 30%"></a>
+        <a href="/"><img src="static/logo.png" style="width: 30%"></a>
         <br>
         <a onclick="switchColorMode()">[switch color mode]</a>
         <h2>Practice Contest Platform</h2>
         {% block content %}{% endblock %}
     </body>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
     <script>
         snowStorm.excludeMobile = false;
         snowStorm.followMouse = false;
@@ -32,7 +32,7 @@
         snowStorm.vMaxY = 2;
         snowStorm.flakeWidth = 20;
         snowStorm.flakeHeight = 20;
-    </script>
+    </script>-->
     <script>
         let mode = parseInt(localStorage.getItem("mode")) || 1;
         let messages = ["Are you sure you want to join the dark side?", "smh using dark mode", "Do you want to make text less readable?", "Every time you use dark mode, you break Jieruei's heart", "Once you start down the dark path, forever it will dominate your destiny.", "The dark side clouds everything."];
