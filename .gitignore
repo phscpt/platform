@@ -9,3 +9,5 @@ problems/*
 
 games/*
 !games/readme.txt
+
+SECRET.txt

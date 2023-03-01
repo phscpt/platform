@@ -17,7 +17,7 @@ app = Flask(__name__)
 max_testcases = 10
 games = []
 users = []
-adminPass = ''.join(random.choice(string.ascii_lowercase) for i in range(40))
+adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 def sortByDifficulty(x):
