@@ -8,12 +8,8 @@ body {
     font-family: 'Asap', sans-serif;
 }
 
-h1, h2 {
+h1, h2, h3 {
     font-weight: lighter;
-}
-
-h3 {
-    letter-spacing: 1px;
 }
 
 #main {
