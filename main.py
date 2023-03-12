@@ -493,11 +493,14 @@ GAME_FILE = "games/game.pkl"
 if os.path.exists(GAME_FILE):
     with open(GAME_FILE, "rb") as f:
         games = pickle.load(f)
+
+''' # Uncomment to remove old games
 running_games = []
 for game in games:
     if game.time_remaining() >= -1:
         running_games.append(game)
 games = running_games
+'''
 
 if __name__ == "__main__":
     app.run("0.0.0.0")
