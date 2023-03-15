@@ -230,6 +230,8 @@ class Game:
         self.start_time = time.time()
         save_game()
     def give_points(self, player, problem, points):
+        if self.time_remaining() < -1:
+            return
         problem_index = self.problems.index(problem)
         for pl in self.players:
             if pl[0] == player:
