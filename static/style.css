@@ -1,11 +1,16 @@
 /* OVERALL */
 
-html, body {
+html {
     background: rgb(250, 250, 250);
+    background-image: url("emblem.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 
 body {
     font-family: 'Asap', sans-serif;
+    background: transparent;
 }
 
 h1, h2, h3 {
@@ -59,7 +64,7 @@ a {
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 }
 .box {
-    background-color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.695);
     border: 1px solid rgb(194, 194, 194);
     box-shadow: 5px 5px 15px rgb(240, 240, 240);
     border-radius: 8px;
