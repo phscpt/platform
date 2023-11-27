@@ -17,7 +17,7 @@
         <h2>Practice Contest Platform</h2>
         {% block content %}{% endblock %}
     </body>
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
     <script>
         snowStorm.excludeMobile = false;
         snowStorm.followMouse = false;
@@ -25,14 +25,14 @@
         snowStorm.snowColor = '#9a9ea1'; //give the snowflakes another colour
         snowStorm.snowStick = false; //if true, the snow will stick to the bottom of the screen
         snowStorm.animationInterval = 30; //milliseconds per frame, the higher the less CPU load
-        snowStorm.flakesMaxActive = 30; //maximum number of active snow flakes, the lower the less CPU/GPU is needed to draw them
+        snowStorm.flakesMaxActive = 10; //maximum number of active snow flakes, the lower the less CPU/GPU is needed to draw them
         snowStorm.freezeOnBlur = true; //recommended: stops the snow effect when the user switches to another tab or window
         snowStorm.usePositionFixed = true; //if the user scrolls, the snow is not affected by the window scroll. Disable to prevent extra CPU load
         snowStorm.vMaxX = 5;
         snowStorm.vMaxY = 2;
         snowStorm.flakeWidth = 20;
         snowStorm.flakeHeight = 20;
-    </script>-->
+    </script>
     <script>
         let mode = parseInt(localStorage.getItem("mode")) || 1;
         let messages = ["Are you sure you want to join the dark side?", "smh using dark mode", "Do you want to make text less readable?", "Every time you use dark mode, you break Jieruei's heart", "Once you start down the dark path, forever it will dominate your destiny.", "The dark side clouds everything."];
