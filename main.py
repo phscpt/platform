@@ -4,7 +4,7 @@ import os
 import random
 import time
 import markdown
-import uuid 
+import uuid
 import hashlib
 import glob
 import string
@@ -140,7 +140,7 @@ def problem():
             data["description"] = markdown.markdown(data["description"], extensions=['fenced_code'])
     except:
         abort(404)
-    
+
     # Run grader if problem is submitted
     if request.method == "POST":
         file = request.files['file']
@@ -161,7 +161,7 @@ def problem():
         for res in results:
             if res[0] == "AC":
                 num_ac += 1
-        
+
         # give points to player if playing a game
         g_id = request.args.get("g_id")
         p_id = request.args.get("player")
@@ -172,7 +172,7 @@ def problem():
                     for pl in game.players:
                         if pl[0] == p_id:
                             if num_ac == len(results):
-                                num_points = 99
+                                num_points = 999
                             elif num_ac > 1:
                                 num_points = 80 * (num_ac - 1)/(len(results) - 1)
                             else:
@@ -301,11 +301,11 @@ def join():
     return render_template("join.html", id=id)
 
 def hash_password(password):
-    salt = uuid.uuid4().hex 
+    salt = uuid.uuid4().hex
     return hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
 
-def check_password(hashed_password, user_password): 
-    password, salt = hashed_password.split(':') 
+def check_password(hashed_password, user_password):
+    password, salt = hashed_password.split(':')
     return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
 
 def is_admin(email, username, hashedPass):
@@ -313,7 +313,7 @@ def is_admin(email, username, hashedPass):
         return True
     if email == "nicholas.d.hagedorn@gmail.com" and username == "Nickname" and check_password("6d6438706baee7793b76597a15628859cf9b47c0097f814d06187247d120ceb7:6316c3b35173482db353c2a2baa8301e", hashedPass):
         return True
-    
+
     return False
 
 def is_account(cred, email_or_username, password):
@@ -324,14 +324,14 @@ class User:
     def __init__(self, email, username, password):
         self.user_ID = str(id(str(email)+str(username)+str(hash_password(password))))
         self.isAdmin = is_admin(email, username, password)
-        self.credentials = [email, username, hash_password(password), self.user_ID, self.isAdmin] 
-    
+        self.credentials = [email, username, hash_password(password), self.user_ID, self.isAdmin]
+
     def is_repeat(self, users):
         for otherUser in users:
             if otherUser.credentials[0] == self.credentials[0] or otherUser.credentials[1] == self.credentials[1]:
                 return True
         return False
-    
+
     def store_account(self):
         open("users/" + self.user_ID + ".json", "w", encoding='utf-8').write(json.dumps(self.credentials))
 
@@ -341,15 +341,15 @@ def log_in():
         try:
             emailUsername = request.form["emailUsername"].strip()
             password = request.form["password"].strip()
-            
-            for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.      
+
+            for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.
                 with open(filename, encoding='utf-8') as currentFile:
                     data = json.load(currentFile)
                     if is_account(data, emailUsername, password):
 
                         userID = adminPass
                         isAdmin = data[4]
-                        
+
                         return render_template(
                             "log_in.html",
                             admin = isAdmin,
@@ -391,7 +391,7 @@ def problem_select():
             if problem["status"] == "public":
                 public_problems.append(problem)
         return render_template("select.html", problems = public_problems)
-    
+
     # admins have access to all problems
     for problem in problems:
         print(problem["status"])
