@@ -172,7 +172,7 @@ def problem():
                     for pl in game.players:
                         if pl[0] == p_id:
                             if num_ac == len(results):
-                                num_points = 123456789
+                                num_points = 345
                             elif num_ac > 1:
                                 num_points = 80 * (num_ac - 1)/(len(results) - 1)
                             else:
