@@ -491,7 +491,7 @@ def crash():
     return
 
 # Load games
-GAME_FILE = "games/game.pkl"
+GAME_FILE = "games/game1.pkl"
 if os.path.exists(GAME_FILE):
     with open(GAME_FILE, "rb") as f:
         games = pickle.load(f)
