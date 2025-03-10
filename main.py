@@ -172,11 +172,11 @@ def problem():
                     for pl in game.players:
                         if pl[0] == p_id:
                             if num_ac == len(results):
-                                num_points = 345
+                                num_points = 100
                             elif num_ac > 1:
-                                num_points = 80 * (num_ac - 1)/(len(results) - 1)
+                                num_points = 100 * (num_ac - 1)/(len(results) - 1)
                             else:
-                                num_points = -0.1
+                                num_points = -0.0001
                             game.give_points(p_id, p, num_points)
                             pl[3][p] = results
         return render_template("problem.html", results=results, data=data)
