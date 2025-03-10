@@ -13,7 +13,7 @@ def grade(file, tests, language):
     #   Otherwise, it returns "Accepted"
 
     results = []
-    
+
     os.chdir(olddir)
     os.chdir("/".join(file.split("/")[:-1]))
 
@@ -71,8 +71,8 @@ def grade(file, tests, language):
             results.append(["AC", time_elapsed])
             continue
         else: # Output doesn't match
-            #print("program outputted:", output[0])
-            #print("correct solution:", solution)
+            print("program outputted:", output[0][:200])
+            print("correct solution:", solution[:200])
             print("wrong answer on test", len(results))
             results.append(["WA", time_elapsed])
     os.chdir(olddir)
