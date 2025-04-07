@@ -2,7 +2,7 @@
 {% block content %}
 <div id="panic-inducer"></div>
 <h2 style="position:fixed;right:40px;bottom:20px;box-sizing:border-box">Game Code: {{ id }}</h2>
-<table>
+<table style="width:unset">
     <thead>
         <tr>
             <th>Rank</th>
@@ -11,7 +11,7 @@
             {% for problem in problems %}
             <th>{{ loop.index }}</th>
             {% endfor %}
-        </tr>    
+        </tr>
     </thead>
     <tbody id="player-list">
     </tbody>
@@ -26,92 +26,92 @@
     function setTable() {
         //update table
         fetch("/api/players?id={{ id }}")
-        .then(response => response.json())
-        .then(function(players){
-            for (let player of players) {
-                player.push(player[2].reduce((a, b) => a + b, 0));
-            }
-            // sort by time
-            players.sort((a, b) => a[4] - b[4]);
+            .then(response => response.json())
+            .then(function (players) {
+                for (let player of players) {
+                    player.push(player[2].reduce((a, b) => a + b, 0));
+                }
+                // sort by time
+                players.sort((a, b) => a[4] - b[4]);
 
-            // sort by score
-            players.sort((a, b) => b[5] - a[5]);
+                // sort by score
+                players.sort((a, b) => b[5] - a[5]);
 
-            document.getElementById("player-list").innerHTML = "";
-            for (let i=0; i<players.length; i++) {
-                let row = document.createElement("tr");
+                document.getElementById("player-list").innerHTML = "";
+                for (let i = 0; i < players.length; i++) {
+                    let row = document.createElement("tr");
 
-                if (i == 0){
-                    row.innerHTML = `
-                    <td style="color:#E6AB21;"> ${i+1}</td>
+                    if (i == 0) {
+                        row.innerHTML = `
+                    <td style="color:#E6AB21;"> ${i + 1}</td>
                     <td style="color:#E6AB21;"><b>${players[i][1]}</b></
                         td>
                     <td style="color:#000000;">${Math.round(players[i][5])}</td>
                     `;
-                }
+                    }
 
-                if (i == 1){
-                    row.innerHTML = `
-                    <td style="color:#D81159;"> ${i+1}</td>
+                    if (i == 1) {
+                        row.innerHTML = `
+                    <td style="color:#D81159;"> ${i + 1}</td>
                     <td style="color:#D81159;"><b>${players[i][1]}</b></
                         td>
                     <td style="color:#000000;">${Math.round(players[i][5])}</td>
                     `;
-                }
+                    }
 
-                if (i == 2){
-                    row.innerHTML = `
-                    <td style="color:#324376;"> ${i+1}</td>
+                    if (i == 2) {
+                        row.innerHTML = `
+                    <td style="color:#324376;"> ${i + 1}</td>
                     <td style="color:#324376;"><b>${players[i][1]}</b></
                         td>
                     <td style="color:#000000;">${Math.round(players[i][5])}</td>
                     `;
-                }
+                    }
 
-                if (i > 2){
-                    row.innerHTML = `
-                    <td> ${i+1}</td>
+                    if (i > 2) {
+                        row.innerHTML = `
+                    <td> ${i + 1}</td>
                     <td><b> ${players[i][1]}</b></
                         td>
                     <td> ${Math.round(players[i][5])}</td>
                     `;
-                }
+                    }
 
-                for (let j=0; j<players[i][2].length; j++) {
-                    let cell = document.createElement("td");
-                    cell.innerHTML = Math.round(players[i][2][j]);
-                    if (players[i][2][j] == 100) {
-                        cell.className = "prob success";
+                    for (let j = 0; j < players[i][2].length; j++) {
+                        let cell = document.createElement("td");
+                        cell.innerHTML = Math.round(players[i][2][j]);
+                        if (players[i][2][j] == 100) {
+                            cell.className = "prob success";
+                        }
+                        else if (players[i][2][j] > 0) {
+                            cell.className = "prob partial";
+                        }
+                        else if (players[i][2][j] == 0) {
+                            cell.className = "prob";
+                        }
+                        else {
+                            cell.className = "prob fail";
+                        }
+                        row.appendChild(cell);
                     }
-                    else if (players[i][2][j] > 0) {
-                        cell.className = "prob partial";
-                    }
-                    else if (players[i][2][j] == 0) {
-                        cell.className = "prob";
-                    }
-                    else {
-                        cell.className = "prob fail";
-                    }
-                    row.appendChild(cell);
+                    document.getElementById("player-list").appendChild(row);
                 }
-                document.getElementById("player-list").appendChild(row);
-            }
-        });
+            });
     }
 
     function update() {
 
-        if (timerActive){
-            if (duration >= 0){
+        if (timerActive) {
+            if (duration >= 0) {
                 hours = parseInt(duration / 3600, 10)
                 minutes = parseInt(duration / 60 % 60, 10);
                 seconds = parseInt(duration % 60, 10);
-        
+
                 hours = hours < 10 ? "0" + hours : hours;
                 minutes = minutes < 10 ? "0" + minutes : minutes;
                 seconds = seconds < 10 ? "0" + seconds : seconds;
-        
-                document.getElementById("timer").innerHTML =  hours + ":" + minutes + ":" + seconds;
+
+                document.getElementById("timer").innerHTML = hours + ":" + minutes + ":" + seconds;
             }
             else {
                 document.getElementById("timer").innerHTML = "Contest Over";
@@ -119,17 +119,17 @@
 
             duration--;
 
-            if ( parseFloat(duration) < 0){
+            if (parseFloat(duration) < 0) {
                 opac -= 0.1;
                 document.getElementById("panic-inducer").style.opacity = Math.max(opac, 0);
             }
-            else if ( parseFloat(duration) / parseFloat(totalTime) < 0.1){
+            else if (parseFloat(duration) / parseFloat(totalTime) < 0.1) {
                 opac = .6 - 6 * parseFloat(duration) / parseFloat(totalTime);
                 document.getElementById("panic-inducer").style.opacity = opac;
             }
         }
 
-        if (duration >= 0 || !timerActive){
+        if (duration >= 0 || !timerActive) {
             setTable();
         }
     }

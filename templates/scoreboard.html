@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 id="timer" style="position:absolute;top:0px;right:40px"></h1>
-<table>
+<table style="width:unset">
     <thead>
         <tr>
             <th>Rank</th>
@@ -24,18 +24,18 @@
 
     function update() {
 
-        if (timerActive){
-            if (duration >= 0){
+        if (timerActive) {
+            if (duration >= 0) {
                 hours = parseInt(duration / 3600, 10)
                 minutes = parseInt(duration / 60 % 60, 10);
                 seconds = parseInt(duration % 60, 10);
-        
+
                 hours = hours < 10 ? "0" + hours : hours;
                 minutes = minutes < 10 ? "0" + minutes : minutes;
                 seconds = seconds < 10 ? "0" + seconds : seconds;
-        
-                document.getElementById("timer").innerHTML =  hours + ":" + minutes + ":" + seconds;
-        
+
+                document.getElementById("timer").innerHTML = hours + ":" + minutes + ":" + seconds;
+
                 duration--;
             }
             else {
@@ -43,12 +43,12 @@
             }
         }
 
-        if (duration >= 0 || !timerActive){
+        if (duration >= 0 || !timerActive) {
 
             //update table
             fetch("/api/players?id={{ id }}")
                 .then(response => response.json())
-                .then(function(players){
+                .then(function (players) {
                     for (let player of players) {
                         player.push(player[2].reduce((a, b) => a + b, 0));
                     }
@@ -59,25 +59,25 @@
                     players.sort((a, b) => b[5] - a[5]);
 
                     document.getElementById("player-list").innerHTML = "";
-                    for (let i=0; i<players.length; i++) {
+                    for (let i = 0; i < players.length; i++) {
 
-                        if (players[i][1] == "{{ player_name | safe}}"){
-                            rank = "→ "+String(i+1);
+                        if (players[i][1] == "{{ player_name | safe}}") {
+                            rank = "→ " + String(i + 1);
                         }
-                        else{
-                            rank = i+1;
+                        else {
+                            rank = i + 1;
                         }
 
-                        if (tst == "true" && players[i][1] != "{{ player_name | safe}}"){
+                        if (tst == "true" && players[i][1] != "{{ player_name | safe}}") {
                             continue;
                         }
 
-                        if (tst == "true"){
+                        if (tst == "true") {
                             rank = "?";
                         }
 
                         let row = document.createElement("tr");
-                        if (i == 0){
+                        if (i == 0) {
                             row.innerHTML = `
                             <td style="color:#E6AB21;"> ${rank}</td>
                             <td style="color:#E6AB21;"><b>${players[i][1]}</b></td>
@@ -85,7 +85,7 @@
                             `;
                         }
 
-                        if (i == 1){
+                        if (i == 1) {
                             row.innerHTML = `
                             <td style="color:#D81159;"> ${rank}</td>
                             <td style="color:#D81159;"><b>${players[i][1]}</b></td>
@@ -93,7 +93,7 @@
                             `;
                         }
 
-                        if (i == 2){
+                        if (i == 2) {
                             row.innerHTML = `
                             <td style="color:#324376;"> ${rank}</td>
                             <td style="color:#324376;"><b>${players[i][1]}</b></td>
@@ -101,7 +101,7 @@
                             `;
                         }
 
-                        if (i > 2){
+                        if (i > 2) {
                             row.innerHTML = `
                             <td> ${rank}</td>
                             <td><b> ${players[i][1]}</b></td>
@@ -109,7 +109,7 @@
                             `;
                         }
 
-                        for (let j=0; j<players[i][2].length; j++) {
+                        for (let j = 0; j < players[i][2].length; j++) {
                             let cell = document.createElement("td");
                             cell.innerHTML = Math.round(players[i][2][j]);
                             if (players[i][2][j] == 100) {
