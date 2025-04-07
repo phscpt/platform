@@ -7,6 +7,8 @@ tmp/*
 
 problems/*
 
+working-aws/*
+
 games/*
 !games/readme.txt
 

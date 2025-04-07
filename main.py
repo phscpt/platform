@@ -20,6 +20,21 @@ max_testcases:int = 10
 games = []
 users = []
 adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
+GAME_FILE = "games/game1.pkl"
+
+last_game_update=0
+GAME_UPDATE_INTERVAL=30
+
+def load_games() -> None:
+    global games
+    if (time.time() - last_game_update < GAME_UPDATE_INTERVAL): return
+    if os.path.exists(GAME_FILE):
+        with open(GAME_FILE, "rb") as f:
+            games = pickle.load(f)
+
+def save_games() -> None:
+    with open(GAME_FILE, "wb") as f:
+        pickle.dump(games, f)
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 def sortByDifficulty(x):
@@ -168,6 +183,7 @@ def problem():
         g_id = request.args.get("g_id")
         p_id = request.args.get("player")
         if (g_id != None) and (p_id != None):
+            load_games()
             print("giving score to", p_id, "from game", g_id)
             for game in games:
                 if game.id == g_id:
@@ -220,17 +236,17 @@ class Game:
         self.problems = [problem.rstrip() for problem in problems]
         print("created game", self.id)
         print("problems:", problems)
-        save_game()
+        save_games()
     def add_player(self, name):
         player_id = random_player_id()
         # [player id, player name, score for each problem, results for each problem, time of last successful submission]
         self.players.append([player_id, name, [0] * len(self.problems), {}, 0])
-        save_game()
+        save_games()
         return player_id
     def start(self):
         self.status = "started"
         self.start_time = time.time()
-        save_game()
+        save_games()
     def give_points(self, player, problem, points):
         if self.time_remaining() < -1:
             return
@@ -245,7 +261,7 @@ class Game:
                     pl[2][problem_index] = points
                     if points > 0:
                         pl[4] = time.time()
-        save_game()
+        save_games()
     def time_remaining(self):
         if self.time == -1:
             return -1
@@ -255,10 +271,6 @@ class Game:
             if name.strip() == player[1].strip():
                 return True
         return False
-
-def save_game():
-    with open(GAME_FILE, "wb") as f:
-        pickle.dump(games, f)
 
 # MAIN
 @app.route("/", methods=["GET", "POST"])
@@ -417,6 +429,7 @@ def waiting():
     id = request.args.get("id")
     player = request.args.get("player")
     player_name = "unknown"
+    load_games()
     for game in games:
         if game.id == id:
             for p in game.players:
@@ -427,6 +440,7 @@ def waiting():
 @app.route("/api/game_status", methods=["GET"])
 def get_game_status():
     id = request.args.get("id")
+    load_games()
     for game in games:
         if game.id == id:
             return '{"status":"%s"}' % game.status
@@ -434,6 +448,7 @@ def get_game_status():
 @app.route("/api/players", methods=["GET"])
 def get_players():
     id = request.args.get("id")
+    load_games()
     for game in games:
         if game.id == id:
             return json.dumps(game.players)
@@ -445,6 +460,7 @@ def get_players():
 def scoreboard():
     id = request.args.get("id")
     player = request.args.get("player")
+    load_games()
     for game in games:
         if game.id == id:
             for p in game.players:
@@ -463,6 +479,7 @@ def scoreboard():
 @app.route("/host_scoreboard", methods=["GET"])
 def scoreboard_host():
     id = request.args.get("id")
+    load_games()
     for game in games:
         if game.id == id:
             return render_template(
