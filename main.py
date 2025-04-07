@@ -16,7 +16,7 @@ import traceback
 from flask import Flask, request, render_template, redirect, abort
 app = Flask(__name__)
 
-max_testcases:int = 10
+max_testcases = 10
 games = []
 users = []
 adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
@@ -24,6 +24,7 @@ GAME_FILE = "games/game1.pkl"
 
 last_game_update=0
 GAME_UPDATE_INTERVAL=30
+'''Minimum wait before reloading `games` in **seconds**'''
 
 def load_games() -> None:
     global games
@@ -37,7 +38,7 @@ def save_games() -> None:
         pickle.dump(games, f)
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
-def sortByDifficulty(x):
+def sortByDifficulty(x) -> int:
     # comparator used to sort problems in increasing difficulty
     mapping = {
         "trivial": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4
@@ -46,7 +47,7 @@ def sortByDifficulty(x):
         return mapping[x["difficulty"].lower()]
     return 5
 
-def get_problem_names():
+def get_problem_names() -> list:
     # Get all problems, in sorted order
     problem_names = os.listdir("problems")
     problems = []
@@ -69,7 +70,7 @@ def get_problem_names():
     problems.sort(key = sortByDifficulty)
     return problems
 
-def admin_check(req):
+def admin_check(req) -> bool:
     return req.cookies.get("userid") == adminPass
 
 @app.route("/list", methods=["GET","POST"])
@@ -201,6 +202,7 @@ def problem():
     g_id = request.args.get("g_id")
     p_id = request.args.get("player")
     if (g_id != None) and (p_id != None):
+        load_games()
         for game in games:
             if game.id == g_id:
                 for pl in game.players:
@@ -282,6 +284,7 @@ def index():
         except:
             return render_template("index.html")
         id = id.rstrip().upper()
+        load_games()
         for game in games:
             if game.id == id :
                 if not game.is_duplicate_name(name):
@@ -308,6 +311,7 @@ def join():
         except:
             return render_template("join.html", id=id)
         id = id.rstrip().upper()
+        load_games()
         for game in games:
             if game.id == id and not game.is_duplicate_name(name):
                 player = game.add_player(name)
@@ -417,6 +421,7 @@ def problem_select():
 def host():
     id = request.args.get("id")
     if request.method == "POST":
+        load_games()
         for game in games:
             if game.id == id:
                 game.start()
