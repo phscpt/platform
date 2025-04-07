@@ -12,6 +12,7 @@ import glob
 import string
 import pickle
 from datetime import datetime
+import html
 import traceback
 from flask import Flask, request, render_template, redirect, abort
 app = Flask(__name__)
@@ -239,14 +240,17 @@ class Game:
         self.problems = [problem.rstrip() for problem in problems]
         print("created game", self.id)
         print("problems:", problems)
+        self.validate_players()
         save_games()
     def add_player(self, name):
         player_id = random_player_id()
         # [player id, player name, score for each problem, results for each problem, time of last successful submission]
         self.players.append([player_id, name, [0] * len(self.problems), {}, 0])
+        self.validate_players()
         save_games()
         return player_id
     def start(self):
+        self.validate_players()
         self.status = "started"
         self.start_time = time.time()
         save_games()
@@ -254,6 +258,7 @@ class Game:
         if self.time_remaining() < -1:
             return
         problem_index = self.problems.index(problem)
+        self.validate_players()
         for pl in self.players:
             if pl[0] == player:
                 if pl[2][problem_index] != 0:
@@ -274,6 +279,9 @@ class Game:
             if name.strip() == player[1].strip():
                 return True
         return False
+    def validate_players(self):
+        for i in range(len(self.players)):
+            self.players[i][1] = html.escape(self.players[i][1],True)
 
 # MAIN
 @app.route("/", methods=["GET", "POST"])
@@ -313,7 +321,7 @@ def join():
     id = request.args.get("id")
     if request.method == "POST":
         try:
-            name = request.form["player_name"]
+            name = html.escape(request.form["player_name"],True)
         except:
             return render_template("join.html", id=id)
         id = id.rstrip().upper()
