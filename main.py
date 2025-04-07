@@ -297,6 +297,7 @@ def index():
         load_games()
         for game in games:
             print(game.id, end=' ')
+            game.validate_players()
             if game.id == id :
                 if not game.is_duplicate_name(name):
                     player = game.add_player(name)
