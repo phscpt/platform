@@ -20,10 +20,10 @@ max_testcases = 10
 games = []
 users = []
 adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
-GAME_FILE = "games/game1.pkl"
+GAME_FILE = "games/game.pkl"
 
 last_game_update=0
-GAME_UPDATE_INTERVAL=30
+GAME_UPDATE_INTERVAL=10
 '''Minimum wait before reloading `games` in **seconds**'''
 
 def load_games() -> None:
@@ -198,6 +198,7 @@ def problem():
                                 num_points = -0.0001
                             game.give_points(p_id, p, num_points)
                             pl[3][p] = results
+                            save_games()
         return render_template("problem.html", results=results, data=data)
     g_id = request.args.get("g_id")
     p_id = request.args.get("player")
@@ -284,16 +285,21 @@ def index():
         except:
             return render_template("index.html")
         id = id.rstrip().upper()
+        print(name, id)
         load_games()
         for game in games:
+            print(game.id, end=' ')
             if game.id == id :
                 if not game.is_duplicate_name(name):
                     player = game.add_player(name)
+                    print()
                     return redirect(f"/waiting?id={id}&player={player}")
                 elif game.teams:
                     for player in game.players:
                         if player[1] == name:
+                            print()
                             return redirect(f"/waiting?id={id}&player={player[0]}")
+        print()
     return render_template("index2.html")
 
 # ABOUT
@@ -315,6 +321,7 @@ def join():
         for game in games:
             if game.id == id and not game.is_duplicate_name(name):
                 player = game.add_player(name)
+                save_games()
                 return redirect(f"/waiting?id={id}&player={player}")
     return render_template("join.html", id=id)
 
@@ -400,6 +407,7 @@ def problem_select():
         print(request.form.get("tst"))
         game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form.get("tst"), request.form.get("teams"))
         games.append(game)
+        save_games()
         return redirect(f"host_waiting?id={game.id}")
     problems = get_problem_names()
     public_problems = []
@@ -426,6 +434,7 @@ def host():
             if game.id == id:
                 game.start()
                 break
+        save_games()
         return redirect(f"/host_scoreboard?id={id}")
     return render_template("host_waiting.html", id=id)
 
@@ -515,7 +524,7 @@ def crash():
     return
 
 # Load games
-GAME_FILE = "games/game1.pkl"
+# GAME_FILE = "games/game1.pkl"
 if os.path.exists(GAME_FILE):
     with open(GAME_FILE, "rb") as f:
         games = pickle.load(f)
