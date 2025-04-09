@@ -22,8 +22,9 @@
     let timerActive = (duration != -1);
     let totalTime = duration;
 
+    let updates = 0;
     function update() {
-
+        updates++;
         if (timerActive) {
             if (duration >= 0) {
                 hours = parseInt(duration / 3600, 10)
@@ -43,7 +44,7 @@
             }
         }
 
-        if (duration >= 0 || !timerActive) {
+        if ((duration >= 0 || !timerActive) && updates % 10 == 0) {
 
             //update table
             fetch("/api/players?id={{ id }}")

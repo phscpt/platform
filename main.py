@@ -1,18 +1,7 @@
 # https://flask.palletsprojects.com/en/stable/quickstart/
 
-import grader
-import json
-import os
-import random
-import time
-import markdown
-import uuid
-import hashlib
-import glob
-import string
+import grader, json, os, random, time, markdown, uuid, hashlib, glob, string, html, traceback
 from datetime import datetime
-import html
-import traceback
 from contest import *
 from flask import Flask, request, render_template, redirect, abort
 app = Flask(__name__)
@@ -25,7 +14,6 @@ users = []
 adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
 # adminPass = "a"
 
-'''Minimum wait before reloading `games` in **seconds**'''
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 def sortByDifficulty(x) -> int:

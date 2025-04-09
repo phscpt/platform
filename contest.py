@@ -3,7 +3,7 @@ import random, html, time, os, json
 ALPHABET = "QWERTYUIOPASDFGHJKLZXCVBNM"
 
 GAMES_PATH = "games"
-LOAD_INTERVAL = 10
+LOAD_INTERVAL = 30
 
 def random_id():
     return "".join([random.choice(ALPHABET) for _ in range(6)])
@@ -53,9 +53,9 @@ class Game:
         self.status = "waiting"
         self.start_time = -1
         self.duration = -1
+        '''Time is in minutes'''
 
         self.last_load = 0
-        '''Time is in minutes'''
         
         if totalTime > 0: self.duration=int(totalTime)*60
 
@@ -85,7 +85,6 @@ class Game:
         for player_json in players_json:
             self.players.append(Player(player_json=player_json))
         self.problems = json_txt["problems"]
-        # self.players = list(map(Player,*players_json))
     
     def save(self) -> None:
         jsoned = self.to_json()

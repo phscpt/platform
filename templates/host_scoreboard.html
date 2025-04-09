@@ -98,9 +98,9 @@
                 }
             });
     }
-
+    let updates = 0;
     function update() {
-
+        updates++;
         if (timerActive) {
             if (duration >= 0) {
                 hours = parseInt(duration / 3600, 10)
@@ -129,7 +129,7 @@
             }
         }
 
-        if (duration >= 0 || !timerActive) {
+        if ((duration >= 0 || !timerActive) && updates % 5 == 0) {
             setTable();
         }
     }
