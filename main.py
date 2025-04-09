@@ -23,8 +23,8 @@ max_testcases = 10
 # games = []
 users = []
 
-#adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
-adminPass = "a"
+adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
+# adminPass = "a"
 GAME_FILE = "games/game.pkl"
 
 last_game_update=0
@@ -501,5 +501,5 @@ games = running_games
 '''
 
 if __name__ == "__main__":
-    app.run("127.0.0.1",8000)
-    # app.run("0.0.0.0")
+    # app.run("127.0.0.1",8000)
+    app.run("0.0.0.0")
