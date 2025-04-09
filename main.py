@@ -10,7 +10,6 @@ import uuid
 import hashlib
 import glob
 import string
-import pickle
 from datetime import datetime
 import html
 import traceback
@@ -25,22 +24,8 @@ users = []
 
 adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
 # adminPass = "a"
-GAME_FILE = "games/game.pkl"
 
-last_game_update=0
-GAME_UPDATE_INTERVAL=10
 '''Minimum wait before reloading `games` in **seconds**'''
-
-# def load_games() -> None:
-#     global games
-#     if (time.time() - last_game_update < GAME_UPDATE_INTERVAL): return
-#     if os.path.exists(GAME_FILE):
-#         with open(GAME_FILE, "rb") as f:
-#             games = pickle.load(f)
-
-# def save_games() -> None:
-#     with open(GAME_FILE, "wb") as f:
-#         pickle.dump(games, f)
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 def sortByDifficulty(x) -> int:
@@ -76,7 +61,6 @@ def get_problem_names() -> list:
     return problems
 
 def admin_check(req) -> bool:
-    return True
     return req.cookies.get("userid") == adminPass
 
 @app.route("/list", methods=["GET","POST"])
@@ -485,12 +469,6 @@ def unauthorized(e):
 def crash():
     raise Exception("Intentional crash tester function triggered")
     return
-
-# Load games
-# GAME_FILE = "games/game1.pkl"
-#if os.path.exists(GAME_FILE):
-#    with open(GAME_FILE, "rb") as f:
-#        games = pickle.load(f)
 
 ''' # Uncomment to remove old games
 running_games = []

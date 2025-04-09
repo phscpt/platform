@@ -1,11 +1,8 @@
-import random, html, pickle, time, os, sys, json
+import random, html, time, os, json
 
 ALPHABET = "QWERTYUIOPASDFGHJKLZXCVBNM"
 
-GAME_FILE = "games/game.pkl"
 GAMES_PATH = "games"
-# assert os.path.exists(GAME_FILE)
-
 LOAD_INTERVAL = 10
 
 def random_id():
@@ -13,21 +10,6 @@ def random_id():
 
 def random_player_id():
     return "".join([random.choice(ALPHABET + ALPHABET.lower() + "1234567890") for _ in range(20)])
-
-# def game_read(do):
-#     def a(*args, **kwargs):
-#         gmae.load_games()
-#         res=do(*args, **kwargs)
-#         return res
-#     return a
-
-# def game_write(do):
-#     def a(*args, **kwargs):
-#         gmae.load_games()
-#         res=do(*args, **kwargs)
-#         gmae.save_games()
-#         return res
-#     return a
 
 class Player:
     def __init__(self, name:str="", num_problems:int=-1, player_json:dict={}):
@@ -198,69 +180,4 @@ def get_game(id:str) -> Game:
         games[id] = Game(g_id=id)
         return games[id]
     
-    raise FileNotFoundError(f"Game {id} cannot be found")        
-
-#i lost the
-# class Games:
-#     __games:dict[Game] = {}
-#     __last_update = 0
-
-#     @staticmethod
-#     def add_game(game:Game)->None:
-#         Games.load_games()
-#         print(Games.__games)
-#         Games.__games.append(game)
-#         print(Games.__games)
-#         Games.save_games()
-
-#     def get_games() -> list[Game]:
-#         return Games.__games
-
-#     @staticmethod
-#     def save_games() -> None:
-#         return
-#         with open(GAME_FILE, "wb") as f: pickle.dump(Games.__games, f)
-
-#     @staticmethod
-#     def load_games() -> None:
-#         return
-#         if time.time()-Games.__last_update < LOAD_INTERVAL: return
-#         if os.path.exists(GAME_FILE):
-#             with open(GAME_FILE, "rb") as f:
-#                 Games.__games = pickle.load(f)
-
-#     @staticmethod
-#     def get(index:int) -> Game:
-#         Games.load_games()
-#         if (int(index) < len(Games.__games)): return Games.__games[index]
-#         raise IndexError()
-
-#     @staticmethod
-#     def get_id(id:str) -> Game:
-#         Games.load_games()
-#         for game in Games.__games:
-#             if game.get_id() == id: return game
-#         print(id)
-#         raise KeyError()
-
-#     @staticmethod
-#     def get_latest() -> Game:
-#         Games.load_games()
-#         latest=Games.__games[0]
-#         for game in Games.__games:
-#             if game.start_time > latest.start_time or (game.start_time == latest.start_time and game.time_remaining() > latest.time_remaining()):
-#                 latest=game
-#         return Games.__games[latest]
-    
-#     @staticmethod
-#     def apply_all(func) -> None:
-#         for game in Games.__games:
-#             func(game)
-
-# gmae=Games
-
-# WAIT NO WAY IVE DONE IT
-# recursive aah class definitions
-# hopefully this doesn't cause problems later
-
-# Games.add_game(Game(["a"]))
+    raise FileNotFoundError(f"Game {id} cannot be found")
