@@ -10,6 +10,6 @@ problems/*
 working-aws/*
 
 games/*
-!games/readme.txt
+!games/readme.md
 
 SECRET.txt

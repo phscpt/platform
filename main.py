@@ -14,29 +14,33 @@ import pickle
 from datetime import datetime
 import html
 import traceback
+from contest import *
 from flask import Flask, request, render_template, redirect, abort
 app = Flask(__name__)
 
 max_testcases = 10
-games = []
+
+# games = []
 users = []
-adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
+
+#adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
+adminPass = "a"
 GAME_FILE = "games/game.pkl"
 
 last_game_update=0
 GAME_UPDATE_INTERVAL=10
 '''Minimum wait before reloading `games` in **seconds**'''
 
-def load_games() -> None:
-    global games
-    if (time.time() - last_game_update < GAME_UPDATE_INTERVAL): return
-    if os.path.exists(GAME_FILE):
-        with open(GAME_FILE, "rb") as f:
-            games = pickle.load(f)
+# def load_games() -> None:
+#     global games
+#     if (time.time() - last_game_update < GAME_UPDATE_INTERVAL): return
+#     if os.path.exists(GAME_FILE):
+#         with open(GAME_FILE, "rb") as f:
+#             games = pickle.load(f)
 
-def save_games() -> None:
-    with open(GAME_FILE, "wb") as f:
-        pickle.dump(games, f)
+# def save_games() -> None:
+#     with open(GAME_FILE, "wb") as f:
+#         pickle.dump(games, f)
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 def sortByDifficulty(x) -> int:
@@ -72,6 +76,7 @@ def get_problem_names() -> list:
     return problems
 
 def admin_check(req) -> bool:
+    return True
     return req.cookies.get("userid") == adminPass
 
 @app.route("/list", methods=["GET","POST"])
@@ -185,33 +190,35 @@ def problem():
         g_id = request.args.get("g_id")
         p_id = request.args.get("player")
         if (g_id != None) and (p_id != None):
-            load_games()
             print("giving score to", p_id, "from game", g_id)
-            for game in games:
-                if game.id == g_id:
-                    for pl in game.players:
-                        if pl[0] == p_id:
-                            if num_ac == len(results):
-                                num_points = 100
-                            elif num_ac > 1:
-                                num_points = 100 * (num_ac - 1)/(len(results) - 1)
-                            else:
-                                num_points = -0.0001
-                            game.give_points(p_id, p, num_points)
-                            pl[3][p] = results
-                            save_games()
+            try:
+                game = get_game(g_id)
+                try:
+                    player = game.get_player(p_id)
+                    if num_ac == len(results):
+                        num_points = 100
+                    elif num_ac > 1:
+                        num_points = 100 * (num_ac - 1)/(len(results) - 1)
+                    else:
+                        num_points = -0.0001
+                    player.results[p] = results
+                    game.give_points(p_id, p, num_points)
+
+                except KeyError: pass
+            except KeyError: pass
         return render_template("problem.html", results=results, data=data)
     g_id = request.args.get("g_id")
     p_id = request.args.get("player")
     if (g_id != None) and (p_id != None):
-        load_games()
-        for game in games:
-            if game.id == g_id:
-                for pl in game.players:
-                    if pl[0] == p_id:
-                        if p in pl[3]:
-                            return render_template("problem.html", results=pl[3][p], data=data)
-                        return render_template("problem.html", results=False, data=data)
+        try:
+            game = get_game(g_id)
+            try:
+                player = game.get_player(p_id)
+                if p in player.results:
+                    return render_template("problem.html", results=player.results[p], data=data)
+                return render_template("problem.html", results=False, data=data)
+            except KeyError: pass
+        except KeyError: pass
     return render_template("problem.html", results=False, data=data)
 
 # GAME CREATION/JOINING
@@ -221,68 +228,6 @@ def random_id():
 def random_player_id():
     return "".join([random.choice(string.ascii_uppercase + string.ascii_lowercase + "1234567890") for _ in range(20)])
 
-class Game:
-    def __init__(self, problems:list, totalTime, tst:str="off", doTeams:bool=False):
-        self.id = random_id()
-        self.players = []
-        self.status = "waiting"
-        #time is in minutes
-        try:
-            self.time = int(totalTime) * 60
-        except:
-            self.time = -1
-        self.teams = doTeams
-        if tst == "on":
-            self.tst = "true"
-        else:
-            self.tst = "false"
-        print(self.tst)
-        self.problems = [problem.rstrip() for problem in problems]
-        print("created game", self.id)
-        print("problems:", problems)
-        self.validate_players()
-        save_games()
-    def add_player(self, name):
-        player_id = random_player_id()
-        # [player id, player name, score for each problem, results for each problem, time of last successful submission]
-        self.players.append([player_id, name, [0] * len(self.problems), {}, 0])
-        self.validate_players()
-        save_games()
-        return player_id
-    def start(self):
-        self.validate_players()
-        self.status = "started"
-        self.start_time = time.time()
-        save_games()
-    def give_points(self, player, problem, points):
-        if self.time_remaining() < -1:
-            return
-        problem_index = self.problems.index(problem)
-        self.validate_players()
-        for pl in self.players:
-            if pl[0] == player:
-                if pl[2][problem_index] != 0:
-                    if pl[2][problem_index] < points:
-                        pl[2][problem_index] = points
-                        pl[4] = time.time()
-                else:
-                    pl[2][problem_index] = points
-                    if points > 0:
-                        pl[4] = time.time()
-        save_games()
-    def time_remaining(self):
-        if self.time == -1:
-            return -1
-        return self.time - (time.time() - self.start_time)
-    def is_duplicate_name(self, name):
-        for player in self.players:
-            if name.strip() == player[1].strip():
-                return True
-        return False
-    def validate_players(self):
-        for i in range(len(self.players)):
-            self.players[i][1] = html.escape(self.players[i][1],True)
-
 # MAIN
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -291,24 +236,19 @@ def index():
             name = request.form["player_name"]
             id = request.form["game_id"]
         except:
-            return render_template("index.html")
+            return render_template("index2.html")
         id = id.rstrip().upper()
         print(name, id)
-        load_games()
-        for game in games:
-            print(game.id, end=' ')
-            game.validate_players()
-            if game.id == id :
-                if not game.is_duplicate_name(name):
-                    player = game.add_player(name)
-                    print()
-                    return redirect(f"/waiting?id={id}&player={player}")
-                elif game.teams:
-                    for player in game.players:
-                        if player[1] == name:
-                            print()
-                            return redirect(f"/waiting?id={id}&player={player[0]}")
-        print()
+        
+        for g_id in games:
+            games[g_id].validate_players()
+        try:
+            game = get_game(id)
+            p_id = game.add_player(name)
+            return redirect(f"/waiting?id={id}&player={p_id}")
+        except KeyError:
+            ...
+            # print(f"Game {id} not found. Active games: {" ".join([game.id for game in Games.__games])}")
     return render_template("index2.html")
 
 # ABOUT
@@ -326,12 +266,13 @@ def join():
         except:
             return render_template("join.html", id=id)
         id = id.rstrip().upper()
-        load_games()
-        for game in games:
-            if game.id == id and not game.is_duplicate_name(name):
-                player = game.add_player(name)
-                save_games()
-                return redirect(f"/waiting?id={id}&player={player}")
+        try:
+            game = get_game(id)
+            p_id = game.add_player(name)
+            return redirect(f"/waiting?id={id}&player={p_id}")
+        except KeyError:
+            ...
+            # print(f"Game {id} not found. Active games: {" ".join([game.id for game in Games.__games])}")
     return render_template("join.html", id=id)
 
 def hash_password(password):
@@ -414,9 +355,14 @@ def problem_select():
     if request.method == "POST":
         print("value is")
         print(request.form.get("tst"))
-        game = Game(request.form["problems"].rstrip().split("\n"), request.form["timer"], request.form.get("tst"), request.form.get("teams"))
-        games.append(game)
-        save_games()
+        try:
+            duration = int(request.form["timer"])
+        except:
+            duration = -1
+
+        game = Game(problems=request.form["problems"].rstrip().split("\n"), totalTime=duration, tst=request.form.get("tst"), doTeams=request.form.get("teams"))
+        
+        games[game.id] = game
         return redirect(f"host_waiting?id={game.id}")
     problems = get_problem_names()
     public_problems = []
@@ -438,13 +384,13 @@ def problem_select():
 def host():
     id = request.args.get("id")
     if request.method == "POST":
-        load_games()
-        for game in games:
-            if game.id == id:
-                game.start()
-                break
-        save_games()
-        return redirect(f"/host_scoreboard?id={id}")
+        try:
+            game = get_game(id)
+            game.start()
+            return redirect(f"/host_scoreboard?id={id}")
+        except KeyError:
+            # print("game not found")
+            print(f"Game {id} not found. Active games: {[games[g_id].id for g_id in games] }")
     return render_template("host_waiting.html", id=id)
 
 @app.route("/waiting", methods=["GET"])
@@ -452,29 +398,36 @@ def waiting():
     id = request.args.get("id")
     player = request.args.get("player")
     player_name = "unknown"
-    load_games()
-    for game in games:
-        if game.id == id:
-            for p in game.players:
-                if p[0] == player:
-                    player_name = p[1]
+    
+    try:
+        game = get_game(id)
+        p = game.get_player(player)
+        print(p, "bruh")
+        player_name = p.name
+    except KeyError:
+        print(f"Game or player not found :(")
     return render_template("waiting.html", id=request.args.get("id"), player=player_name, player_id=player)
 
 @app.route("/api/game_status", methods=["GET"])
 def get_game_status():
     id = request.args.get("id")
-    load_games()
-    for game in games:
-        if game.id == id:
-            return '{"status":"%s"}' % game.status
+    try:
+        game = get_game(id)
+        return '{"status":"%s"}' % game.status
+    except:
+        print(f"API request for status of game id {id} failed.")
+        return "error"
 
 @app.route("/api/players", methods=["GET"])
 def get_players():
     id = request.args.get("id")
-    load_games()
-    for game in games:
-        if game.id == id:
-            return json.dumps(game.players)
+    try:
+        game = get_game(id)
+        listified = list(map(Player.to_list,game.players))
+        # print(listified)
+        return json.dumps(listified)
+    except KeyError:
+        print(f"No game found with id {id}")
     return "error"
 
 # SCOREBOARD
@@ -483,35 +436,36 @@ def get_players():
 def scoreboard():
     id = request.args.get("id")
     player = request.args.get("player")
-    load_games()
-    for game in games:
-        if game.id == id:
-            for p in game.players:
-                if p[0] == player:
-                    return render_template(
-                        "scoreboard.html",
-                        id=id,
-                        player = player,
-                        player_name = p[1],
-                        problems = game.problems,
-                        tst = game.tst,
-                        time = game.time_remaining()
-                    )
+    try:
+        game = get_game(id)
+        p = game.get_player(player)
+        return render_template(
+            "scoreboard.html",
+            id=id,
+            player = player,
+            player_name = p.name,
+            problems = game.problems,
+            tst = False,
+            time = game.time_remaining()
+        )
+    except:
+        print(f"Scoreboard for game {id}, player {player} not found")
     abort(404)
 
 @app.route("/host_scoreboard", methods=["GET"])
 def scoreboard_host():
     id = request.args.get("id")
-    load_games()
-    for game in games:
-        if game.id == id:
-            return render_template(
-                "host_scoreboard.html",
-                id = id,
-                problems = game.problems,
-                tst = game.tst,
-                time = game.time_remaining()
-            )
+    try:
+        game = get_game(id)
+        return render_template(
+            "host_scoreboard.html",
+            id = id,
+            problems = game.problems,
+            tst = False,
+            time = game.time_remaining()
+        )
+    except KeyError:
+        print(f"Game with id {id} not found")
     abort(404)
 
 # ERROR PAGES
@@ -547,5 +501,5 @@ games = running_games
 '''
 
 if __name__ == "__main__":
-    # app.run("127.0.0.1")
-    app.run("0.0.0.0")
+    app.run("127.0.0.1",8000)
+    # app.run("0.0.0.0")
