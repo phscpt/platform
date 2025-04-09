@@ -239,7 +239,7 @@ def index():
             return render_template("index2.html")
         id = id.rstrip().upper()
         print(name, id)
-        
+
         for g_id in games:
             games[g_id].validate_players()
         try:
@@ -361,7 +361,7 @@ def problem_select():
             duration = -1
 
         game = Game(problems=request.form["problems"].rstrip().split("\n"), totalTime=duration, tst=request.form.get("tst"), doTeams=request.form.get("teams"))
-        
+
         games[game.id] = game
         return redirect(f"host_waiting?id={game.id}")
     problems = get_problem_names()
@@ -398,7 +398,7 @@ def waiting():
     id = request.args.get("id")
     player = request.args.get("player")
     player_name = "unknown"
-    
+
     try:
         game = get_game(id)
         p = game.get_player(player)
@@ -488,9 +488,9 @@ def crash():
 
 # Load games
 # GAME_FILE = "games/game1.pkl"
-if os.path.exists(GAME_FILE):
-    with open(GAME_FILE, "rb") as f:
-        games = pickle.load(f)
+#if os.path.exists(GAME_FILE):
+#    with open(GAME_FILE, "rb") as f:
+#        games = pickle.load(f)
 
 ''' # Uncomment to remove old games
 running_games = []
