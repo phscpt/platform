@@ -1,38 +1,61 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>About</h1>
-<h2>Contributors</h2>
-<p>Jieruei Chang, Nicholas Hagedorn, Jonathan Ji, Om Mehta and Tom Schlessinger</p>
-<h2>Frameworks</h2>
-<p>Built primarily with Flask, along with Water.css for frontend styling, Markdown for problem creation, and MathJax for
-    problem rendering. Deployed on PythonAnywhere.</p>
-<p>Source code: <a href="https://github.com/phscpt/platform">https://github.com/phscpt/platform</a></p>
-<h2>Environment</h2>
-<p>All commands are run on a server with Ubuntu 20.04.2 LTS.</p>
-<ul>
-    <li>Python 3.9.5: <code>python3 [filename].py</code></li>
-    <li>Python 2.7.18: <code>python2.7 [filename].py</code></li>
-    <li>Java: <code>javac [filename].java; java [filename]</code> (openjdk 11.0.11)</li>
-    <li>C++: <code>g++ [filename].cpp; ./a.out</code> (C++14, g++ version 9.3.0)</li>
-</ul>
-<h2>Bug Reporting</h2>
-<details>
-    <summary>Submit a bug report</summary>
-    <iframe
-        src="https://docs.google.com/forms/d/e/1FAIpQLSfnJI7NGPqS-vUNAU0DbRsSO4G-SD_QXrPyXmEJtmIkYGUKgQ/viewform?embedded=true"
-        height="760" frameborder="0" marginheight="0" marginwidth="0"
-        style="width: 75vw;max-width: 800px;height: 975px">Loading…</iframe>
-</details>
-<br>
-<footer>
-    Made by <a href="https://jierueichang.github.io" style="color:var(--text-muted);">Jieruei Chang</a> and <a
-        href="https://nicholashagedorn.com" style="color:var(--text-muted);">Nick Hagedorn</a>
-    •
-    <a href="/" style="color:var(--text-muted);">Home</a>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <link id="custom_css" rel="stylesheet" href="static/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PHSCPT Practice Platform</title>
+    <link rel="icon" href="static/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
+    <script src="static/common.js" defer></script>
+</head>
+
+<body>
     <br>
-    Copyright © <span id="year"></span> PHS Competitive Programming Team
-</footer>
-<script>
-    document.getElementById("year").innerHTML = new Date().getFullYear();
-</script>
-{% endblock %}
+    <a href="/"><img src="static/logo.png" style="width: 30%"></a>
+    <br>
+    <a onclick="switchColorMode()">[switch color mode]</a>
+    <h2>Practice Contest Platform</h2>
+    <h1>About</h1>
+    <h2>Contributors</h2>
+    <p>Jieruei Chang, Nicholas Hagedorn, Jonathan Ji, Om Mehta and Tom Schlessinger</p>
+    <h2>Frameworks</h2>
+    <p>Built primarily with Flask, along with Water.css for frontend styling, Markdown for problem creation, and MathJax
+        for
+        problem rendering. Deployed on PythonAnywhere.</p>
+    <p>Source code: <a href="https://github.com/phscpt/platform">https://github.com/phscpt/platform</a></p>
+    <h2>Environment</h2>
+    <p>All commands are run on a server with Ubuntu 20.04.2 LTS.</p>
+    <ul>
+        <li>Python 3.9.5: <code>python3 [filename].py</code></li>
+        <li>Python 2.7.18: <code>python2.7 [filename].py</code></li>
+        <li>Java: <code>javac [filename].java; java [filename]</code> (openjdk 11.0.11)</li>
+        <li>C++: <code>g++ [filename].cpp; ./a.out</code> (C++14, g++ version 9.3.0)</li>
+    </ul>
+    <h2>Bug Reporting</h2>
+    <details>
+        <summary>Submit a bug report</summary>
+        <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLSfnJI7NGPqS-vUNAU0DbRsSO4G-SD_QXrPyXmEJtmIkYGUKgQ/viewform?embedded=true"
+            height="760" frameborder="0" marginheight="0" marginwidth="0"
+            style="width: 75vw;max-width: 800px;height: 975px">Loading…</iframe>
+    </details>
+    <br>
+    <footer>
+        Made by <a href="https://jierueichang.github.io" style="color:var(--text-muted);">Jieruei Chang</a> and <a
+            href="https://nicholashagedorn.com" style="color:var(--text-muted);">Nick Hagedorn</a>
+        •
+        <a href="/" style="color:var(--text-muted);">Home</a>
+        <br>
+        Copyright © <span id="year"></span> PHS Competitive Programming Team
+    </footer>
+    <script>
+        document.getElementById("year").innerHTML = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

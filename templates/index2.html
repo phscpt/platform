@@ -1,99 +1,126 @@
-{% extends "base.html" %}
-{% block content %}
-<form action="log_in" id="log_in"> <!---Change right px to 170 when adding back sign up-->
-    <input type="submit" value="Admin Log In" style="top:30px;right:40px" class="absolute-button">
-</form>
-<button id="sign_out" onclick="signOut()" style="top:30px;right:40px" class="absolute-button">Sign Out</button> <!---Change right px to 170 when adding back sign up-->
-<br>
-<div class="grid">
-    <div class="box">
-        <form method="post">
-            <h2>Join Contest</h2>
-            <input name=game_id placeholder="Enter Join Code">
-            <input name=player_name placeholder="Enter Name">
-            <input type="submit" value="Join" class="button-emphasis">
-        </form>
-    </div>
-    <div class="box">
-        <h2>Practice</h2>
-        <button id="public_catalogue" onclick="location.href='public'" class="button-emphasis">Problem Catalogue</button>
-        <button id="catalogue" onclick="location.href='list'">Admin Catalogue</button>
-    </div>
-</div>
-<br>
-<button onclick="location.href='select'">Host Contest</button>
-<button id="addQuestion" onclick="window.open('https:\/\/forms.gle/WTtjz5tkhXwH98hW9','_blank')" style="bottom:30px;right:40px;" class="absolute-button">Suggest Problem</button>
-<script>
-    function setCookie(cname,cvalue,exdays) {
-        const d = new Date();
-        d.setTime(d.getTime() + (exdays*24*60*60*1000));
-        let expires = "expires=" + d.toUTCString();
-        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-    }
-      
-    function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let ca = decodedCookie.split(';');
-        for(let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
-    }
-      
-    function checkCookie() {
-        return getCookie("username");
-    }
+<!DOCTYPE html>
+<html>
 
-    updateLogInOut();
+<head>
+    <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <link id="custom_css" rel="stylesheet" href="static/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PHSCPT Practice Platform</title>
+    <link rel="icon" href="static/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
+    <script src="static/common.js" defer></script>
+</head>
 
-    function updateLogInOut(){
-
-        thisAdmin = checkCookie();
-        //document.getElementById("userid").value = getCookie("userid");
-
-        if ( thisAdmin == "True" ){ // If user is an admin
-            document.getElementById("catalogue").style.display = "initial";
-            document.getElementById("addQuestion").style.display = "none";
-        }
-
-        else { // If user is not admin
-            document.getElementById("catalogue").style.display = "none";
-            document.getElementById("addQuestion").style.display = "initial";
-        }
-        
-        if ( thisAdmin == "NotIn" || thisAdmin == "" ){ // If user hasn't logged in
-            document.getElementById("sign_out").style.display = "none";
-            document.getElementById("log_in").style.display = "initial";
-        }
-        else{ // If user has logged in
-            document.getElementById("log_in").style.display = "none";
-            document.getElementById("sign_out").style.display = "initial";
-        }    
-    }
-
-    function signOut(){
-        setCookie("username", "NotIn", 30);
-        setCookie("userid", "NotIn", 30);
-        updateLogInOut();
-    }
-</script>
-<br>
-<footer>
-    Made by <a href="https://jierueichang.github.io" style="color:var(--text-muted);">Jieruei Chang</a> and <a href="https://nicholashagedorn.com" style="color:var(--text-muted);">Nick Hagedorn</a>
-    •
-    <a href="about" style="color:var(--text-muted);">About</a>
+<body>
     <br>
-    Copyright © <span id="year"></span> <a href="https://phscpt.github.io" style="color:var(--text-muted);">PHS Competitive Programming Team</a>
-</footer>
-<script>
-    document.getElementById("year").innerHTML = new Date().getFullYear();
-</script>
-<br>
-{% endblock %}
+    <a href="/"><img src="static/logo.png" style="width: 30%"></a>
+    <br>
+    <a onclick="switchColorMode()">[switch color mode]</a>
+    <h2>Practice Contest Platform</h2>
+    <form action="log_in" id="log_in"> <!---Change right px to 170 when adding back sign up-->
+        <input type="submit" value="Admin Log In" style="top:30px;right:40px" class="absolute-button">
+    </form>
+    <button id="sign_out" onclick="signOut()" style="top:30px;right:40px" class="absolute-button">Sign Out</button>
+    <!---Change right px to 170 when adding back sign up-->
+    <br>
+    <div class="grid">
+        <div class="box">
+            <form method="post">
+                <h2>Join Contest</h2>
+                <input name=game_id placeholder="Enter Join Code">
+                <input name=player_name placeholder="Enter Name">
+                <input type="submit" value="Join" class="button-emphasis">
+            </form>
+        </div>
+        <div class="box">
+            <h2>Practice</h2>
+            <button id="public_catalogue" onclick="location.href='public'" class="button-emphasis">Problem
+                Catalogue</button>
+            <button id="catalogue" onclick="location.href='list'">Admin Catalogue</button>
+        </div>
+    </div>
+    <br>
+    <button onclick="location.href='select'">Host Contest</button>
+    <button id="addQuestion" onclick="window.open('https:\/\/forms.gle/WTtjz5tkhXwH98hW9','_blank')"
+        style="bottom:30px;right:40px;" class="absolute-button">Suggest Problem</button>
+    <script>
+        function setCookie(cname, cvalue, exdays) {
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        function checkCookie() {
+            return getCookie("username");
+        }
+
+        updateLogInOut();
+
+        function updateLogInOut() {
+
+            thisAdmin = checkCookie();
+            //document.getElementById("userid").value = getCookie("userid");
+
+            if (thisAdmin == "True") { // If user is an admin
+                document.getElementById("catalogue").style.display = "initial";
+                document.getElementById("addQuestion").style.display = "none";
+            }
+
+            else { // If user is not admin
+                document.getElementById("catalogue").style.display = "none";
+                document.getElementById("addQuestion").style.display = "initial";
+            }
+
+            if (thisAdmin == "NotIn" || thisAdmin == "") { // If user hasn't logged in
+                document.getElementById("sign_out").style.display = "none";
+                document.getElementById("log_in").style.display = "initial";
+            }
+            else { // If user has logged in
+                document.getElementById("log_in").style.display = "none";
+                document.getElementById("sign_out").style.display = "initial";
+            }
+        }
+
+        function signOut() {
+            setCookie("username", "NotIn", 30);
+            setCookie("userid", "NotIn", 30);
+            updateLogInOut();
+        }
+    </script>
+    <br>
+    <footer>
+        Made by <a href="https://jierueichang.github.io" style="color:var(--text-muted);">Jieruei Chang</a> and <a
+            href="https://nicholashagedorn.com" style="color:var(--text-muted);">Nick Hagedorn</a>
+        •
+        <a href="about" style="color:var(--text-muted);">About</a>
+        <br>
+        Copyright © <span id="year"></span> <a href="https://phscpt.github.io" style="color:var(--text-muted);">PHS
+            Competitive Programming Team</a>
+    </footer>
+    <script>
+        document.getElementById("year").innerHTML = new Date().getFullYear();
+    </script>
+    <br>
+</body>
+
+</html>

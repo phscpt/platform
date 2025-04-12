@@ -1,65 +1,26 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
-        <link id="custom_css" rel="stylesheet" href="static/style.css">
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PHSCPT Practice Platform</title>
-        <link rel="icon" href="static/icon.png">
-        <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
-    </head>
-    <body>
-        <br>
-        <a href="/"><img src="static/logo.png" style="width: 30%"></a>
-        <br>
-        <a onclick="switchColorMode()">[switch color mode]</a>
-        <h2>Practice Contest Platform</h2>
-        {% block content %}{% endblock %}
-    </body>
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
-    <script>
-        snowStorm.excludeMobile = false;
-        snowStorm.followMouse = false;
-        snowStorm.snowCharacter = '&#10052;'; //snowflake character
-        snowStorm.snowColor = '#9a9ea1'; //give the snowflakes another colour
-        snowStorm.snowStick = false; //if true, the snow will stick to the bottom of the screen
-        snowStorm.animationInterval = 30; //milliseconds per frame, the higher the less CPU load
-        snowStorm.flakesMaxActive = 10; //maximum number of active snow flakes, the lower the less CPU/GPU is needed to draw them
-        snowStorm.freezeOnBlur = true; //recommended: stops the snow effect when the user switches to another tab or window
-        snowStorm.usePositionFixed = true; //if the user scrolls, the snow is not affected by the window scroll. Disable to prevent extra CPU load
-        snowStorm.vMaxX = 5;
-        snowStorm.vMaxY = 2;
-        snowStorm.flakeWidth = 20;
-        snowStorm.flakeHeight = 20;
-    </script>-->
-    <script>
-        let mode = parseInt(localStorage.getItem("mode")) || 1;
-        let messages = ["Are you sure you want to join the dark side?", "smh using dark mode", "Do you want to make text less readable?", "Every time you use dark mode, you break Jieruei's heart", "Once you start down the dark path, forever it will dominate your destiny.", "The dark side clouds everything."];
-        function switchColorMode() {
-            if (mode == 1) {
-                if (!confirm(messages[Math.floor(Math.random() * messages.length)])) {
-                    return;
-                }
-            }
-            mode *= -1;
-            localStorage.setItem("mode", mode);
-            setColorMode();
-        }
 
-        function setColorMode() {
-            if (mode == -1) {
-                document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css";
-                document.getElementById("custom_css").href = "static/style_dark.css";
-            }
-            else {
-                document.getElementById("water_css").href = "https://cdn.jsdelivr.net/npm/water.css@2/out/light.css";
-                document.getElementById("custom_css").href = "static/style.css";
-            }            
-        }
+<head>
+    <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <link id="custom_css" rel="stylesheet" href="static/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PHSCPT Practice Platform</title>
+    <link rel="icon" href="static/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
+    <script src="static/common.js" defer></script>
+</head>
 
-        if (mode == -1) {
-            setColorMode();
-        }
-    </script>
+<body>
+    <br>
+    <a href="/"><img src="static/logo.png" style="width: 30%"></a>
+    <br>
+    <a onclick="switchColorMode()">[switch color mode]</a>
+    <h2>Practice Contest Platform</h2>
+    {% block content %}{% endblock %}
+</body>
+
 </html>

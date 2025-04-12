@@ -1,67 +1,89 @@
-{% extends "base.html" %}
-{% block content %}
-<br>
-<form method="post">
-    <h1>Edit Problem</h1>
-    <h2>Problem Identifier</h2>
-    <input name="id" placeholder = "Short Unique Text" value = "{{ data.id }}">
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <link id="custom_css" rel="stylesheet" href="static/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PHSCPT Practice Platform</title>
+    <link rel="icon" href="static/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
+    <script src="static/common.js" defer></script>
+</head>
+
+<body>
     <br>
-    <h2>Problem Title</h2>
-    <input name="title" placeholder = "Problem Title" value = "{{ data.title }}">
+    <a href="/"><img src="static/logo.png" style="width: 30%"></a>
     <br>
-    <h2>Status</h2>
-    <div>
-        {% if data.status == "public" %}
+    <a onclick="switchColorMode()">[switch color mode]</a>
+    <h2>Practice Contest Platform</h2>
+    <br>
+    <form method="post">
+        <h1>Edit Problem</h1>
+        <h2>Problem Identifier</h2>
+        <input name="id" placeholder="Short Unique Text" value="{{ data.id }}">
+        <br>
+        <h2>Problem Title</h2>
+        <input name="title" placeholder="Problem Title" value="{{ data.title }}">
+        <br>
+        <h2>Status</h2>
+        <div>
+            {% if data.status == "public" %}
             <input type="radio" name="status" value="public" checked> Used in Competition<br>
             <input type="radio" name="status" value="publvate"> Ready for Competition<br>
             <input type="radio" name="status" value="private"> Not Ready for Competition<br>
-        {% elif data.status == "publvate" %}
+            {% elif data.status == "publvate" %}
             <input type="radio" name="status" value="public"> Used in Competition<br>
             <input type="radio" name="status" value="publvate" checked> Ready for Competition<br>
             <input type="radio" name="status" value="private"> Not Ready for Competition<br>
-        {% else %}
+            {% else %}
             <input type="radio" name="status" value="public"> Used in Competition<br>
             <input type="radio" name="status" value="publvate"> Ready for Competition<br>
             <input type="radio" name="status" value="private" checked> Not Ready for Competition<br>
-        {% endif %}
-    </div>
-    <br>
-    <h2>Difficulty</h2>
-    <input name="difficulty" placeholder="Difficulty" value="{{ data.difficulty }}">
-    <br>
-    <h2>Tags</h2>
-    <input name="tags" placeholder="Tags" value="{{ data.tags }}">
-    <br>
-    <h2>Description</h2>
-    <p>Type in markdown.</p>
-    <textarea name="description">{{ data.description }}</textarea>
-    <br>
-    <h2>Testcases</h2>
-    {% for i in range(max_testcases) %}
-    <div class="grid-mini">
-        {% if data.testcases|length > i %}
-        <div class="box">
-            <h4>Input {{i}}</h4>
-            <textarea name="input{{ i }}">{{ data.testcases[i][0] }}</textarea>
+            {% endif %}
         </div>
-        <div class="box">
-            <h4>Output {{i}}</h4>
-            <textarea name="output{{ i }}">{{ data.testcases[i][1] }}</textarea>
-        </div>
-        {% else %}
-        <div class="box">
-            <h4>Input {{i}}</h4>
-            <textarea name="input{{ i }}"></textarea>
-        </div>
-        <div class="box">
-            <h4>Output {{i}}</h4>
-            <textarea name="output{{ i }}"></textarea>
-        </div>
-        {% endif %}
-    </div><br>
-    {% endfor %}
-    <br>
-    <input type="submit" text="Save Problem">
-</form>
+        <br>
+        <h2>Difficulty</h2>
+        <input name="difficulty" placeholder="Difficulty" value="{{ data.difficulty }}">
+        <br>
+        <h2>Tags</h2>
+        <input name="tags" placeholder="Tags" value="{{ data.tags }}">
+        <br>
+        <h2>Description</h2>
+        <p>Type in markdown.</p>
+        <textarea name="description">{{ data.description }}</textarea>
+        <br>
+        <h2>Testcases</h2>
+        {% for i in range(max_testcases) %}
+        <div class="grid-mini">
+            {% if data.testcases|length > i %}
+            <div class="box">
+                <h4>Input {{i}}</h4>
+                <textarea name="input{{ i }}">{{ data.testcases[i][0] }}</textarea>
+            </div>
+            <div class="box">
+                <h4>Output {{i}}</h4>
+                <textarea name="output{{ i }}">{{ data.testcases[i][1] }}</textarea>
+            </div>
+            {% else %}
+            <div class="box">
+                <h4>Input {{i}}</h4>
+                <textarea name="input{{ i }}"></textarea>
+            </div>
+            <div class="box">
+                <h4>Output {{i}}</h4>
+                <textarea name="output{{ i }}"></textarea>
+            </div>
+            {% endif %}
+        </div><br>
+        {% endfor %}
+        <br>
+        <input type="submit" text="Save Problem">
+    </form>
 
-{% endblock %}
+</body>
+
+</html>

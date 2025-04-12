@@ -1,123 +1,147 @@
-{% extends "base.html" %}
-{% block content %}
-<script type="text/x-mathjax-config">
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <link id="custom_css" rel="stylesheet" href="static/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PHSCPT Practice Platform</title>
+    <link rel="icon" href="static/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
+    <script src="static/common.js" defer></script>
+</head>
+
+<body>
+    <br>
+    <a href="/"><img src="static/logo.png" style="width: 30%"></a>
+    <br>
+    <a onclick="switchColorMode()">[switch color mode]</a>
+    <h2>Practice Contest Platform</h2>
+    <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
       tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
     });
 </script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<button id="scoreboard_button">Back to Scoreboard</button>
-<button id="catalog_button" onclick="location.href='public'">Back to Catalogue</button>
-<script>
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
-    });
-    let p_id = params.player;
-    let g_id = params.g_id;
-    if (p_id != null && g_id != null) {
-        document.getElementById("scoreboard_button").addEventListener("click", function() {
-            location.href = "scoreboard?id=" + g_id + "&player=" + p_id;
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <button id="scoreboard_button">Back to Scoreboard</button>
+    <button id="catalog_button" onclick="location.href='public'">Back to Catalogue</button>
+    <script>
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
         });
-        document.getElementById("catalog_button").style.display = "none";
-    }
-    else {
-        document.getElementById("scoreboard_button").style.display = "none";
-        document.getElementById("catalog_button").style.display = "block";
-    }
-</script>
-<h1>{{ data.title }}</h1>
-<div class="box">
-    {{ data.description | safe }}
-</div>
-<h2>Submit solution</h2>
-<div class="box">
-    <form method="post" enctype=multipart/form-data onSubmit="document.getElementById('submit').disabled=true;">
-        <div class="grid-mini">
-            <input type="file" name="file" accept = ".py,.java,.cpp" id="file" required>
-            <script>
-                document.getElementById("file").onchange = function(){
-                    extension = String((document.getElementById("file")).value).split('.').pop();
-                    var i = 0;
-                    if (extension == "cpp"){
-                        i = 0
-                    }
-                    if (extension == "java"){
-                        i = 1
-                    }
-                    if (extension == "py"){
-                        i = 3
-                    }
-                    document.getElementById("language").options[i].selected = true;
-                }
-
-                function copyToClipboard(text) {
-                    var textarea = document.createElement("textarea");
-                    textarea.textContent = text;
-                    textarea.style.position = "fixed";
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(textarea);
-                }
-                
-                // copy function for input/output
-                for (codeblock of document.getElementsByTagName("pre")) {
-                    codeblock.onclick = function() {
-                        copyToClipboard(this.innerText);
-                    }.bind(codeblock);
-                }
-            </script>
-            <div style="text-align:right;">
-                <select name="language" id="language" style="display:inline-block;width:auto;margin-right:0px" required>
-                    <option value="cpp">C++</option>
-                    <option value="java">Java</option>
-                    <option value="python2">Python 2.7.18</option>
-                    <option value="python">Python 3.9.5</option>
-                </select>        
-            </div>
-        </div>
-        <input type="submit" id="submit">
-    </form>
-</div>
-
-<h2>Results</h2>
-
-<div class="box">
-    {% if results %}
-    <div class="grid-tiny">
-        {% for result in results %}
-            {% if result[0] == "AC" %}
-                <div class="result-box success" title="Accepted">
-                    {{ loop.index }} <b>AC</b>
-                    <p>{{ result[1] }}ms</p>
-                </div>
-            {% elif result[0] == "WA" %}
-                <div class="result-box fail" title="Wrong Answer">
-                    {{ loop.index }} <b>{{ result[0] }}</b>
-                    <p>{{ result[1] }}ms</p>
-                </div>
-            {% elif result[0] == "TLE" %}
-                <div class="result-box fail" title="Time Limit Exceeded">
-                    {{ loop.index }} <b>{{ result[0] }}</b>
-                    <p>{{ result[1] }}ms</p>
-                </div>
-            {% elif result[0] == "RE" %}
-                <div class="result-box fail" title="Runtime Error">
-                    {{ loop.index }} <b>{{ result[0] }}</b>
-                    <p>{{ result[1] }}ms</p>
-                </div>
-            {% elif result[0] == "CE" %}
-                <div class="result-box fail" title="Compilation Error">
-                    {{ loop.index }} <b>{{ result[0] }}</b>
-                    <p>Compile Error</p>
-                </div>
-            {% endif %}
-        {% endfor %}
+        let p_id = params.player;
+        let g_id = params.g_id;
+        if (p_id != null && g_id != null) {
+            document.getElementById("scoreboard_button").addEventListener("click", function () {
+                location.href = "scoreboard?id=" + g_id + "&player=" + p_id;
+            });
+            document.getElementById("catalog_button").style.display = "none";
+        }
+        else {
+            document.getElementById("scoreboard_button").style.display = "none";
+            document.getElementById("catalog_button").style.display = "block";
+        }
+    </script>
+    <h1>{{ data.title }}</h1>
+    <div class="box">
+        {{ data.description | safe }}
     </div>
-    {% else %}
-    Submit a program to view results
-    {% endif %}            
-</div>
+    <h2>Submit solution</h2>
+    <div class="box">
+        <form method="post" enctype=multipart/form-data onSubmit="document.getElementById('submit').disabled=true;">
+            <div class="grid-mini">
+                <input type="file" name="file" accept=".py,.java,.cpp" id="file" required>
+                <script>
+                    document.getElementById("file").onchange = function () {
+                        extension = String((document.getElementById("file")).value).split('.').pop();
+                        var i = 0;
+                        if (extension == "cpp") {
+                            i = 0
+                        }
+                        if (extension == "java") {
+                            i = 1
+                        }
+                        if (extension == "py") {
+                            i = 3
+                        }
+                        document.getElementById("language").options[i].selected = true;
+                    }
 
-<br><br><br>
-{% endblock %}
+                    function copyToClipboard(text) {
+                        var textarea = document.createElement("textarea");
+                        textarea.textContent = text;
+                        textarea.style.position = "fixed";
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand("copy");
+                        document.body.removeChild(textarea);
+                    }
+
+                    // copy function for input/output
+                    for (codeblock of document.getElementsByTagName("pre")) {
+                        codeblock.onclick = function () {
+                            copyToClipboard(this.innerText);
+                        }.bind(codeblock);
+                    }
+                </script>
+                <div style="text-align:right;">
+                    <select name="language" id="language" style="display:inline-block;width:auto;margin-right:0px"
+                        required>
+                        <option value="cpp">C++</option>
+                        <option value="java">Java</option>
+                        <option value="python2">Python 2.7.18</option>
+                        <option value="python">Python 3.9.5</option>
+                    </select>
+                </div>
+            </div>
+            <input type="submit" id="submit">
+        </form>
+    </div>
+
+    <h2>Results</h2>
+
+    <div class="box">
+        {% if results %}
+        <div class="grid-tiny">
+            {% for result in results %}
+            {% if result[0] == "AC" %}
+            <div class="result-box success" title="Accepted">
+                {{ loop.index }} <b>AC</b>
+                <p>{{ result[1] }}ms</p>
+            </div>
+            {% elif result[0] == "WA" %}
+            <div class="result-box fail" title="Wrong Answer">
+                {{ loop.index }} <b>{{ result[0] }}</b>
+                <p>{{ result[1] }}ms</p>
+            </div>
+            {% elif result[0] == "TLE" %}
+            <div class="result-box fail" title="Time Limit Exceeded">
+                {{ loop.index }} <b>{{ result[0] }}</b>
+                <p>{{ result[1] }}ms</p>
+            </div>
+            {% elif result[0] == "RE" %}
+            <div class="result-box fail" title="Runtime Error">
+                {{ loop.index }} <b>{{ result[0] }}</b>
+                <p>{{ result[1] }}ms</p>
+            </div>
+            {% elif result[0] == "CE" %}
+            <div class="result-box fail" title="Compilation Error">
+                {{ loop.index }} <b>{{ result[0] }}</b>
+                <p>Compile Error</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        Submit a program to view results
+        {% endif %}
+    </div>
+
+    <br><br><br>
+</body>
+
+</html>

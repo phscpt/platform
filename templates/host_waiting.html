@@ -1,26 +1,48 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Game Code: {{ id }}</h1>
-<h3>Go to phscpt.pythonanywhere.com and enter code displayed above</h3>
-<div class="grid-mini" id="player-grid">
-</div>
-<h2><i>Waiting To Start...</i></h2>
-<form method=post>
-    <input type="submit" value="Start">
-</form>
-<script>
-    setInterval(function() {
-        fetch("/api/players?id={{ id }}")
-            .then(response => response.json())
-            .then(function(data){
-                document.getElementById("player-grid").innerHTML = "";
-                for (let player of data) {
-                    let box = document.createElement("div");
-                    box.className = "box";
-                    box.innerHTML = player[1];
-                    document.getElementById("player-grid").appendChild(box);
-                }
-            });
-    }, 1000);
-</script>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <link id="custom_css" rel="stylesheet" href="static/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PHSCPT Practice Platform</title>
+    <link rel="icon" href="static/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
+    <script src="static/common.js" defer></script>
+</head>
+
+<body>
+    <br>
+    <a href="/"><img src="static/logo.png" style="width: 30%"></a>
+    <br>
+    <a onclick="switchColorMode()">[switch color mode]</a>
+    <h2>Practice Contest Platform</h2>
+    <h1>Game Code: {{ id }}</h1>
+    <h3>Go to phscpt.pythonanywhere.com and enter code displayed above</h3>
+    <div class="grid-mini" id="player-grid">
+    </div>
+    <h2><i>Waiting To Start...</i></h2>
+    <form method=post>
+        <input type="submit" value="Start">
+    </form>
+    <script>
+        setInterval(function () {
+            fetch("/api/players?id={{ id }}")
+                .then(response => response.json())
+                .then(function (data) {
+                    document.getElementById("player-grid").innerHTML = "";
+                    for (let player of data) {
+                        let box = document.createElement("div");
+                        box.className = "box";
+                        box.innerHTML = player[1];
+                        document.getElementById("player-grid").appendChild(box);
+                    }
+                });
+        }, 1000);
+    </script>
+</body>
+
+</html>

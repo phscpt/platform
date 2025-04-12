@@ -1,10 +1,30 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Admin Catalogue</h1>
-<a id="upload-link" href="upload">Upload a Problem</a>
-<br><br>
-<h2>Used in Competition</h2>
-<!--
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link id="water_css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <link id="custom_css" rel="stylesheet" href="static/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PHSCPT Practice Platform</title>
+    <link rel="icon" href="static/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
+    <script src="static/common.js" defer></script>
+</head>
+
+<body>
+    <br>
+    <a href="/"><img src="static/logo.png" style="width: 30%"></a>
+    <br>
+    <a onclick="switchColorMode()">[switch color mode]</a>
+    <h2>Practice Contest Platform</h2>
+    <h1>Admin Catalogue</h1>
+    <a id="upload-link" href="upload">Upload a Problem</a>
+    <br><br>
+    <h2>Used in Competition</h2>
+    <!--
 <div class="grid">
     {% for problem in problems %}
     {% if problem.status == "public" %}
@@ -16,16 +36,16 @@
     {% endif %}
     {% endfor %}
 </div>-->
-<table style="font-size: 14pt; table-layout: auto">
-    <thead>
-        <tr>
-            <th>Problem</th>
-            <th>Difficulty</th>
-            <th>Tags</th>
-            <th>Edit</th>
-        </tr>
-    </thead>
-    {% for problem in problems %}
+    <table style="font-size: 14pt; table-layout: auto">
+        <thead>
+            <tr>
+                <th>Problem</th>
+                <th>Difficulty</th>
+                <th>Tags</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        {% for problem in problems %}
         {% if problem.status == "public" %}
         <tr>
             <td style="padding: 10px">
@@ -33,16 +53,16 @@
             </td>
             <td style="padding: 10px">
                 {% if "difficulty" in problem %}
-                    {{ problem.difficulty }}
+                {{ problem.difficulty }}
                 {% else %}
-                    N/A
+                N/A
                 {% endif %}
             </td>
             <td style="padding: 10px">
                 {% if "tags" in problem %}
-                    {{ problem.tags }}
+                {{ problem.tags }}
                 {% else %}
-                    N/A
+                N/A
                 {% endif %}
             </td>
             <td style="padding: 10px">
@@ -50,12 +70,12 @@
             </td>
         </tr>
         {% endif %}
-    {% endfor %}
-</table>
-<br><br>
-<hr>
-<h2>Ready for Competition</h2>
-<!--<div class="grid">
+        {% endfor %}
+    </table>
+    <br><br>
+    <hr>
+    <h2>Ready for Competition</h2>
+    <!--<div class="grid">
     {% for problem in problems %}
     {% if problem.status == "publvate" %}
     <div class="box">
@@ -66,16 +86,16 @@
     {% endif %}
     {% endfor %}
 </div>-->
-<table style="font-size: 14pt; table-layout: auto">
-    <thead>
-        <tr>
-            <th>Problem</th>
-            <th>Difficulty</th>
-            <th>Tags</th>
-            <th>Edit</th>
-        </tr>
-    </thead>
-    {% for problem in problems %}
+    <table style="font-size: 14pt; table-layout: auto">
+        <thead>
+            <tr>
+                <th>Problem</th>
+                <th>Difficulty</th>
+                <th>Tags</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        {% for problem in problems %}
         {% if problem.status == "publvate" %}
         <tr>
             <td style="padding: 10px">
@@ -83,16 +103,16 @@
             </td>
             <td style="padding: 10px">
                 {% if "difficulty" in problem %}
-                    {{ problem.difficulty }}
+                {{ problem.difficulty }}
                 {% else %}
-                    N/A
+                N/A
                 {% endif %}
             </td>
             <td style="padding: 10px">
                 {% if "tags" in problem %}
-                    {{ problem.tags }}
+                {{ problem.tags }}
                 {% else %}
-                    N/A
+                N/A
                 {% endif %}
             </td>
             <td style="padding: 10px">
@@ -100,12 +120,12 @@
             </td>
         </tr>
         {% endif %}
-    {% endfor %}
-</table>
-<br><br>
-<hr>
-<h2>Not ready for Competition</h2>
-<!--<div class="grid">
+        {% endfor %}
+    </table>
+    <br><br>
+    <hr>
+    <h2>Not ready for Competition</h2>
+    <!--<div class="grid">
     {% for problem in problems %}
     {% if problem.status == "private" %}
     <div class="box">
@@ -116,16 +136,16 @@
     {% endif %}
     {% endfor %}
 </div>-->
-<table style="font-size: 14pt; table-layout: auto">
-    <thead>
-        <tr>
-            <th>Problem</th>
-            <th>Difficulty</th>
-            <th>Tags</th>
-            <th>Edit</th>
-        </tr>
-    </thead>
-    {% for problem in problems %}
+    <table style="font-size: 14pt; table-layout: auto">
+        <thead>
+            <tr>
+                <th>Problem</th>
+                <th>Difficulty</th>
+                <th>Tags</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        {% for problem in problems %}
         {% if problem.status == "private" %}
         <tr>
             <td style="padding: 10px">
@@ -133,16 +153,16 @@
             </td>
             <td style="padding: 10px">
                 {% if "difficulty" in problem %}
-                    {{ problem.difficulty }}
+                {{ problem.difficulty }}
                 {% else %}
-                    N/A
+                N/A
                 {% endif %}
             </td>
             <td style="padding: 10px">
                 {% if "tags" in problem %}
-                    {{ problem.tags }}
+                {{ problem.tags }}
                 {% else %}
-                    N/A
+                N/A
                 {% endif %}
             </td>
             <td style="padding: 10px">
@@ -150,7 +170,9 @@
             </td>
         </tr>
         {% endif %}
-    {% endfor %}
-</table>
-<br>
-{% endblock %}
+        {% endfor %}
+    </table>
+    <br>
+</body>
+
+</html>
