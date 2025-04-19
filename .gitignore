@@ -13,3 +13,4 @@ games/*
 !games/readme.md
 
 SECRET.txt
+.vscode/*.*

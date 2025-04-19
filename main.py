@@ -97,7 +97,7 @@ def upload():
 def edit():
     if not admin_check(request):
         abort(401)
-    p = request.args.get("id")
+    p = str(request.args.get("id"))
     with open("problems/" + p + ".json", encoding='utf-8') as f:
         data = json.load(f)
     data["id"] = p
@@ -127,7 +127,7 @@ def edit():
 @app.route('/problem', methods=["GET", "POST"])
 def problem():
     # Get problem id
-    p = request.args.get("id")
+    p = str(request.args.get("id"))
 
     # Load problem description + convert to html
     try:
@@ -147,7 +147,7 @@ def problem():
         rand = random_id()
         os.mkdir("tmp/" + date + rand)
 
-        fname = "tmp/" + date + rand + "/" + file.filename
+        fname = "tmp/" + date + rand + "/" + str(file.filename)
         file.save(fname)
         lang = request.form["language"]
 

@@ -1,3 +1,4 @@
+from csv import Error
 import hashlib, uuid, json, os
 
 '''
@@ -66,6 +67,8 @@ class User:
         '''
         self.isAdmin = is_admin(email, username, password)
         self.credentials = [email, username, hash_password(password), salt, self.isAdmin]
+        self.email = email
+        self.username = username
 
     @staticmethod
     def from_json(json_dat):
@@ -73,14 +76,12 @@ class User:
         return User(jsonned["email"], jsonned["username"], jsonned["password"], jsonned["salt"])
 
     def save(self):
-        fp = "users/" + hashlib.sha256(self.email).hexdigest() + ".json"
-
-    def store_account(self):
-        open("users/" + self.user_ID + ".json", "w", encoding='utf-8').write(json.dumps(self.credentials))
+        fp = "users/" + hashlib.sha256(self.email.encode()).hexdigest() + ".json"
 
 def get_user(email:str) -> User:
-    fp = "users/" + hashlib.sha256(email).hexdigest() + ".json"
-    if not os.path.exists(fp): return FileNotFoundError()
+    fp = "users/" + hashlib.sha256(email.encode()).hexdigest() + ".json"
+    if not os.path.exists(fp): raise FileNotFoundError()
 
     usrdata = open(fp,'w')
     usr = User.from_json(usrdata)
+    return usr

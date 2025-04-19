@@ -63,7 +63,7 @@ class Game:
         print("created game", self.id)
         print("problems:", problems)
 
-    def to_json(self) -> str:
+    def to_json(self) -> dict:
         jsoned = {
             "id":self.id,
             "players": list(map(Player.to_json,self.players)),
@@ -142,7 +142,7 @@ class Game:
         self.start_time = time.time()
     
     @_save_wrap
-    def give_points(self, player_id:str, problem, points:int):
+    def give_points(self, player_id:str, problem, points:float):
         if self.time_remaining() < -1: raise Exception(f"Contest over")
         problem_idx = self.problems.index(problem)
         for player in self.players:
