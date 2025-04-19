@@ -11,5 +11,6 @@ working-aws/*
 
 games/*
 !games/readme.md
+.vscode/*
 
 SECRET.txt
