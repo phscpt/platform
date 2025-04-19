@@ -145,13 +145,16 @@ def problem():
         date = now.strftime("%m-%d-%Y-%H-%M-%S-")
 
         rand = random_id()
+
+        SUBMISSION_ID = date+rand
+
         os.mkdir("tmp/" + date + rand)
 
         fname = "tmp/" + date + rand + "/" + file.filename
         file.save(fname)
         lang = request.form["language"]
 
-        results = grader.grade(fname, data["testcases"], lang)
+        results = grader.grade(fname, data["testcases"], lang, SUBMISSION_ID)
 
         num_ac = 0
         for res in results:

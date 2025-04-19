@@ -1,4 +1,4 @@
-import subprocess, os
+import subprocess, os, json
 from subprocess import Popen, PIPE
 import time
 
@@ -11,9 +11,9 @@ def elim_whitespace(a: str) -> str:
     strippedLines = list(map(str.rstrip, a.splitlines()))
     return "\n".join(strippedLines).replace("\r","")
 
-def grade(file, tests, language):
+def grade(file:str, problem:str, language:str, id:str):
     '''
-     Takes in a filename and testcases and runs it using each test case
+     Takes in a filename and problem name and runs it using each test case
 
      For each test case:
        - If the program takes over `TIME_LIMIT` to execute, it returns `"Time Limit Exceeded"` for that testcase
@@ -21,7 +21,9 @@ def grade(file, tests, language):
        - If the program crashes, it returns `"Runtime Error"`
        - Otherwise, it returns `"Accepted"`
     '''
-
+    with open("problems/" + problem + ".json", encoding='utf-8') as f:
+        data = json.load(f)
+        tests = data["testcases"]
     results = []
 
     os.chdir(olddir)
@@ -91,6 +93,9 @@ def grade(file, tests, language):
             print("wrong answer on test", len(results))
             results.append(["WA", time_elapsed])
     os.chdir(olddir)
+
+    # save results here
+    # follow format in grading/readme.md
     return results
 
 if __name__ == "__main__":
