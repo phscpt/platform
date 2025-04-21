@@ -42,3 +42,10 @@ function setColorMode() {
 
 setColorMode();
 // storm();
+
+// copy function for input/output
+for (codeblock of document.getElementsByTagName("pre")) {
+    codeblock.onclick = function () {
+        navigator.clipboard.writeText(this.innerText);
+    }
+}

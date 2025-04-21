@@ -5,6 +5,9 @@ __pycache__/
 tmp/*
 !tmp/readme.txt
 
+grading/*
+!grading/readme.md
+
 problems/*
 
 working-aws/*

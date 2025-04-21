@@ -25,8 +25,16 @@
     </form>
     <button id="sign_out" onclick="signOut()" style="top:30px;right:40px" class="absolute-button">Sign Out</button>
     <!---Change right px to 170 when adding back sign up-->
+    <!--
+<form action="sign_up" style="position:absolute;top:30px;right:40px">
+    <input type="submit" class="button-emphasis" value="Sign Up" />
+</form>-->
     <br>
     <div class="grid">
+        <div class="box">
+            <h2>Host Contest</h2>
+            <button onclick="location.href='select'">Host</button>
+        </div>
         <div class="box">
             <form method="post">
                 <h2>Join Contest</h2>
@@ -35,15 +43,14 @@
                 <input type="submit" value="Join" class="button-emphasis">
             </form>
         </div>
-        <div class="box">
-            <h2>Practice</h2>
-            <button id="public_catalogue" onclick="location.href='public'" class="button-emphasis">Problem
-                Catalogue</button>
-            <button id="catalogue" onclick="location.href='list'">Admin Catalogue</button>
-        </div>
     </div>
     <br>
-    <button onclick="location.href='select'">Host Contest</button>
+    <!--<form method="post" action="list">
+    <input type="text" name="userid" id="userid" hidden style="display:none"> <!-- very cursed userid transfer --
+    <input type="submit" id="catalogue" value="Problem Catalogue">
+</form>-->
+    <button id="public_catalogue" onclick="location.href='public'">Problem Catalogue</button>
+    <button id="catalogue" onclick="location.href='list'">Admin Catalogue</button>
     <button id="addQuestion" onclick="window.open('https:\/\/forms.gle/WTtjz5tkhXwH98hW9','_blank')"
         style="bottom:30px;right:40px;" class="absolute-button">Suggest Problem</button>
     <script>
@@ -107,19 +114,9 @@
             updateLogInOut();
         }
     </script>
-    <br>
-    <footer>
-        Made by <a href="https://jierueichang.github.io" style="color:var(--text-muted);">Jieruei Chang</a> and <a
-            href="https://nicholashagedorn.com" style="color:var(--text-muted);">Nick Hagedorn</a>
-        •
-        <a href="about" style="color:var(--text-muted);">About</a>
-        <br>
-        Copyright © <span id="year"></span> <a href="https://phscpt.github.io" style="color:var(--text-muted);">PHS
-            Competitive Programming Team</a>
-    </footer>
-    <script>
-        document.getElementById("year").innerHTML = new Date().getFullYear();
-    </script>
+    <br><br>
+    <footer>Made by <a href="https://jierueichang.github.io" style="color:var(--text-muted);">Jieruei Chang</a> and <a
+            href="https://nicholashagedorn.com" style="color:var(--text-muted);">Nick Hagedorn</a></footer>
     <br>
 </body>
 
