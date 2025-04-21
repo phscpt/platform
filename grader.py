@@ -116,6 +116,8 @@ def grade(id:str):
     os.chdir(olddir)
 
     os.remove(f"tmp/{id}/{filename}")
+    if os.path.exists(f"tmp/{id}/a.out"): os.remove(f"tmp/{id}/a.out")
+    if os.path.exists(f"tmp/{id}/{filename.split('.')[0]}.class"): os.remove(f"tmp/{id}/{filename.split('.')[0]}.class")
     os.rmdir(f"tmp/{id}")
     
 
