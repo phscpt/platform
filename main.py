@@ -361,7 +361,7 @@ def get_problem_results():
         if r[0] == "AC": num_ac += 1
 
     if "game" not in res and "player" not in res:
-        return res["results"]
+        return json.dumps(res["results"])
     print('a')
     # give points to player if playing a game
     g_id = res["game"]
