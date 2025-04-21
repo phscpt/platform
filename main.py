@@ -344,7 +344,7 @@ def submit_solution():
     with open(f"grading/{SUBMISSION_ID}.json",'w') as f: json.dump(res,f)
     grader.grade(SUBMISSION_ID)
 
-    return [SUBMISSION_ID]
+    return json.dumps([SUBMISSION_ID,])
 
 @app.route("/api/submission_result", methods=["GET"])
 def get_problem_results():
