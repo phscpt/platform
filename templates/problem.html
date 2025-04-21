@@ -36,18 +36,22 @@
     </div>
     <h2>Submit solution</h2>
     <div class="box" submission={{submission}}>
-        <div class="grid-mini">
-            <input type="file" name="file" accept=".py,.java,.cpp" id="file" required>
-            <div style="text-align:right;">
-                <select name="language" id="language" style="display:inline-block;width:auto;margin-right:0px" required>
-                    <option value="cpp">C++</option>
-                    <option value="java">Java</option>
-                    <option value="python2">Python 2.7.18</option>
-                    <option value="python">Python 3.9.5</option>
-                </select>
+        <form id="submission-box">
+            <div class="grid-mini">
+                <input type="file" name="file" accept=".py,.java,.cpp" id="file" required>
+                <div style="text-align:right;">
+                    <select name="language" id="language" style="display:inline-block;width:auto;margin-right:0px"
+                        required>
+                        <option value="cpp">C++</option>
+                        <option value="java">Java</option>
+                        <option value="python2">Python 2.7.18</option>
+                        <option value="python">Python 3.9.5</option>
+                    </select>
+                </div>
             </div>
-        </div>
+        </form>
         <input type="submit" id="submit" onclick="submit()">
+        <!-- ^^ outside of form because we have our own submit function -->
     </div>
 
     <h2>Results</h2>

@@ -40,6 +40,42 @@ function setColorMode() {
     }
 }
 
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+const updateLoginStatus = () => {
+    fetch("/api/check_admin")
+        .then(response => response.json())
+        .then(loginStatus => {
+            if (loginStatus.admin === true) return;
+            setCookie("username", "NotIn", 30);
+            setCookie("userid", "NotIn", 30);
+            if (signOut != undefined) signOut();
+        })
+
+}
+updateLoginStatus();
+
 setColorMode();
 // storm();
 
@@ -49,3 +85,6 @@ for (codeblock of document.getElementsByTagName("pre")) {
         navigator.clipboard.writeText(this.innerText);
     }
 }
+
+
+if (document.getElementById("year") != null) document.getElementById("year").innerHTML = new Date().getFullYear();

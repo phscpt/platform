@@ -8,12 +8,22 @@ app = Flask(__name__)
 
 max_testcases = 10
 
-# games = []
 users = []
 
-# adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
-adminPass = "a"
+def loadSecret() -> None:
+    global secret
+    secret = open("SECRET.txt", "r").read().rstrip()
 
+def changeSecret() -> None:
+    global secret
+    ALLOWED = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm"
+    LENGTH = 100
+    now = datetime.now()
+    secret = "".join([random.choice(ALLOWED) for _ in range(LENGTH)]) + now.strftime("%m-%Y")
+    with open("SECRET.txt",'w') as f:
+        f.write(secret)
+
+loadSecret()
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 def sortByDifficulty(x) -> int:
@@ -49,7 +59,9 @@ def get_problem_names() -> list:
     return problems
 
 def admin_check(req) -> bool:
-    return req.cookies.get("userid") == adminPass
+    loadSecret()
+    if (secret[-7:] != datetime.now().strftime("%m-%Y")[-7:]): changeSecret()
+    return req.cookies.get("userid") == secret
 
 @app.route("/list", methods=["GET","POST"])
 def catalogue():
@@ -237,7 +249,7 @@ def log_in():
                     data = json.load(currentFile)
                     if is_account(data, emailUsername, password):
 
-                        userID = adminPass
+                        userID = secret
                         isAdmin = data[4]
 
                         return render_template(
@@ -322,6 +334,15 @@ def waiting():
         print(f"Game or player not found :(")
     return render_template("waiting.html", id=request.args.get("id"), player=player_name, player_id=player)
 
+@app.route("/api/check_admin", methods=["GET"])
+def request_is_admin():
+    curr_state = {"admin":False, "logged_in":False}
+    if admin_check(request):
+        curr_state["admin"]=True
+        curr_state["logged_in"]=True
+        return json.dumps(curr_state)
+    return curr_state
+    
 
 @app.route("/api/submit", methods=["POST"])
 def submit_solution():

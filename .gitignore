@@ -8,6 +8,8 @@ tmp/*
 grading/*
 !grading/readme.md
 
+users/*
+
 problems/*
 
 working-aws/*

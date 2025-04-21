@@ -1,17 +1,16 @@
 // scoreboard button
-
-const params = new Proxy(new URLSearchParams(window.location.search), {
-    get: (searchParams, prop) => searchParams.get(prop),
-});
+const params = new URLSearchParams(window.location.search);
 const p_id = params.player;
 const g_id = params.g_id;
 const problem = params.id;
-if (p_id != null && g_id != null) {
+const submissionBox = document.getElementById("submission-box");
+
+const inGame = (p_id != null && g_id != null);
+if (inGame) {
     document.getElementById("scoreboard_button").addEventListener("click", () => { location.href = "scoreboard?id=" + g_id + "&player=" + p_id; });
     document.getElementById("scoreboard_button").style.display = "block";
     document.getElementById("catalog_button").style.display = "none";
 }
-
 
 // deal with form
 const autoSelectExtension = () => {
@@ -33,22 +32,16 @@ const resultName = {
 }
 
 const fillResults = (results) => {
+    submissionBox.reset();
+
     const resultDisplay = document.createElement("div");
     resultDisplay.className = "grid-tiny";
-
     results.forEach((result, i) => {
-        const ansBlock = document.createElement("div");
-        ansBlock.className = "result-box fail";
-        ansBlock.title = resultName[result[0]];
-        ansBlock.innerHTML = (i + 1) + " <b>" + result[0] + "</b><p>" + result[1] + "ms</p>";
-        if (result[0] == "AC") ansBlock.className = "result-box success";
-
-        resultDisplay.appendChild(ansBlock);
+        resultDisplay.innerHTML += `
+            <div class = "result-box ${(result[0] == "AC") ? "success" : "fail"}" title = ${resultName[result[0]]}>
+                ${i + 1} <b>${result[0]}</b><p>${result[1]}ms</p>
+            </div> `;
     });
-
-    const submissionContainer = document.getElementById("file").parentNode;
-    submissionContainer.innerHTML = submissionContainer.innerHTML;
-    document.getElementById("file").onchange = autoSelectExtension;
 
     document.getElementById('results-container').innerHTML = "";
     document.getElementById('results-container').appendChild(resultDisplay);
@@ -65,6 +58,8 @@ const getGrade = (submissionID) => {
 }
 
 const submit = () => {
+    if (!submissionBox.reportValidity()) throw new Error("Could not submit: invalid form contents")
+
     const file = document.getElementById("file").files[0];
     const reader = new FileReader();
 
@@ -83,8 +78,7 @@ const submit = () => {
             }
         })
             .then(response => response.json())
-            .then(resList => resList[0])
-            .then(submissionID => getGrade(submissionID));
+            .then(submissionIDList => getGrade(submissionIDList[0]));
     }
     reader.readAsText(file);
 }
