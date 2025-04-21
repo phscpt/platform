@@ -379,7 +379,7 @@ def get_problem_results():
         player.results[res["problem"]] = results
         game.give_points(p_id, res["problem"], num_points)
     except KeyError: pass
-    return res["results"]
+    return json.dumps(res["results"])
 
 @app.route("/api/game_status", methods=["GET"])
 def get_game_status():
