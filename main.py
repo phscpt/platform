@@ -11,8 +11,8 @@ max_testcases = 10
 # games = []
 users = []
 
-adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
-# adminPass = "a"
+# adminPass = open("SECRET.txt", "r").read().rstrip() #''.join(random.choice(string.ascii_lowercase) for i in range(40))
+adminPass = "a"
 
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
@@ -134,66 +134,8 @@ def problem():
         with open("problems/" + p + ".json", encoding='utf-8') as f:
             data = json.load(f)
             data["description"] = markdown.markdown(data["description"], extensions=['fenced_code'])
-    except:
-        abort(404)
+    except: abort(404)
 
-    # Run grader if problem is submitted
-    if request.method == "POST":
-        file = request.files['file']
-        print(f"received problem submission for {p}:", file.filename)
-        now = datetime.now()
-        date = now.strftime("%m-%d-%Y-%H-%M-%S-")
-
-        rand = random_id()
-
-        SUBMISSION_ID = date+rand
-
-        os.mkdir("tmp/" + date + rand)
-
-        fname = "tmp/" + date + rand + "/" + file.filename
-        file.save(fname)
-        lang = request.form["language"]
-
-        results = grader.grade(fname, data["testcases"], lang, SUBMISSION_ID)
-
-        num_ac = 0
-        for res in results:
-            if res[0] == "AC":
-                num_ac += 1
-
-        # give points to player if playing a game
-        g_id = request.args.get("g_id")
-        p_id = request.args.get("player")
-        if (g_id != None) and (p_id != None):
-            print("giving score to", p_id, "from game", g_id)
-            try:
-                game = get_game(g_id)
-                try:
-                    player = game.get_player(p_id)
-                    if num_ac == len(results):
-                        num_points = 100
-                    elif num_ac > 1:
-                        num_points = 100 * (num_ac - 1)/(len(results) - 1)
-                    else:
-                        num_points = -0.0001
-                    player.results[p] = results
-                    game.give_points(p_id, p, num_points)
-
-                except KeyError: pass
-            except KeyError: pass
-        return render_template("problem.html", results=results, data=data)
-    g_id = request.args.get("g_id")
-    p_id = request.args.get("player")
-    if (g_id != None) and (p_id != None):
-        try:
-            game = get_game(g_id)
-            try:
-                player = game.get_player(p_id)
-                if p in player.results:
-                    return render_template("problem.html", results=player.results[p], data=data)
-                return render_template("problem.html", results=False, data=data)
-            except KeyError: pass
-        except KeyError: pass
     return render_template("problem.html", results=False, data=data)
 
 # GAME CREATION/JOINING
@@ -211,7 +153,7 @@ def index():
             name = request.form["player_name"]
             id = request.form["game_id"]
         except:
-            return render_template("index2.html")
+            return render_template("index.html")
         id = id.rstrip().upper()
         print(name, id)
 
@@ -221,10 +163,8 @@ def index():
             game = get_game(id)
             p_id = game.add_player(name)
             return redirect(f"/waiting?id={id}&player={p_id}")
-        except KeyError:
-            ...
-            # print(f"Game {id} not found. Active games: {" ".join([game.id for game in Games.__games])}")
-    return render_template("index2.html")
+        except KeyError: pass
+    return render_template("index.html")
 
 # ABOUT
 @app.route("/about")
@@ -364,7 +304,6 @@ def host():
             game.start()
             return redirect(f"/host_scoreboard?id={id}")
         except KeyError:
-            # print("game not found")
             print(f"Game {id} not found. Active games: {[games[g_id].id for g_id in games] }")
     return render_template("host_waiting.html", id=id)
 
@@ -383,6 +322,65 @@ def waiting():
         print(f"Game or player not found :(")
     return render_template("waiting.html", id=request.args.get("id"), player=player_name, player_id=player)
 
+
+@app.route("/api/submit", methods=["POST"])
+def submit_solution():
+    submission = request.get_json()
+    # print(f"received problem submission for {p}:", file.filename)
+    now = datetime.now()
+    SUBMISSION_ID = now.strftime("%m-%d-%Y-%H-%M-%S-") + random_id()
+    res = {
+        "submission": SUBMISSION_ID,
+        "problem": request.args.get("id"),
+        "status": "waiting for grading server",
+        "code": submission["submission"],
+        "lang": submission["lang"],
+        "results": []
+    }
+    if "g_id" in request.args and "player" in request.args:
+        res["game"] = request.args.get("g_id")
+        res["player"] = request.args.get("player")
+
+    with open(f"grading/{SUBMISSION_ID}.json",'w') as f: json.dump(res,f)
+    grader.grade(SUBMISSION_ID)
+
+    return [SUBMISSION_ID]
+
+@app.route("/api/submission_result", methods=["GET"])
+def get_problem_results():
+    if "submission" not in request.args: return "error"
+    submission = request.args.get("submission")
+    if not os.path.exists(f"grading/{submission}.json"): return "error"
+
+    with open(f"grading/{submission}.json",'r') as f: res = json.load(f)
+    if res["status"] != "graded": return "ungraded"
+    results = res["results"]
+
+    num_ac = 0
+    for r in results:
+        if r[0] == "AC": num_ac += 1
+
+    if "game" not in res and "player" not in res:
+        return res["results"]
+    print('a')
+    # give points to player if playing a game
+    g_id = res["game"]
+    p_id = res["player"]
+    print("giving score to", p_id, "from game", g_id)
+    try:
+        game = get_game(g_id)
+        player = game.get_player(p_id)
+        if num_ac == len(results):
+            num_points = 100
+        elif num_ac > 1:
+            num_points = 100 * (num_ac - 1)/(len(results) - 1)
+        else:
+            num_points = -0.0001
+        player.results[res["problem"]] = results
+        game.give_points(p_id, res["problem"], num_points)
+    except KeyError: pass
+    return res["results"]
+
 @app.route("/api/game_status", methods=["GET"])
 def get_game_status():
     id = request.args.get("id")
@@ -399,7 +397,6 @@ def get_players():
     try:
         game = get_game(id)
         listified = list(map(Player.to_list,game.players))
-        # print(listified)
         return json.dumps(listified)
     except KeyError:
         print(f"No game found with id {id}")
@@ -420,7 +417,6 @@ def scoreboard():
             player = player,
             player_name = p.name,
             problems = game.problems,
-            tst = False,
             time = game.time_remaining()
         )
     except:
@@ -470,5 +466,5 @@ games = running_games
 '''
 
 if __name__ == "__main__":
-    # app.run("127.0.0.1",8000)
-    app.run("0.0.0.0")
+    app.run("127.0.0.1",8000)
+    # app.run("0.0.0.0")
