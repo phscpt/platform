@@ -16,3 +16,8 @@ https://phscpt.pythonanywhere.com
 
 ## Dependencies
 Requires python `markdown` and `flask` libraries, as well as `g++`, `java`, `python2.7` and `python3.9`.
+
+## Usage
+- Use a WSGI of your choosing to host the website in main.py
+- Run `grader.py` on the _same machine_
+  - You _can_ run multiple graders, but they have a decently high chance of racing for any given submission so it's highly discouraged

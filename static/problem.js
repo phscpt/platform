@@ -4,6 +4,7 @@ const p_id = params.player;
 const g_id = params.g_id;
 const problem = params.id;
 const submissionBox = document.getElementById("submission-box");
+const resultsContainer = document.getElementById('results-container');
 
 const inGame = (p_id != null && g_id != null);
 if (inGame) {
@@ -13,7 +14,7 @@ if (inGame) {
 }
 
 // deal with form
-const autoSelectExtension = () => {
+document.getElementById("file").onchange = () => {
     const extension = String((document.getElementById("file")).value).split('.').pop();
     let i = 0;
     if (extension == "cpp") i = 0
@@ -21,7 +22,6 @@ const autoSelectExtension = () => {
     if (extension == "py") i = 3
     document.getElementById("language").options[i].selected = true;
 }
-document.getElementById("file").onchange = autoSelectExtension;
 
 const resultName = {
     "AC": "Accepted",
@@ -32,8 +32,6 @@ const resultName = {
 }
 
 const fillResults = (results) => {
-    submissionBox.reset();
-
     const resultDisplay = document.createElement("div");
     resultDisplay.className = "grid-tiny";
     results.forEach((result, i) => {
@@ -43,8 +41,9 @@ const fillResults = (results) => {
             </div> `;
     });
 
-    document.getElementById('results-container').innerHTML = "";
-    document.getElementById('results-container').appendChild(resultDisplay);
+    resultsContainer.innerHTML = `<div id="loading-spinny-container" class="box loading-spinny-container"><div class="loading-spinny"></div></div>`;
+    resultsContainer.appendChild(resultDisplay);
+    stopLoading();
 }
 
 const getGrade = (submissionID) => {
@@ -52,9 +51,25 @@ const getGrade = (submissionID) => {
     fetch("/api/submission_result?submission=" + submissionID)
         .then(response => response.json())
         .then(results => {
-            if (results == "ungraded") setTimeout(getGrade, 500, [submissionID]);
+            console.log(results);
+            if (results[0] === "ungraded") setTimeout(getGrade, 500, [submissionID]);
             else fillResults(results);
         });
+}
+
+const doLoading = () => {
+    submissionBox.reset();
+    resultsContainer.innerHTML = `
+    <div id="loading-spinny-container" class="box loading-spinny-container">
+        <div class="loading-spinny"></div>
+    </div><h2>grading...</h2>`;
+    const container = document.getElementById("loading-spinny-container");
+    container.style.display = "block";
+}
+
+const stopLoading = () => {
+    const container = document.getElementById("loading-spinny-container");
+    container.style.display = "none";
 }
 
 const submit = () => {
@@ -77,7 +92,10 @@ const submit = () => {
                 "Content-type": "application/json; charset=UTF-8"
             }
         })
-            .then(response => response.json())
+            .then(response => {
+                doLoading();
+                return response.json()
+            })
             .then(submissionIDList => getGrade(submissionIDList[0]));
     }
     reader.readAsText(file);

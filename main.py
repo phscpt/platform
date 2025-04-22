@@ -1,6 +1,6 @@
 # https://flask.palletsprojects.com/en/stable/quickstart/
 
-import grader, json, os, random, time, markdown, uuid, hashlib, glob, string, html, traceback
+import json, os, random, time, markdown, uuid, hashlib, glob, string, html, traceback
 from datetime import datetime
 from contest import *
 from flask import Flask, request, render_template, redirect, abort
@@ -363,7 +363,8 @@ def submit_solution():
         res["player"] = request.args.get("player")
 
     with open(f"grading/{SUBMISSION_ID}.json",'w') as f: json.dump(res,f)
-    grader.grade(SUBMISSION_ID)
+    with open(f"grading/todo/{SUBMISSION_ID}",'w') as f: f.write("")
+    # grader.grade(SUBMISSION_ID)
 
     return json.dumps([SUBMISSION_ID,])
 
@@ -374,7 +375,7 @@ def get_problem_results():
     if not os.path.exists(f"grading/{submission}.json"): return "error"
 
     with open(f"grading/{submission}.json",'r') as f: res = json.load(f)
-    if res["status"] != "graded": return "ungraded"
+    if res["status"] != "graded": return json.dumps(["ungraded",])
     results = res["results"]
 
     num_ac = 0
