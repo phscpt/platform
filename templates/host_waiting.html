@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
     <script src="static/common.js" defer></script>
+    <script src="static/host_waiting.js" defer></script>
 </head>
 
 <body>
@@ -20,7 +21,7 @@
     <br>
     <a onclick="switchColorMode()">[switch color mode]</a>
     <h2>Practice Contest Platform</h2>
-    <h1>Game Code: {{ id }}</h1>
+    <h1 id="gamecode"></h1>
     <h3>Go to phscpt.pythonanywhere.com and enter code displayed above</h3>
     <div class="grid-mini" id="player-grid">
     </div>
@@ -28,21 +29,6 @@
     <form method=post>
         <input type="submit" value="Start">
     </form>
-    <script>
-        setInterval(function () {
-            fetch("/api/players?id={{ id }}")
-                .then(response => response.json())
-                .then(function (data) {
-                    document.getElementById("player-grid").innerHTML = "";
-                    for (let player of data) {
-                        let box = document.createElement("div");
-                        box.className = "box";
-                        box.innerHTML = player[1];
-                        document.getElementById("player-grid").appendChild(box);
-                    }
-                });
-        }, 1000);
-    </script>
 </body>
 
 </html>

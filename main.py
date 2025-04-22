@@ -336,7 +336,7 @@ def waiting():
 
 @app.route("/api/check_admin", methods=["GET"])
 def request_is_admin():
-    curr_state = {"admin":False, "logged_in":False}
+    curr_state = {"admin":False, "logged_in":False, "error":"none"}
     if admin_check(request):
         curr_state["admin"]=True
         curr_state["logged_in"]=True
@@ -366,16 +366,16 @@ def submit_solution():
     with open(f"grading/todo/{SUBMISSION_ID}",'w') as f: f.write("")
     # grader.grade(SUBMISSION_ID)
 
-    return json.dumps([SUBMISSION_ID,])
+    return json.dumps({"submissionID": SUBMISSION_ID, "error":"none"})
 
 @app.route("/api/submission_result", methods=["GET"])
 def get_problem_results():
-    if "submission" not in request.args: return "error"
+    if "submission" not in request.args: return json.dumps({"error":"dne"})
     submission = request.args.get("submission")
-    if not os.path.exists(f"grading/{submission}.json"): return "error"
+    if not os.path.exists(f"grading/{submission}.json"): return json.dumps({"error":"dne"})
 
     with open(f"grading/{submission}.json",'r') as f: res = json.load(f)
-    if res["status"] != "graded": return json.dumps(["ungraded",])
+    if res["status"] != "graded": return json.dumps({"error":"unready"})
     results = res["results"]
 
     num_ac = 0
@@ -383,7 +383,7 @@ def get_problem_results():
         if r[0] == "AC": num_ac += 1
 
     if "game" not in res and "player" not in res:
-        return json.dumps(res["results"])
+        return json.dumps({"results":res["results"],"error":"none"})
     print('a')
     # give points to player if playing a game
     g_id = res["game"]
@@ -401,17 +401,17 @@ def get_problem_results():
         player.results[res["problem"]] = results
         game.give_points(p_id, res["problem"], num_points)
     except KeyError: pass
-    return json.dumps(res["results"])
+    return json.dumps({"results":res["results"],"error":"none"})
 
 @app.route("/api/game_status", methods=["GET"])
 def get_game_status():
     id = request.args.get("id")
     try:
         game = get_game(id)
-        return '{"status":"%s"}' % game.status
+        return json.dumps({"status":game.status, "error":"none"})
     except:
         print(f"API request for status of game id {id} failed.")
-        return "error"
+        return json.dumps({"error":"dne"})
 
 @app.route("/api/players", methods=["GET"])
 def get_players():
@@ -419,10 +419,10 @@ def get_players():
     try:
         game = get_game(id)
         listified = list(map(Player.to_list,game.players))
-        return json.dumps(listified)
+        return json.dumps({"players":listified,"error":"none"})
     except KeyError:
         print(f"No game found with id {id}")
-    return "error"
+    return json.dumps({"error":"dne"})
 
 # SCOREBOARD
 

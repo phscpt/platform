@@ -1,8 +1,8 @@
 // scoreboard button
 const params = new URLSearchParams(window.location.search);
-const p_id = params.player;
-const g_id = params.g_id;
-const problem = params.id;
+const p_id = params.get("player");
+const g_id = params.get("g_id");
+const problem = params.get("id");
 const submissionBox = document.getElementById("submission-box");
 const resultsContainer = document.getElementById('results-container');
 
@@ -31,6 +31,10 @@ const resultName = {
     "CE": "Compile Error"
 }
 
+/**
+ * Fill the results panel with recieved submission results
+ * @param {string[][]} results has results in a list of length-2 lists in the form [RESULT, time]
+ */
 const fillResults = (results) => {
     const resultDisplay = document.createElement("div");
     resultDisplay.className = "grid-tiny";
@@ -48,16 +52,14 @@ const fillResults = (results) => {
 
 const getGrade = (submissionID) => {
     if (localStorage.getItem("submission-" + problem) != submissionID) localStorage.setItem("submission-" + problem, submissionID);
-    fetch("/api/submission_result?submission=" + submissionID)
-        .then(response => response.json())
-        .then(results => {
-            console.log(results);
-            if (results[0] === "ungraded") setTimeout(getGrade, 500, [submissionID]);
-            else fillResults(results);
-        });
+
+    getContent("/api/submission_result?submission=" + submissionID, (data) => {
+        console.log(data);
+        fillResults(data.results);
+    });
 }
 
-const doLoading = () => {
+const startLoading = () => {
     submissionBox.reset();
     resultsContainer.innerHTML = `
     <div id="loading-spinny-container" class="box loading-spinny-container">
@@ -93,10 +95,10 @@ const submit = () => {
             }
         })
             .then(response => {
-                doLoading();
+                startLoading();
                 return response.json()
             })
-            .then(submissionIDList => getGrade(submissionIDList[0]));
+            .then(data => getGrade(data.submissionID));
     }
     reader.readAsText(file);
 }
