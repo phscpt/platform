@@ -24,3 +24,4 @@ games/*
 
 SECRET.txt
 graderlog.log
+problems_by_status.json

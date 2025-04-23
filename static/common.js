@@ -64,15 +64,12 @@ function getCookie(cname) {
 }
 
 const updateLoginStatus = () => {
-    fetch("/api/check_admin")
-        .then(response => response.json())
-        .then(loginStatus => {
-            if (loginStatus.admin === true) return;
-            setCookie("username", "NotIn", 30);
-            setCookie("userid", "NotIn", 30);
-            if (signOut != undefined) signOut();
-        })
-
+    getContent("/api/check_admin", (loginStatus) => {
+        if (loginStatus.admin === true) return;
+        setCookie("username", "NotIn", 30);
+        setCookie("userid", "NotIn", 30);
+        if (document.getElementById("sign_out") != undefined) updateLogInOut();
+    })
 }
 updateLoginStatus();
 
@@ -84,6 +81,21 @@ for (codeblock of document.getElementsByTagName("pre")) {
     codeblock.onclick = function () {
         navigator.clipboard.writeText(this.innerText);
     }
+}
+
+/**
+ * GET and process json data
+ * @param {string} url the url to GET json data from
+ * @param {Function} callback ingest json data from the url
+ */
+function getContent(url, callback) {
+    fetch(url)
+        .then(response => response.json())
+        .then((data) => {
+            if (data.error == "dne") return;
+            else if (data.error == "unready") setTimeout(getContent, 500, url, callback);
+            else callback(data);
+        });
 }
 
 

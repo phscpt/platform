@@ -1,7 +1,7 @@
 .loading-spinny-container {
     position: absolute;
     z-index: -1;
-    display: block;
+    display: none;
     background: none;
     inset: -3px;
     width: calc(100% + 6px);
