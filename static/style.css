@@ -13,7 +13,9 @@ body {
     background: transparent;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-weight: lighter;
 }
 
@@ -27,6 +29,7 @@ h1, h2, h3 {
     #main {
         display: block;
     }
+
     #logo-main {
         width: 50%;
     }
@@ -53,24 +56,29 @@ a {
     gap: 20px;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
+
 .grid-mini {
     display: grid;
     gap: 20px;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
+
 .grid-tiny {
     display: grid;
     gap: 10px;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 }
+
 .box {
-    background-color: rgba(255, 255, 255, 0.695);
+    background-color: rgb(253, 253, 253);
     border: 1px solid rgb(194, 194, 194);
     box-shadow: 5px 5px 15px rgb(240, 240, 240);
     border-radius: 8px;
     padding: 10px;
 }
-.box button, .box input {
+
+.box button,
+.box input {
     width: 100%;
     box-sizing: border-box;
     border-radius: 8px;
@@ -81,36 +89,43 @@ a {
     margin: 0px;
     padding: 20px 0px;
     text-transform: lowercase;
-    color:rgb(191, 191, 191);
+    color: rgb(191, 191, 191);
 }
 
 input {
     border: 1px solid #d6d6d6;
 }
 
-button, input[type="submit"], select {
+button,
+input[type="submit"],
+select {
     border: 1px solid var(--button-hover);
-    box-shadow: 5px 5px 15px rgb(240, 240, 240);
+    /* box-shadow: 5px 5px 15px rgb(240, 240, 240); */
     border-radius: 8px;
 }
-button.button-emphasis, input.button-emphasis {
+
+button.button-emphasis,
+input.button-emphasis {
     color: rgb(255, 255, 255);
-    background:#324376 !important; 
-    border:1px solid #12182b;
-    cursor:pointer;
+    background: #324376 !important;
+    border: 1px solid #12182b;
+    cursor: pointer;
 }
-button.button-emphasis:hover, input.button-emphasis:hover {
-    background:#1d2a54 !important;
+
+button.button-emphasis:hover,
+input.button-emphasis:hover {
+    background: #1d2a54 !important;
 }
 
 .result-box {
     border: 1px solid black;
-    box-shadow: 5px 5px 15px rgb(240, 240, 240);
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
     border-radius: 3px;
     padding: 10px;
     text-align: center;
     font-size: 16pt;
 }
+
 .result-box p {
     margin: 0px;
 }
@@ -123,7 +138,9 @@ input[type="file"] {
     padding: 0px;
     border: none;
 }
-::-webkit-file-upload-button, ::file-selector-button {
+
+::-webkit-file-upload-button,
+::file-selector-button {
     color: #1d1d1d;
     color: var(--form-text);
     background-color: #efefef;
@@ -140,7 +157,8 @@ input[type="file"] {
     transition: 0.1s all;
 }
 
-::-webkit-file-upload-button:hover, ::file-selector-button:hover {
+::-webkit-file-upload-button:hover,
+::file-selector-button:hover {
     background: #9b9b9b;
     background: var(--button-hover);
 }
@@ -149,17 +167,22 @@ input[type="file"] {
 table {
     border-collapse: collapse;
 }
-td, th {
+
+td,
+th {
     text-align: center;
 }
+
 .fail {
     background-color: rgba(255, 83, 83, 0.5);
     border-color: rgb(255, 83, 83);
 }
+
 .success {
     background-color: rgba(81, 204, 85, 0.5);
     border-color: rgba(81, 204, 85);
 }
+
 .partial {
     background-color: #e6ab2192;
 }
@@ -167,23 +190,23 @@ td, th {
 .autocomplete-suggestion {
     cursor: pointer;
     border: 2px solid #cecece;
-    border-radius:5px;
-    margin-top:3px;
+    border-radius: 5px;
+    margin-top: 3px;
     margin-bottom: 8px;
     margin-right: 3px;
     display: inline-block;
-    padding:5px;
+    padding: 5px;
 }
 
 #panic-inducer {
     pointer-events: none;
-    position:fixed;
-    left:0;
-    top:0;
-    width:100vw;
-    height:100vh;
-    background-color:red;
-    opacity:0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: red;
+    opacity: 0;
     /*transition: 0.5s all;*/
 }
 

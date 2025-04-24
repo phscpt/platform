@@ -37,8 +37,50 @@
     }
 }
 
+#submission-panel {
+    display: flex;
+    flex-direction: row;
+}
+
 #results-container {
     position: relative;
     box-shadow: none;
-    background-color: rgb(253, 253, 253);
+}
+
+#tabs {
+    display: flex;
+    flex-direction: column;
+    background: none;
+}
+
+.tab {
+    margin: 0;
+    border-radius: 8px 0 0 8px;
+    padding: 0.5rem calc(0.5rem + 10px) 0.5rem 0.5rem;
+    width: calc(100% + 10px);
+}
+
+span.material-symbols-outlined {
+    font-size: 1.75rem;
+}
+
+.tab.selected {
+    background: var(--button-hover);
+    transform: translate(4px, 0px);
+}
+
+#tab-content-container {
+    flex-grow: 1;
+    z-index: 1;
+}
+
+.flex-hor {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+textarea.code {
+    font-family: monospace;
+    font-size: 1rem;
 }
