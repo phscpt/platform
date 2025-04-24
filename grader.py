@@ -58,7 +58,6 @@ def grade(id:str):
     with open(f"tmp/{id}/{filename}",'w') as f: f.write(code)
 
     os.chdir(f"tmp/{id}")
-
     # compile
     if language == "java":
         Popen(["javac", filename], stdout=PIPE, stderr=PIPE).communicate()
@@ -66,7 +65,10 @@ def grade(id:str):
         if not os.path.isfile(filename.split(".")[0] + ".class"):
             log("java compilation error")
             os.chdir(olddir)
-            return [["CE", "Compile Error"]]
+            res["status"]="graded"
+            res["results"] = [["CE","Compile Error"]]
+            with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
+            return
         log("java compilation successful")
     elif language == "cpp":
         Popen(["g++", filename], stdout=PIPE, stderr=PIPE).communicate()
@@ -74,7 +76,10 @@ def grade(id:str):
         if not os.path.isfile("a.out"):
             log("c++ compilation failed")
             os.chdir(olddir)
-            return [["CE","Compile Error"]]
+            res["status"]="graded"
+            res["results"] = [["CE","Compile Error"]]
+            with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
+            return
         log("cpp compilation successful")
 
     # execute
@@ -127,7 +132,6 @@ def grade(id:str):
     if os.path.exists(f"tmp/{id}/{filename.split('.')[0]}.class"): os.remove(f"tmp/{id}/{filename.split('.')[0]}.class")
     os.rmdir(f"tmp/{id}")
     
-
     res["results"] = results
     res["status"] = "graded"
 
