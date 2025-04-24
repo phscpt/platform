@@ -71,7 +71,7 @@ def catalogue():
 
 @app.route("/public", methods=["GET","POST"])
 def public_catalogue():
-    return render_template("list_public.html", problems = get_problem_names())
+    return render_template("list_public.html")
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
