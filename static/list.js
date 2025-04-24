@@ -38,7 +38,6 @@ const problem_names = getContent("/api/problem_names", (problems) => {
         else if (b[1].toLowerCase() in diffToNum) return 1; //b goes first
         else if (a[1].toLowerCase() in diffToNum) return -1; // a goes first
 
-        console.log("a");
         if (a[0] > b[0]) return 1;
         if (b[0] > a[0]) return -1;
         return 0;
@@ -50,24 +49,9 @@ const problem_names = getContent("/api/problem_names", (problems) => {
     let public_l = 0;
     public.forEach((problemTuple, i) => {
         getContent(`/api/problem_data?id=${problemTuple[0]}&title&difficulty&tags&status`, (problem) => {
-            // console.log(problem);
             public_details[i] = problem;
             while (public_details[public_l] != undefined) {
-                const p = public_details[public_l];
-
-                public_problems.innerHTML += `
-                    <tr>
-                    <td style="padding: 10px">
-                        <a href="problem?id=${p.id}">${p.title}</a>
-                    </td>
-                    <td style="padding: 10px">
-                        ${p.difficulty ? p.difficulty : "N/A"}
-                    </td>
-                    <td style="padding: 10px">
-                        ${p.tags ? p.tags : "N/A"}
-                    </td>
-                    </tr>
-                `;
+                public_problems.innerHTML += renderProblem(public_details[public_l]);
                 public_l++;
             }
         })
@@ -76,23 +60,9 @@ const problem_names = getContent("/api/problem_names", (problems) => {
     let publvate_l = 0;
     publvate.forEach((problemTuple, i) => {
         getContent(`/api/problem_data?id=${problemTuple[0]}&title&difficulty&tags&status`, (problem) => {
-            // console.log(problem);
             publvate_details[i] = problem;
             while (publvate_details[publvate_l] != undefined) {
-                const p = publvate_details[publvate_l];
-                publvate_problems.innerHTML += `
-                    <tr>
-                    <td style="padding: 10px">
-                        <a href="problem?id=${p.id}">${p.title}</a>
-                    </td>
-                    <td style="padding: 10px">
-                        ${p.difficulty ? p.difficulty : "N/A"}
-                    </td>
-                    <td style="padding: 10px">
-                        ${p.tags ? p.tags : "N/A"}
-                    </td>
-                    </tr>
-                `;
+                publvate_problems.innerHTML += renderProblem(publvate_details[publvate_l]);
                 publvate_l++;
             }
         })
@@ -101,32 +71,13 @@ const problem_names = getContent("/api/problem_names", (problems) => {
     let private_l = 0;
     private.forEach((problemTuple, i) => {
         getContent(`/api/problem_data?id=${problemTuple[0]}&title&difficulty&tags&status`, (problem) => {
-            // console.log(problem);
             private_details[i] = problem;
             while (private_details[private_l] != undefined) {
-                const p = private_details[private_l];
-                private_problems.innerHTML += `
-                    <tr>
-                    <td style="padding: 10px">
-                        <a href="problem?id=${p.id}">${p.title}</a>
-                    </td>
-                    <td style="padding: 10px">
-                        ${p.difficulty ? p.difficulty : "N/A"}
-                    </td>
-                    <td style="padding: 10px">
-                        ${p.tags ? p.tags : "N/A"}
-                    </td>
-                    </tr>
-                `;
+                private_problems.innerHTML += renderProblem(private_details[private_l])
                 private_l++;
             }
         })
     })
-    // for (const problem of private) {
-    //     getContent(`/api/problem_data?id=${problem}&title&difficulty&tags&status`, (data) => {
-    //         console.log(data);
-    //     })
-    // }
 })
 
 const cmp = (a, b) => {
@@ -169,6 +120,35 @@ const cmpAlph = (a, b) => {
     return 0;
 }
 
+const renderProblem = (p) => `
+    <tr>
+    <td style="padding: 10px width:50%">
+        <a href="problem?id=${p.id}">${p.title}</a>
+    </td>
+    <td style="padding: 10px; width: 20%;">
+        ${p.difficulty ? p.difficulty : "N/A"}
+    </td>
+    
+    <td style="padding: 10px; width: 30%;">
+        ${showTags ? (p.tags ? p.tags : "N/A") : ""}
+    </td>
+    </tr>
+`;
+
+const showProblems = () => {
+
+    let newPublic = "";
+    let newPublvate = "";
+    let newPrivate = "";
+    for (const p of public_details) newPublic += renderProblem(p);
+    for (const p of publvate_details) newPublvate += renderProblem(p);
+    for (const p of private_details) newPrivate += renderProblem(p);
+
+    public_problems.innerHTML = newPublic;
+    publvate_problems.innerHTML = newPublvate;
+    private_problems.innerHTML = newPrivate;
+}
+
 /**
  * 
  * @param {Function} cmp 
@@ -178,68 +158,42 @@ const sortBy = (cmp) => {
     publvate_details.sort(cmp);
     private_details.sort(cmp);
 
-    let newPublic = "";
-    let newPublvate = "";
-    let newPrivate = "";
-
-    for (let i = 0; i < public_details.length; i++) {
-        const p = public_details[i];
-        newPublic += `
-            <tr>
-            <td style="padding: 10px">
-                <a href="problem?id=${p.id}">${p.title}</a>
-            </td>
-            <td style="padding: 10px">
-                ${p.difficulty ? p.difficulty : "N/A"}
-            </td>
-            <td style="padding: 10px">
-                ${p.tags ? p.tags : "N/A"}
-            </td>
-            </tr>
-        `;
-    }
-    for (let i = 0; i < publvate_details.length; i++) {
-        const p = publvate_details[i];
-        newPublvate += `
-            <tr>
-            <td style="padding: 10px">
-                <a href="problem?id=${p.id}">${p.title}</a>
-            </td>
-            <td style="padding: 10px">
-                ${p.difficulty ? p.difficulty : "N/A"}
-            </td>
-            <td style="padding: 10px">
-                ${p.tags ? p.tags : "N/A"}
-            </td>
-            </tr>
-        `;
-    }
-    for (let i = 0; i < private_details.length; i++) {
-        const p = private_details[i];
-        newPrivate += `
-            <tr>
-            <td style="padding: 10px">
-                <a href="problem?id=${p.id}">${p.title}</a>
-            </td>
-            <td style="padding: 10px">
-                ${p.difficulty ? p.difficulty : "N/A"}
-            </td>
-            <td style="padding: 10px">
-                ${p.tags ? p.tags : "N/A"}
-            </td>
-            </tr>
-        `;
-    }
-
-    public_problems.innerHTML = newPublic;
-    publvate_problems.innerHTML = newPublvate;
-    private_problems.innerHTML = newPrivate;
+    showProblems();
 }
 
-let currSort = "difficulty";
+let currSort = "buhsort";
 let currDir = 1;
 
+const updateArrows = () => {
+    for (const item of document.getElementsByClassName("problem-title")) {
+        const a = item.getElementsByTagName("span").item(0);
+
+        if (currSort == "alphabet") {
+            if (currDir == 1) a.innerText = "arrow_downward";
+            else a.innerText = "arrow_upward";
+        }
+        else a.innerText = "";
+    }
+    for (const item of document.getElementsByClassName("difficulty-title")) {
+        const a = item.getElementsByTagName("span").item(0);
+
+        if (currSort == "difficulty") {
+            if (currDir == -1) a.innerText = "arrow_downward";
+            else a.innerText = "arrow_upward";
+        }
+        else a.innerText = "";
+    }
+
+    for (const item of document.getElementsByClassName("tags-title")) {
+        const a = item.getElementsByTagName("span").item(0);
+
+        if (showTags) a.innerText = "visibility";
+        else a.innerText = "visibility_off";
+    }
+}
+
 const changeSort = (sortName) => {
+    console.log(sortName);
     if (sortName == currSort) currDir *= -1;
     else {
         currDir = 1;
@@ -253,9 +207,39 @@ const changeSort = (sortName) => {
 
     if (currDir == -1) cmpFunc = reverse(cmpFunc);
 
-    sortBy(cmpFunc)
+    sortBy(cmpFunc);
 
+    updateArrows();
 }
 
-document.getElementById('problem-title').onclick = () => changeSort("alphabet");
-document.getElementById('difficulty-title').onclick = () => changeSort("difficulty");
+const tableHeadInterior = `
+<tr>
+    <th style="width:50%;" class="problem-title">
+        <div class="head-int">Problem <span class="material-symbols-outlined"></span>
+        </div>
+    </th>
+    <th style="width:20%;" class="difficulty-title">
+        <div class="head-int">Difficulty <span class="material-symbols-outlined"></span></div>
+    </th>
+    <th style="width:30%;" class="tags-title">
+        <div class="head-int">Tags<span class="material-symbols-outlined"></span>
+        </div>
+    </th>
+</tr>`
+
+for (const item of document.getElementsByTagName("thead")) item.innerHTML = tableHeadInterior;
+
+for (const item of document.getElementsByClassName('problem-title')) item.onclick = () => changeSort("alphabet");
+for (const item of document.getElementsByClassName('difficulty-title')) item.onclick = () => changeSort("difficulty");
+for (const item of document.getElementsByClassName('tags-title')) item.onclick = () => {
+    showTags = !showTags;
+    updateArrows();
+    showProblems();
+}
+
+document.body.onload = () => {
+
+    showProblems();
+    changeSort("difficulty");
+    updateArrows();
+}
