@@ -20,6 +20,13 @@ if (inGame) {
     document.getElementById("catalog_button").style.display = "none";
 }
 
+
+/**
+ * 
+ * @param {string} text 
+ */
+const fixQuotes = (text) => text.replaceAll(`‘`, `'`).replaceAll(`’`, `'`).replaceAll(`“`, `"`).replaceAll(`”`, '"');
+
 // deal with form
 document.getElementById("file").onchange = () => {
     const extension = String((document.getElementById("file")).value).split('.').pop();
@@ -32,6 +39,7 @@ document.getElementById("file").onchange = () => {
 
 const submissionText = document.getElementById("submission-text");
 submissionText.onchange = () => {
+    submissionText.value = fixQuotes(submissionText.value);
     if (userChosenTextType) return;
 
     const text = new String(submissionText.value);
@@ -66,7 +74,7 @@ const fillResults = (results) => {
     results.forEach((result, i) => {
         resultDisplay.innerHTML += `
             <div class = "result-box ${(result[0] == "AC") ? "success" : "fail"}" title = ${resultName[result[0]]}>
-                ${i + 1} <b>${result[0]}</b><p>${result[1]}ms</p>
+                ${i + 1} <b>${result[0]}</b><p>${result[1]}${result[0] == "CE" ? "" : "ms"}</p>
             </div> `;
     });
 
@@ -125,8 +133,10 @@ const submitFile = () => {
 
 const submitText = () => {
     const language = languageText.value;
+
     const sol_text = submissionText.value;
     if (sol_text == "") return;
+    "".replaceAll(`“”`)
     fetch("/api/submit" + window.location.search, {
         method: "POST",
         body: JSON.stringify({
@@ -154,7 +164,6 @@ if (localStorage.getItem("submission-" + problem) != null) getGrade(localStorage
 const setSelectedTab = (tab) => {
     if (selectedTab == tab) return;
 
-    console.log(tab);
     document.getElementById(`tab-${selectedTab}-content`).style.display = "none";
     document.getElementById(`tab-${tab}-content`).style.display = "block";
 
