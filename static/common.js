@@ -53,12 +53,8 @@ function getCookie(cname) {
     let ca = decodedCookie.split(';');
     for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
+        while (c.charAt(0) == ' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
     }
     return "";
 }
@@ -98,5 +94,29 @@ function getContent(url, callback) {
         });
 }
 
+/**
+ * 
+ * @param {string} className 
+ * @param {Function} callbackfn 
+ */
+const doByClass = (className, callbackfn) => {
+    for (let item of document.getElementsByClassName(className)) callbackfn(item);
+}
+
+/**
+ * 
+ * @param {string} tagName 
+ * @param {Function} callbackfn 
+ */
+const doByTag = (tagName, callbackfn) => {
+    for (let item of document.getElementsByTagName(tagName)) callbackfn(item);
+}
+
+/**
+ * 
+ * @param {string} id 
+ * @param {Function} callbackfn 
+ */
+const doById = (id, callbackfn) => callbackfn(document.getElementById(id));
 
 if (document.getElementById("year") != null) document.getElementById("year").innerHTML = new Date().getFullYear();

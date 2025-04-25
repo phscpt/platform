@@ -401,6 +401,7 @@ def request_is_admin():
 @app.route("/api/submit", methods=["POST"])
 def submit_solution():
     submission = request.get_json()
+
     # print(f"received problem submission for {p}:", file.filename)
     now = datetime.now()
     SUBMISSION_ID = now.strftime("%m-%d-%Y-%H-%M-%S-") + random_id()

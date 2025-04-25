@@ -3,10 +3,14 @@ from subprocess import Popen, PIPE
 from datetime import datetime
 
 out = open("graderlog.log", 'a')
-
-def log(*args):
+def log(*args,id=""):
     args = list(map(str, args))
-    out.write(" ".join(args) + "\n")
+    id=str(id)
+    now = datetime.now()
+    timeinfo = now.strftime("%m/%d %H:%M:%S")
+    if id!="": timeinfo += " " + id[-6:]
+    timeinfo += ": "
+    out.write(timeinfo + " ".join(args) + "\n")
     out.flush()
 
 olddir = os.getcwd()
@@ -33,6 +37,13 @@ def grade(id:str):
        - If the program crashes, it returns `"Runtime Error"`
        - Otherwise, it returns `"Accepted"`
     '''
+
+    def cleanup(filename:str):
+        os.remove(f"tmp/{id}/{filename}")
+        if os.path.exists(f"tmp/{id}/a.out"): os.remove(f"tmp/{id}/a.out")
+        if os.path.exists(f"tmp/{id}/{filename.split('.')[0]}.class"): os.remove(f"tmp/{id}/{filename.split('.')[0]}.class")
+        os.rmdir(f"tmp/{id}")
+
     with open(f"grading/{id}.json",'r') as f:
         # log(f.read())
         res = json.load(f)
@@ -54,6 +65,12 @@ def grade(id:str):
     os.mkdir(f"tmp/{id}")
     if language not in EXTENSIONS: raise ValueError("language must be python, java or cpp")
     filename = f"submission{EXTENSIONS[language]}"
+    if language == "java":
+        tokens = code.split()
+        for i in range(len(tokens)):
+            if (tokens[i] == "class"):
+                filename = tokens[i+1] + ".java"
+                break
 
     with open(f"tmp/{id}/{filename}",'w') as f: f.write(code)
 
@@ -63,35 +80,40 @@ def grade(id:str):
         Popen(["javac", filename], stdout=PIPE, stderr=PIPE).communicate()
         # test if compilation was successful
         if not os.path.isfile(filename.split(".")[0] + ".class"):
-            log("java compilation error")
+            log("java compilation error",id=id)
             os.chdir(olddir)
             res["status"]="graded"
             res["results"] = [["CE","Compile Error"]]
             with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
+            cleanup()
             return
-        log("java compilation successful")
+        log("java compilation successful",id=id)
     elif language == "cpp":
         Popen(["g++", filename], stdout=PIPE, stderr=PIPE).communicate()
         # test if compilation was successful
         if not os.path.isfile("a.out"):
-            log("c++ compilation failed")
+            log("c++ compilation failed",id=id)
             os.chdir(olddir)
             res["status"]="graded"
             res["results"] = [["CE","Compile Error"]]
             with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
+            cleanup()
             return
-        log("cpp compilation successful")
+        log("cpp compilation successful",id=id)
 
     # execute
+    py_confirm = False
     for test in tests:
         data, solution = test
         time_start = time.perf_counter_ns()
         if language == "python":
-            log(f"running {filename} (python)")
+            if not py_confirm: log("running... (py)",id=id)
+            py_confirm=True
             process = Popen(["python3", filename], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
             TIME_LIMIT = 4
         elif language == "python2":
-            log(f"running {filename} (python)")
+            if not py_confirm: log("running... (py)",id=id)
+            py_confirm=True
             process = Popen(["python2.7", filename], stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
             TIME_LIMIT = 4
         elif language == "java":
@@ -105,11 +127,11 @@ def grade(id:str):
             time_elapsed = (time.perf_counter_ns() - time_start)//1000000
         except subprocess.TimeoutExpired:
             process.kill()
-            log("time limit exceeded on test", len(results))
+            log("time limit exceeded on test", len(results),id=id)
             results.append(["TLE","--"])
             continue
         if output[1] != "": # Some error happened
-            log(output[1])
+            log(output[1],id=id)
             results.append(["RE", time_elapsed])
             continue
 
@@ -121,9 +143,7 @@ def grade(id:str):
             continue
         else: # Output doesn't match
             # log("input was:", str(data))
-            log("program outputted:", output[0][:200])
-            log("correct solution:", solution[:200])
-            log("wrong answer on test", len(results))
+            log(f'''\nprogram outputted: {output[0][:200]}\ncorrect solution: {solution[:200]}\nwrong answer on test {len(results)}''',id=id)
             results.append(["WA", time_elapsed])
     os.chdir(olddir)
 

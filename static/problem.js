@@ -7,9 +7,11 @@ const params = new URLSearchParams(window.location.search);
 const p_id = params.get("player");
 const g_id = params.get("g_id");
 const problem = params.get("id");
+
 const submissionBox = document.getElementById("submission-box");
 const resultsContainer = document.getElementById('results-container');
 const languageText = document.getElementById("language-text");
+const submissionText = document.getElementById("submission-text");
 
 languageText.oninput = () => { userChosenTextType = true; }
 
@@ -37,20 +39,19 @@ document.getElementById("file").onchange = () => {
     document.getElementById("language").options[i].selected = true;
 }
 
-const submissionText = document.getElementById("submission-text");
 submissionText.onchange = () => {
     submissionText.value = fixQuotes(submissionText.value);
     if (userChosenTextType) return;
 
-    const text = new String(submissionText.value);
+    const text = submissionText.value;
 
     const pyHints = ["print(", "input()", "##PY", "else:"];
     const cppHints = ["cout", "ll", "long long", "#include <", "using namespace std;"];
-    const javaHints = ["public static void main(",]
+    const javaHints = ["public static void main("];
 
-    pyHints.forEach((hint) => { if (text.includes(hint)) lang = 3; })
-    cppHints.forEach((hint) => { if (text.includes(hint)) lang = 0; })
-    javaHints.forEach((hint) => { if (text.includes(hint)) lang = 1; })
+    pyHints.forEach((hint) => { if (text.includes(hint)) lang = 3; });
+    cppHints.forEach((hint) => { if (text.includes(hint)) lang = 0; });
+    javaHints.forEach((hint) => { if (text.includes(hint)) lang = 1; });
 
     languageText.options[0].selected = false;
     languageText.options[lang].selected = true;
@@ -94,69 +95,53 @@ const getGrade = (submissionID) => {
 
 const startLoading = () => {
     submissionBox.reset();
+    document.getElementById("submit").disabled = true;
     resultsContainer.innerHTML = `
     <div id="loading-spinny-container" class="box loading-spinny-container" style="display:block">
         <div class="loading-spinny"></div>
     </div><h2>grading...</h2>`;
 }
 
-const stopLoading = () => { document.getElementById("loading-spinny-container").style.display = "none"; }
-
-const submitFile = () => {
-    if (!submissionBox.reportValidity()) throw new Error("Could not submit: invalid form contents")
-
-    const file = document.getElementById("file").files[0];
-    const reader = new FileReader();
-
-    reader.onload = () => {
-        const sol_text = reader.result;
-        const language = document.getElementById("language").value;
-
-        fetch("/api/submit" + window.location.search, {
-            method: "POST",
-            body: JSON.stringify({
-                submission: sol_text,
-                lang: language
-            }),
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        })
-            .then(response => {
-                startLoading();
-                return response.json()
-            })
-            .then(data => getGrade(data.submissionID));
-    }
-    reader.readAsText(file);
+const stopLoading = () => {
+    document.getElementById("loading-spinny-container").style.display = "none";
+    document.getElementById("submit").disabled = false;
 }
 
-const submitText = () => {
-    const language = languageText.value;
-
-    const sol_text = submissionText.value;
-    if (sol_text == "") return;
-    "".replaceAll(`“”`)
+const submitCode = (code, language) => {
+    startLoading();
     fetch("/api/submit" + window.location.search, {
         method: "POST",
         body: JSON.stringify({
-            submission: sol_text,
+            submission: code,
             lang: language
         }),
         headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
     })
-        .then(response => {
-            startLoading();
-            return response.json()
-        })
+        .then(response => response.json())
         .then(data => getGrade(data.submissionID));
 }
 
+const reader = new FileReader();
+reader.onload = () => {
+    const sol_text = reader.result;
+    const language = document.getElementById("language").value;
+    submitCode(sol_text, language);
+}
+
+/**
+ * Submits the submission text or file (based on tab)
+ * @throws {Error} if no file selected
+ */
 const submit = () => {
-    if (selectedTab == 1) submitFile();
-    else submitText();
+    if (selectedTab == 1) {
+        if (!submissionBox.reportValidity()) throw new Error("Invalid form contents");
+        const file = document.getElementById("file").files[0];
+
+        reader.readAsText(file);
+    }
+    else submitCode(submissionText.value, languageText.value);
 }
 
 if (localStorage.getItem("submission-" + problem) != null) getGrade(localStorage.getItem("submission-" + problem));
