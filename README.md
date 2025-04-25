@@ -13,6 +13,7 @@ https://phscpt.pythonanywhere.com
 
 ## KNOWN BUGS
 - Past problem results may appear on the client side for 2 players on 1 browser account (or otherwise with shared localstorage)
+- Sorting appears to persist, but actually doesn't...
 
 ## Dependencies
 Requires python `markdown` and `flask` libraries, as well as `g++`, `java`, `python2.7` and `python3.9`.
