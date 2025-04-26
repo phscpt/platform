@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
     <script src="static/common.js" defer></script>
+    <script src="static/signup.js" defer></script>
 </head>
 
 <body>
@@ -23,13 +24,13 @@
 
     <div class="grid">
         <div class="box">
-            <form method="post">
+            <form id="credentials">
                 <h2>Enter Credentials</h2>
-                <input name=email placeholder="Email">
-                <input name=username placeholder="Username">
-                <input name=password placeholder="Password">
-                <input type="submit" value="Join">
+                <input name=email placeholder="Email" id="email">
+                <input name=username placeholder="Username" id="username">
+                <input type=password name=password placeholder="Password" id="password">
             </form>
+            <input type="submit" value="Sign Up" id="submit">
         </div>
     </div>
 </body>

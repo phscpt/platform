@@ -4,6 +4,7 @@ import json, os, random, time, markdown, uuid, hashlib, glob, string, html, trac
 from datetime import datetime
 from contest import *
 from flask import Flask, request, render_template, redirect, abort
+from user import User
 app = Flask(__name__)
 
 max_testcases = 10
@@ -224,20 +225,20 @@ def is_account(cred, email_or_username, password):
     return check_password( cred[2], password) and (email_or_username == cred[0] or email_or_username == cred[1])
 
 # This class is unused; it remains in the code in case user accounts are implented in the future
-class User:
-    def __init__(self, email, username, password):
-        self.user_ID = str(id(str(email)+str(username)+str(hash_password(password))))
-        self.isAdmin = is_admin(email, username, password)
-        self.credentials = [email, username, hash_password(password), self.user_ID, self.isAdmin]
+# class User:
+#     def __init__(self, email, username, password):
+#         self.user_ID = str(id(str(email)+str(username)+str(hash_password(password))))
+#         self.isAdmin = is_admin(email, username, password)
+#         self.credentials = [email, username, hash_password(password), self.user_ID, self.isAdmin]
 
-    def is_repeat(self, users):
-        for otherUser in users:
-            if otherUser.credentials[0] == self.credentials[0] or otherUser.credentials[1] == self.credentials[1]:
-                return True
-        return False
+#     def is_repeat(self, users):
+#         for otherUser in users:
+#             if otherUser.credentials[0] == self.credentials[0] or otherUser.credentials[1] == self.credentials[1]:
+#                 return True
+#         return False
 
-    def store_account(self):
-        open("users/" + self.user_ID + ".json", "w", encoding='utf-8').write(json.dumps(self.credentials))
+#     def store_account(self):
+#         open("users/" + self.user_ID + ".json", "w", encoding='utf-8').write(json.dumps(self.credentials))
 
 @app.route("/log_in", methods=["GET", "POST"])
 def log_in():
@@ -353,7 +354,30 @@ def update_problem_statuses():
         else: private.append([id,data["difficulty"]])
     with open("problems_by_status.json",'w') as f:
         json.dump({"public": public, "publvate": publvate, "private": private},f)
-        
+
+@app.route("/api/start_signup")
+def start_signup():
+    usr = User()
+    return json.dumps({"salt": usr.set_salt(), "id":usr.id,"error":"none"})
+
+@app.route("/api/finish_signup", methods=["POST"])
+def finish_signup():
+    if "id" not in request.args or "email" not in request.args or "username" not in request.args: return json.dumps({"error":"dne"})
+    id = request.args.get("id")
+    hashed_pass = request.get_json()["hashed_pass"]
+    username = request.args.get("username")
+    email = request.args.get("email")
+    print(id)
+    try: user = User(id)
+    except FileNotFoundError: return json.dumps({"error":"dne"})
+    print(hashed_pass)
+
+    user.set_details(username, email)
+    user.set_hash_pass(hashed_pass)
+
+    return json.dumps({"jonathan":"orz","error":"none"})
+
+
 
 @app.route("/api/problem_names")
 def problem_names():
