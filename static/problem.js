@@ -46,11 +46,11 @@ submissionText.onchange = () => {
     const text = submissionText.value;
 
     const pyHints = ["print(", "input()", "##PY", "else:"];
-    const cppHints = ["cout", "ll", "long long", "#include <", "using namespace std;"];
+    const cppHints = ["cout", "long long", "#include <", "using namespace std;"];
     const javaHints = ["public static void main("];
 
-    pyHints.forEach((hint) => { if (text.includes(hint)) lang = 3; });
     cppHints.forEach((hint) => { if (text.includes(hint)) lang = 0; });
+    pyHints.forEach((hint) => { if (text.includes(hint)) lang = 3; });
     javaHints.forEach((hint) => { if (text.includes(hint)) lang = 1; });
 
     languageText.options[0].selected = false;
@@ -85,8 +85,6 @@ const fillResults = (results) => {
 }
 
 const getGrade = (submissionID) => {
-    if (localStorage.getItem("submission-" + problem) != submissionID) localStorage.setItem("submission-" + problem, submissionID);
-
     getContent("/api/submission_result?submission=" + submissionID, (data) => {
         console.log(data);
         fillResults(data.results);
@@ -115,9 +113,7 @@ const submitCode = (code, language) => {
             submission: code,
             lang: language
         }),
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
+        headers: { "Content-type": "application/json; charset=UTF-8" }
     })
         .then(response => response.json())
         .then(data => getGrade(data.submissionID));
@@ -144,8 +140,6 @@ const submit = () => {
     else submitCode(submissionText.value, languageText.value);
 }
 
-if (localStorage.getItem("submission-" + problem) != null) getGrade(localStorage.getItem("submission-" + problem));
-
 const setSelectedTab = (tab) => {
     if (selectedTab == tab) return;
 
@@ -162,3 +156,10 @@ document.getElementById("tab-1").onclick = setSelectedTab.bind(this, 1);
 document.getElementById("tab-2").onclick = setSelectedTab.bind(this, 2);
 
 setSelectedTab(1)
+
+console.log(user);
+user.onLogin = () => {
+    if (problem in user.attempted) {
+        getGrade(user.attempted[problem]);
+    }
+}

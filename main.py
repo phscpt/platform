@@ -1,29 +1,15 @@
 # https://flask.palletsprojects.com/en/stable/quickstart/
 
-import json, os, random, time, markdown, uuid, hashlib, glob, string, html, traceback
-from datetime import datetime
+import json, os, random, time, markdown, uuid, hashlib, glob, string, html, traceback, datetime
 from contest import *
-from flask import Flask, request, render_template, redirect, abort
+from flask import Flask, request, render_template, redirect, abort, make_response
+from user import User, Users
 app = Flask(__name__)
 
 max_testcases = 10
+last_users_clean = 0
 
 users = []
-
-def loadSecret() -> None:
-    global secret
-    secret = open("SECRET.txt", "r").read().rstrip()
-
-def changeSecret() -> None:
-    global secret
-    ALLOWED = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm"
-    LENGTH = 100
-    now = datetime.now()
-    secret = "".join([random.choice(ALLOWED) for _ in range(LENGTH)]) + now.strftime("%m-%Y")
-    with open("SECRET.txt",'w') as f:
-        f.write(secret)
-
-loadSecret()
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 def sortByDifficulty(x) -> int:
@@ -58,15 +44,16 @@ def get_problem_names() -> list:
     problems.sort(key = sortByDifficulty)
     return problems
 
-def admin_check(req) -> bool:
-    loadSecret()
-    if (secret[-7:] != datetime.now().strftime("%m-%Y")[-7:]): changeSecret()
-    return req.cookies.get("userid") == secret
+def admin_check(request) -> bool:
+    try:
+        user = get_logged_in_user(request)
+    except: return False
+    return user.admin
 
 @app.route("/list", methods=["GET","POST"])
 def catalogue():
     if admin_check(request):
-        return render_template("list.html", problems = get_problem_names())
+        return render_template("list.html",problems=get_problem_names())
     abort(401)
 
 @app.route("/public", methods=["GET","POST"])
@@ -76,14 +63,12 @@ def public_catalogue():
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     # ensure only admin can access this page
-    if not admin_check(request):
-        abort(401)
+    if not admin_check(request): abort(401)
 
     if request.method == "POST":
         id = request.form["id"]
         title = request.form["title"]
         status = request.form["status"]
-        #description = markdown.markdown(request.form["description"])
         description = request.form["description"]
         testcases = []
         for i in range(max_testcases):
@@ -156,9 +141,6 @@ def problem():
 def random_id():
     return "".join([random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(6)])
 
-def random_player_id():
-    return "".join([random.choice(string.ascii_uppercase + string.ascii_lowercase + "1234567890") for _ in range(20)])
-
 # MAIN
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -204,79 +186,12 @@ def join():
             # print(f"Game {id} not found. Active games: {" ".join([game.id for game in Games.__games])}")
     return render_template("join.html", id=id)
 
-def hash_password(password):
-    salt = uuid.uuid4().hex
-    return hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
-
-def check_password(hashed_password, user_password):
-    password, salt = hashed_password.split(':')
-    return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
-
-def is_admin(email, username, hashedPass):
-    if email == "jierueic@gmail.com" and username == "knosmos" and check_password("c8cd035724dd2cc48f87c17f21c4cb7f9bdf9cf767bc88e5fcefefbf8f73dd0f:533a7722507f4d1da1bdfca16bf70675", hashedPass):
-        return True
-    if email == "nicholas.d.hagedorn@gmail.com" and username == "Nickname" and check_password("6d6438706baee7793b76597a15628859cf9b47c0097f814d06187247d120ceb7:6316c3b35173482db353c2a2baa8301e", hashedPass):
-        return True
-
-    return False
-
-def is_account(cred, email_or_username, password):
-    return check_password( cred[2], password) and (email_or_username == cred[0] or email_or_username == cred[1])
-
-# This class is unused; it remains in the code in case user accounts are implented in the future
-class User:
-    def __init__(self, email, username, password):
-        self.user_ID = str(id(str(email)+str(username)+str(hash_password(password))))
-        self.isAdmin = is_admin(email, username, password)
-        self.credentials = [email, username, hash_password(password), self.user_ID, self.isAdmin]
-
-    def is_repeat(self, users):
-        for otherUser in users:
-            if otherUser.credentials[0] == self.credentials[0] or otherUser.credentials[1] == self.credentials[1]:
-                return True
-        return False
-
-    def store_account(self):
-        open("users/" + self.user_ID + ".json", "w", encoding='utf-8').write(json.dumps(self.credentials))
-
-@app.route("/log_in", methods=["GET", "POST"])
+@app.route("/log_in", methods=["GET"])
 def log_in():
-    if request.method == "POST":
-        try:
-            emailUsername = request.form["emailUsername"].strip()
-            password = request.form["password"].strip()
-
-            for filename in glob.glob(os.path.join("users/", '*.json')): #only process .JSON files in folder.
-                with open(filename, encoding='utf-8') as currentFile:
-                    data = json.load(currentFile)
-                    if is_account(data, emailUsername, password):
-
-                        userID = secret
-                        isAdmin = data[4]
-
-                        return render_template(
-                            "log_in.html",
-                            admin = isAdmin,
-                            userid = userID
-                        )
-                        # return redirect(f"/?id={userID}") #change to put userID in the URL
-        except:
-            pass
-
     return render_template("log_in.html")
 
-@app.route("/sign_up", methods=["GET", "POST"])
+@app.route("/sign_up", methods=["GET"])
 def sign_up():
-    if request.method == "POST":
-        email = request.form["email"].strip()
-        username = request.form["username"].strip()
-        password = request.form["password"].strip()
-
-        user = User(email, username, password)
-        if "@" in email and len(username) > 4 and len(password) > 4 and not user.is_repeat(users):
-            user.store_account()
-            userID = user.credentials[3]
-            return redirect(f"/") #change to put userID in the URL
     return render_template("sign_up.html")
 
 @app.route("/select", methods=["GET", "POST"])
@@ -319,7 +234,7 @@ def host():
             return redirect(f"/host_scoreboard?id={id}")
         except KeyError:
             print(f"Game {id} not found. Active games: {[games[g_id].id for g_id in games] }")
-    return render_template("host_waiting.html", id=id)
+    return render_template("host_waiting.html")
 
 @app.route("/waiting", methods=["GET"])
 def waiting():
@@ -347,14 +262,102 @@ def update_problem_statuses():
         if not ".json" in problem: continue
         with open(f"problems/{problem}") as f: data = json.load(f)
         id = '.'.join(problem.split('.')[:-1])
+
         if "difficulty" not in data: data["difficulty"] = ""
         if data["status"] == "public": public.append([id,data["difficulty"]])
         elif data["status"] == "publvate": publvate.append([id,data["difficulty"]])
         else: private.append([id,data["difficulty"]])
     with open("problems_by_status.json",'w') as f:
         json.dump({"public": public, "publvate": publvate, "private": private},f)
-        
+def api_error():
+    return make_response(json.dumps({"error":"dne"}))
 
+def get_logged_in_user(request):
+    if "user_id" not in request.cookies or "hashed_pass" not in request.cookies:
+        raise LookupError
+    user = User(request.cookies.get("user_id"))
+    if user.check_login(request.cookies.get("hashed_pass")): return user
+    raise LookupError
+
+@app.route("/api/auth/start_signup")
+def start_signup():
+    usr = User()
+    return json.dumps({"salt": usr.set_salt(), "id":usr.id,"error":"none"})
+
+@app.route("/api/auth/finish_signup", methods=["POST"])
+def finish_signup():
+    if "id" not in request.args or "email" not in request.args or "username" not in request.args: return json.dumps({"error":"dne"})
+    id = request.args.get("id")
+    hashed_pass = request.get_json()["hashed_pass"]
+    username = request.args.get("username")
+    email = request.args.get("email")
+    print(id)
+    try: user = User(id)
+    except FileNotFoundError: return api_error()
+    print(hashed_pass)
+
+    Users.load_indexing()
+    if email in Users.email_to_id or username in Users.username_to_id:
+        return api_error()
+    print(Users.email_to_id, Users.username_to_id)
+
+    if not user.set_details(username, email): return api_error()
+    user.set_hash_pass(hashed_pass)
+
+    return json.dumps({"jonathan":"orz","error":"none"})
+
+@app.route("/api/auth/login_salt")
+def get_login_salt():
+    if "email_username" not in request.args:
+        print("bad args")
+        return api_error()
+    Users.load_indexing()
+    email_username = request.args.get("email_username")
+    id=""
+    if email_username in Users.email_to_id: id=Users.email_to_id[email_username]
+    elif email_username in Users.username_to_id: id=Users.username_to_id[email_username]
+    else: 
+        print("no user")
+        return api_error()
+
+    user = User(id)
+    if user.hashed_pass == "" or user.salt == "":
+        print("incomplete user")
+        return api_error()
+    print("bueno")
+    return json.dumps({"salt": user.salt, "id":id, "error":"none"})
+
+@app.route("/api/auth/login",methods=["POST","GET"])
+def login():
+    def user_json(u:User):
+        print(u.solved_problems)
+        return {"admin":u.admin, "attempted":u.attempted_problems, "solved": u.solved_problems, "username":u.username, "id":u.id}
+    if time.time() - last_users_clean >= 1800: Users.del_empty()
+    
+    if request.method=="POST":
+        data = request.get_json()
+
+        try: user = User(data["id"])
+        except: return api_error()
+        if not user.check_login(data["hashed_pass"]): return api_error()
+
+        res = make_response(json.dumps({"error":"none","user":user_json(user)}))
+        THIRTY_DAYS = datetime.timedelta(days=30)
+
+        res.set_cookie("hashed_pass",user.hashed_pass, max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
+        res.set_cookie("user_id",user.id,max_age=THIRTY_DAYS)
+
+        return res
+    def clear_login_fail():
+        res = api_error()
+        res.delete_cookie("hashed_pass")
+        res.delete_cookie("user_id")
+        return res
+    
+    try: user = get_logged_in_user(request)
+    except: return clear_login_fail()
+    return json.dumps({"error":"none","user":user_json(user)})
+    
 @app.route("/api/problem_names")
 def problem_names():
     '''
@@ -372,11 +375,11 @@ def problem_names():
 def problem_data():
     id = request.args["id"]
     is_admin = admin_check(request)
-    if not os.path.exists(f"problems/{id}.json"): return json.dumps({"error":"dne"})
+    if not os.path.exists(f"problems/{id}.json"): return api_error()
     
     with open(f"problems/{id}.json") as f: problem = json.load(f)
 
-    if problem["status"] == "private" and not is_admin: return json.dumps({"error":"dne"})
+    if problem["status"] == "private" and not is_admin: return api_error()
     res = {"id":id}
     
     for property in ["title", "status", "difficulty", "tags", "description"]:
@@ -396,14 +399,14 @@ def request_is_admin():
         curr_state["logged_in"]=True
         return json.dumps(curr_state)
     return curr_state
-    
+ 
 
 @app.route("/api/submit", methods=["POST"])
 def submit_solution():
     submission = request.get_json()
 
     # print(f"received problem submission for {p}:", file.filename)
-    now = datetime.now()
+    now = datetime.datetime.now()
     SUBMISSION_ID = now.strftime("%m-%d-%Y-%H-%M-%S-") + random_id()
     res = {
         "submission": SUBMISSION_ID,
@@ -417,17 +420,25 @@ def submit_solution():
         res["game"] = request.args.get("g_id")
         res["player"] = request.args.get("player")
 
+    try: res["user"] = request.cookies.get("user_id")
+    except: pass
+
     with open(f"grading/{SUBMISSION_ID}.json",'w') as f: json.dump(res,f)
     with open(f"grading/todo/{SUBMISSION_ID}",'w') as f: f.write("")
     # grader.grade(SUBMISSION_ID)
+
+    try:
+        user = get_logged_in_user(request)
+        user.add_attempted(request.args.get("id"),SUBMISSION_ID)
+    except: pass
 
     return json.dumps({"submissionID": SUBMISSION_ID, "error":"none"})
 
 @app.route("/api/submission_result", methods=["GET"])
 def get_problem_results():
-    if "submission" not in request.args: return json.dumps({"error":"dne"})
+    if "submission" not in request.args: return api_error()
     submission = request.args.get("submission")
-    if not os.path.exists(f"grading/{submission}.json"): return json.dumps({"error":"dne"})
+    if not os.path.exists(f"grading/{submission}.json"): return api_error()
 
     with open(f"grading/{submission}.json",'r') as f: res = json.load(f)
     if res["status"] != "graded": return json.dumps({"error":"unready"})
@@ -439,7 +450,6 @@ def get_problem_results():
 
     if "game" not in res and "player" not in res:
         return json.dumps({"results":res["results"],"error":"none"})
-    print('a')
     # give points to player if playing a game
     g_id = res["game"]
     p_id = res["player"]
@@ -466,7 +476,7 @@ def get_game_status():
         return json.dumps({"status":game.status, "error":"none"})
     except:
         print(f"API request for status of game id {id} failed.")
-        return json.dumps({"error":"dne"})
+        return api_error()
 
 @app.route("/api/players", methods=["GET"])
 def get_players():
@@ -477,10 +487,9 @@ def get_players():
         return json.dumps({"players":listified,"error":"none"})
     except KeyError:
         print(f"No game found with id {id}")
-    return json.dumps({"error":"dne"})
+    return api_error()
 
 # SCOREBOARD
-
 @app.route("/scoreboard", methods=["GET"])
 def scoreboard():
     id = request.args.get("id")
@@ -529,18 +538,10 @@ def internal_server_error(e):
 def unauthorized(e):
     return render_template('401.html'), 401
 
-@app.route("/crash")
-def crash():
-    raise Exception("Intentional crash tester function triggered")
-    return
-
-''' # Uncomment to remove old games
-running_games = []
-for game in games:
-    if game.time_remaining() >= -1:
-        running_games.append(game)
-games = running_games
-'''
+# @app.route("/crash")
+# def crash():
+#     raise Exception("Intentional crash tester function triggered")
+#     return
 
 if __name__ == "__main__":
     app.run("127.0.0.1",8000)

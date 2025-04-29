@@ -1,3 +1,73 @@
+class User {
+    id = null;
+    username = null;
+    #admin = false;
+    attempted = {};
+    solved = {};
+    #loggedIn = false;
+
+    constructor() {
+        if (getCookie("user_id") == "") return;
+
+        this.id = getCookie("user_id");
+    }
+
+    clear() {
+        this.id = null;
+        this.username = null;
+        this.attempted = {};
+        this.isAdmin = false;
+        this.#loggedIn = false;
+
+        this.onLogout();
+    }
+
+    loginError() {
+        console.log("could not login :(")
+    }
+
+    onAdmin() { }
+    onLogin() { }
+    onLogout() { }
+
+    get admin() { return this.#admin; }
+    set admin(isAdmin) {
+        if (isAdmin) this.onAdmin();
+        this.#admin = isAdmin;
+    }
+
+    get loggedIn() { return this.#loggedIn }
+    set loggedIn(loginState) {
+        this.#loggedIn = loginState;
+        if (loginState) this.onLogin();
+        else this.onLogout()
+    }
+
+    async login() {
+        if (this.id == null) {
+            this.admin = false;
+            return false;
+        }
+
+        const loginData = await fetch(`/api/auth/login`).then(response => response.json());
+        console.log(loginData);
+        if (loginData.error != "none") {
+            this.loginError();
+            this.loggedIn = false;
+            return false;
+        }
+        this.admin = loginData.user.admin;
+        this.attempted = loginData.user.attempted;
+        this.solved = loginData.user.solved;
+        this.username = loginData.user.username;
+        this.loggedIn = true;
+        return true;
+    }
+}
+
+const user = new User();
+user.login();
+
 function storm() {
     const stormScript = document.createElement("script", { src: "//cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js" });
     stormScript.onload = () => {
@@ -59,24 +129,12 @@ function getCookie(cname) {
     return "";
 }
 
-const updateLoginStatus = () => {
-    getContent("/api/check_admin", (loginStatus) => {
-        if (loginStatus.admin === true) return;
-        setCookie("username", "NotIn", 30);
-        setCookie("userid", "NotIn", 30);
-        if (document.getElementById("sign_out") != undefined) updateLogInOut();
-    })
-}
-updateLoginStatus();
-
 setColorMode();
 // storm();
 
 // copy function for input/output
 for (codeblock of document.getElementsByTagName("pre")) {
-    codeblock.onclick = function () {
-        navigator.clipboard.writeText(this.innerText);
-    }
+    codeblock.onclick = function () { navigator.clipboard.writeText(this.innerText); }
 }
 
 /**
@@ -118,5 +176,19 @@ const doByTag = (tagName, callbackfn) => {
  * @param {Function} callbackfn 
  */
 const doById = (id, callbackfn) => callbackfn(document.getElementById(id));
+
+const encoder = new TextEncoder();
+
+const hash = async (text) => {
+    const data = encoder.encode(text);
+
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hash));
+    const hashHex = hashArray
+        .map((val) => val.toString(16).padStart(2, "0"))
+        .join("");
+
+    return hashHex;
+}
 
 if (document.getElementById("year") != null) document.getElementById("year").innerHTML = new Date().getFullYear();

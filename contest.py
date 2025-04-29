@@ -63,7 +63,7 @@ class Game:
         print("created game", self.id)
         print("problems:", problems)
 
-    def to_json(self) -> str:
+    def to_json(self) -> dict:
         jsoned = {
             "id":self.id,
             "players": list(map(Player.to_json,self.players)),
