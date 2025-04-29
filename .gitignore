@@ -13,6 +13,7 @@ grading/todo/*
 !grading/todo/readme.txt
 
 users/*
+!users/readme.md
 
 problems/*
 

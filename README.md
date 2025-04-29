@@ -9,7 +9,11 @@ https://phscpt.pythonanywhere.com
 - [x] Grader support for Python, Java and C++
 - [x] Persistent Scoreboards across system restarts
 - [x] Client-side storage of problem results
-- [ ] User accounts
+- [X] User accounts
+- [ ] Interactive grading
+- [ ] Reworked UI
+- [ ] Teams in practice contests
+- [ ] AWS integration (lambda + dynamodb)
 
 ## KNOWN BUGS
 - Past problem results may appear on the client side for 2 players on 1 browser account (or otherwise with shared localstorage)
