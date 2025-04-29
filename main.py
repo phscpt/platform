@@ -7,7 +7,7 @@ from user import User, Users
 app = Flask(__name__)
 
 max_testcases = 10
-last_users_clean = 0
+last_users_clean = time.time()
 
 users = []
 
@@ -297,11 +297,11 @@ def finish_signup():
     print(hashed_pass)
 
     Users.load_indexing()
-    if email in Users.email_to_id or username in Users.username_to_id:
-        return api_error()
-    print(Users.email_to_id, Users.username_to_id)
 
-    if not user.set_details(username, email): return api_error()
+    if user.hashed_pass != "": return api_error()
+    # print(Users.email_to_id, Users.username_to_id)
+
+    user.set_details(username, email)
     user.set_hash_pass(hashed_pass)
 
     return json.dumps({"jonathan":"orz","error":"none"})
