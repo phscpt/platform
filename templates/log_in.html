@@ -10,8 +10,10 @@
     <link rel="icon" href="static/icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Asap:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Asap:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <script src="static/common.js" defer></script>
+    <script src="static/login.js" defer></script>
 </head>
 
 <body>
@@ -21,64 +23,13 @@
     <a onclick="switchColorMode()">[switch color mode]</a>
     <h2>Practice Contest Platform</h2>
     <div class="box">
-        <form method="post">
+        <form method="post" id="form">
             <h2>Enter Credentials</h2>
-            <input name=emailUsername placeholder="Email or Username">
-            <input type=password name=password placeholder="Password">
-            <input type="submit" value="Sign in">
+            <input id="emailUsername" name=emailUsername placeholder="Email or Username">
+            <input id="password" type=password name=password placeholder="Password">
         </form>
+        <input id="submit" type="submit" value="Sign in">
     </div>
-    <script>
-        function setCookie(cname, cvalue, exdays) {
-            const d = new Date();
-            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-            let expires = "expires=" + d.toUTCString();
-            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-        }
-
-        function getCookie(cname) {
-            let name = cname + "=";
-            let decodedCookie = decodeURIComponent(document.cookie);
-            let ca = decodedCookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) == 0) {
-                    return c.substring(name.length, c.length);
-                }
-            }
-            return "";
-        }
-
-        function checkCookie() {
-            let user = getCookie("username");
-            console.log("out");
-            console.log(user);
-
-            if (user == "" || user == null || "{{ admin }}" != "") {
-                console.log("in");
-                let isAdmin = "{{ admin }}";
-
-                if (isAdmin == "") {
-                    if (user == "" || user == null) {
-                        setCookie("username", "NotIn", 30);
-                    }
-                }
-                else {
-                    setCookie("username", isAdmin, 30);
-                    // sorry for the hacky way of doing this
-                    setCookie("userid", "{{ userid }}", 30);
-                }
-            }
-            return getCookie("username");
-        }
-
-        if (checkCookie() == "True") {
-            location.href = "/";
-        }
-    </script>
 </body>
 
 </html>

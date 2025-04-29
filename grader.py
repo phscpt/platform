@@ -1,6 +1,7 @@
 import subprocess, os, json, sys, time
 from subprocess import Popen, PIPE
 from datetime import datetime
+from user import User
 
 out = open("graderlog.log", 'a')
 def log(*args,id=""):
@@ -85,7 +86,7 @@ def grade(id:str):
             res["status"]="graded"
             res["results"] = [["CE","Compile Error"]]
             with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
-            cleanup()
+            cleanup(filename)
             return
         log("java compilation successful",id=id)
     elif language == "cpp":
@@ -97,7 +98,7 @@ def grade(id:str):
             res["status"]="graded"
             res["results"] = [["CE","Compile Error"]]
             with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
-            cleanup()
+            cleanup(filename)
             return
         log("cpp compilation successful",id=id)
 
@@ -154,7 +155,14 @@ def grade(id:str):
     
     res["results"] = results
     res["status"] = "graded"
-
+    
+    if "user" in res:
+        allAC = True
+        for result in results:
+            if result[0] != "AC": allAC = False
+        if allAC:
+            user = User(res["user"])
+            user.add_solved(res["problem"],id)
     with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
 
 WAIT_TIME = 5.0
@@ -181,7 +189,9 @@ def main():
             raise e
 
 if __name__ == "__main__":
-    main()
-    # log(grade("hello.py", [[1,"hello world!\n"], [2,"hello world!\n"*2]], "python2"))
+    try:
+        main()
+    except:
+        print("Exiting...")
 log("closed peacefully\n\n")
 out.close()

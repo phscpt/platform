@@ -231,3 +231,20 @@ pre>code::before {
     font-style: italic;
     text-align: right;
 }
+
+tr.solved {
+    background-color: #103c1f;
+    /* background-color: rgb(127.5, 41.5, 41.5); */
+}
+
+tr.partial {
+    background-color: #5b4e0b;
+}
+
+tbody tr:nth-child(even).solved {
+    background-color: #0b2815;
+}
+
+tbody tr:nth-child(even).partial {
+    background-color: #453b08;
+}

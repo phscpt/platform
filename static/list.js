@@ -101,8 +101,15 @@ const cmpAlph = (a, b) => {
 
 const renderProblem = (p) => {
     if (!p) return "";
+    let colorType = "";
+
+    if (p.id in user.attempted) colorType = "partial";
+    if (p.id in user.solved) colorType = "solved";
+
+    console.log(colorType);
+
     return `
-        <tr>
+        <tr ${colorType != "" ? ("class=" + colorType) : ""}>
         <td style="padding: 10px width:50%">
             <a href="problem?id=${p.id}">${p.title}</a>
         </td>
@@ -228,4 +235,8 @@ document.body.onload = () => {
     }
     else changeSort("difficulty");
     updateArrows();
+}
+
+user.onLogin = () => {
+    showProblems();
 }

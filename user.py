@@ -9,22 +9,34 @@ def generate_salt():
     return "".join([random.choice(ALPHABET) for _ in range(32)])
 
 
-email_to_id = {}
-username_to_id = {}
+class Users:
+    email_to_id = {}
+    username_to_id = {}
 
-def save_indexing():
-    with open("users/indexing.json",'w') as f:
-        json.dump({
-            "email": email_to_id,
-            "username": username_to_id
-        })
-def load_indexing():
-    global email_to_id, username_to_id
-    if not os.path.exists("users/indexing.json"): save_indexing()
-    with open("users/indexing.json") as f:
-        a = json.load(f)
-        email_to_id = a["email"]
-        username_to_id = a["username_to_id"]
+    def save_indexing():
+        with open("users/indexing.json",'w') as f:
+            json.dump({
+                "email": Users.email_to_id,
+                "username": Users.username_to_id
+            },f)
+            print({
+                "email": Users.email_to_id,
+                "username": Users.username_to_id
+            })
+    def load_indexing():
+        if not os.path.exists("users/indexing.json"): Users.save_indexing()
+        with open("users/indexing.json") as f:
+            a = json.load(f)
+            Users.email_to_id = a["email"]
+            Users.username_to_id = a["username"]
+
+    def del_empty():
+        paths = os.listdir("users/")
+        for path in paths:
+            if path == "indexing.json": continue
+            try: user = User(path[:-5])
+            except: os.remove("users/" + path)
+            if user.hashed_pass == "": os.remove("users/" + path)
 
 class User:
     def __init__(self, id=""):
@@ -37,8 +49,8 @@ class User:
         self.email = ""
         self.hashed_pass = ""
         self.salt = ""
-        self.solved_problems = []
-        self.attempted_problems = []
+        self.solved_problems:dict[str, str] = {}
+        self.attempted_problems:dict[str,str] = {}
         self.joined_contests = []
         self.date_created = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
         self.admin = False
@@ -84,25 +96,40 @@ class User:
     def save(self):
         with open(f"users/{self.id}.json",'w') as f:
             json.dump(self.to_json(),f)
+        
 
     def set_details(self, username, email):
         self.load()
         self.username = username
         self.email = email
+        Users.load_indexing()
+        Users.username_to_id[self.username] = self.id
+        Users.email_to_id[self.email] = self.id
+        Users.save_indexing()
         self.save()
 
     def set_hash_pass(self, hashed_pass):
-        self.load()
         self.hashed_pass = hashed_pass
         self.save()
 
     def set_salt(self) -> str:
+        self.load()
         if self.salt != "" and self.hashed_pass != "": raise Exception("Salt already set")
         self.salt = generate_salt()
         self.save()
         return self.salt
+    
+    def add_attempted(self, problem, id):
+        self.load()
+        self.attempted_problems[problem] = id
+        self.save()
+
+    def add_solved(self, problem, id):
+        self.load()
+        self.solved_problems[problem] = id
+        self.save()
 
     def check_login(self, hashedpass):
-        if self.hashed_pass == "": return False
+        if self.hashed_pass == "" or self.salt=="": return False
         if hashedpass == self.hashed_pass: return True
         return False

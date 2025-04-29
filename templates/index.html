@@ -21,10 +21,14 @@
     <br>
     <a onclick="switchColorMode()">[switch color mode]</a>
     <h2>Practice Contest Platform</h2>
-    <form action="log_in" id="log_in"> <!---Change right px to 170 when adding back sign up-->
-        <input type="submit" value="Admin Log In" style="top:30px;right:40px" class="absolute-button">
-    </form>
-    <button id="sign_out" onclick="signOut()" style="top:30px;right:40px" class="absolute-button">Sign Out</button>
+    <!-- <form action="log_in" id="log_in"> -Change right px to 170 when adding back sign up -->
+    <!-- <input type="submit" value="Admin Log In" style="top:30px;right:40px" class="absolute-button"> -->
+    <!-- </form> -->
+    <button id="sign_out" style="top:30px;right:40px;display:none" class="absolute-button">Sign Out</button>
+    <button id="log_in" onclick="window.location.href='/log_in'" style="top:30px;right:40px" class="absolute-button">Log
+        In</button>
+    <button id="sign_up" onclick="window.location.href='/sign_up'" style="top:30px;right:170px"
+        class="absolute-button">Sign Up</button>
     <!---Change right px to 170 when adding back sign up-->
     <br>
     <div class="grid">
