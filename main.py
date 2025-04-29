@@ -159,7 +159,7 @@ def index():
             game = get_game(id)
             p_id = game.add_player(name)
             return redirect(f"/waiting?id={id}&player={p_id}")
-        except KeyError: pass
+        except: pass
     return render_template("index.html")
 
 # ABOUT
@@ -300,7 +300,8 @@ def finish_signup():
 
     if user.hashed_pass != "": return api_error()
     # print(Users.email_to_id, Users.username_to_id)
-
+    if email in Users.email_to_id: return api_error()
+    if username in Users.username_to_id: return api_error()
     user.set_details(username, email)
     user.set_hash_pass(hashed_pass)
 
@@ -316,7 +317,7 @@ def get_login_salt():
     id=""
     if email_username in Users.email_to_id: id=Users.email_to_id[email_username]
     elif email_username in Users.username_to_id: id=Users.username_to_id[email_username]
-    else: 
+    else:
         print("no user")
         return api_error()
 
@@ -333,7 +334,7 @@ def login():
         print(u.solved_problems)
         return {"admin":u.admin, "attempted":u.attempted_problems, "solved": u.solved_problems, "username":u.username, "id":u.id}
     if time.time() - last_users_clean >= 1800: Users.del_empty()
-    
+
     if request.method=="POST":
         data = request.get_json()
 
@@ -353,11 +354,11 @@ def login():
         res.delete_cookie("hashed_pass")
         res.delete_cookie("user_id")
         return res
-    
+
     try: user = get_logged_in_user(request)
     except: return clear_login_fail()
     return json.dumps({"error":"none","user":user_json(user)})
-    
+
 @app.route("/api/problem_names")
 def problem_names():
     '''
@@ -376,12 +377,12 @@ def problem_data():
     id = request.args["id"]
     is_admin = admin_check(request)
     if not os.path.exists(f"problems/{id}.json"): return api_error()
-    
+
     with open(f"problems/{id}.json") as f: problem = json.load(f)
 
     if problem["status"] == "private" and not is_admin: return api_error()
     res = {"id":id}
-    
+
     for property in ["title", "status", "difficulty", "tags", "description"]:
         if property in request.args:
             if property not in problem: problem[property] = ""
@@ -399,7 +400,7 @@ def request_is_admin():
         curr_state["logged_in"]=True
         return json.dumps(curr_state)
     return curr_state
- 
+
 
 @app.route("/api/submit", methods=["POST"])
 def submit_solution():
