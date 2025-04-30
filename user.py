@@ -33,7 +33,7 @@ class Users:
     def del_empty():
         paths = os.listdir("users/")
         for path in paths:
-            if path == "indexing.json": continue
+            if path == "indexing.json" or path == "readme.md": continue
             try: user = User(path[:-5])
             except: os.remove("users/" + path)
             if user.hashed_pass == "": os.remove("users/" + path)

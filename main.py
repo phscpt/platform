@@ -6,6 +6,8 @@ from flask import Flask, request, render_template, redirect, abort, make_respons
 from user import User, Users
 app = Flask(__name__)
 
+ALPHABET = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_-"
+
 max_testcases = 10
 last_users_clean = time.time()
 
@@ -21,6 +23,7 @@ def sortByDifficulty(x) -> int:
         return mapping[x["difficulty"].lower()]
     return 5
 
+ # TODO: this is *REALLY* slow -- try to replace it with /api/problem_names calls as much as possible
 def get_problem_names() -> list:
     # Get all problems, in sorted order
     problem_names = os.listdir("problems")
@@ -45,11 +48,11 @@ def get_problem_names() -> list:
     return problems
 
 def admin_check(request) -> bool:
-    try:
-        user = get_logged_in_user(request)
+    try: user = get_logged_in_user(request)
     except: return False
     return user.admin
 
+#TODO: remove this (move edit/upload to /public behind admin wall)
 @app.route("/list", methods=["GET","POST"])
 def catalogue():
     if admin_check(request):
@@ -65,32 +68,32 @@ def upload():
     # ensure only admin can access this page
     if not admin_check(request): abort(401)
 
-    if request.method == "POST":
-        id = request.form["id"]
-        title = request.form["title"]
-        status = request.form["status"]
-        description = request.form["description"]
-        testcases = []
-        for i in range(max_testcases):
-            inp = request.form["input" + str(i)]
-            out = request.form["output" + str(i)]
-            # check if empty
-            if inp.rstrip() != "" and out.rstrip() != "":
-                testcases.append([inp, out])
-        open("problems/" + id + ".json", "w", encoding='utf-8').write(
-            json.dumps({
-                "title": title,
-                "status": status,
-                "difficulty": request.form["difficulty"],
-                "tags": request.form["tags"],
-                "description": description,
-                "testcases": testcases
-            })
-        )
-        update_problem_statuses()
-        return redirect("/")
-    return render_template("create.html", max_testcases=max_testcases)
-
+    if request.method == "GET": return render_template("create.html", max_testcases=max_testcases)
+    
+    id = request.form["id"]
+    title = request.form["title"]
+    status = request.form["status"]
+    description = request.form["description"]
+    testcases = []
+    for i in range(max_testcases):
+        inp = request.form["input" + str(i)]
+        out = request.form["output" + str(i)]
+        # check if empty
+        if inp.rstrip() != "" and out.rstrip() != "":
+            testcases.append([inp, out])
+    open("problems/" + id + ".json", "w", encoding='utf-8').write(
+        json.dumps({
+            "title": title,
+            "status": status,
+            "difficulty": request.form["difficulty"],
+            "tags": request.form["tags"],
+            "description": description,
+            "testcases": testcases
+        })
+    )
+    update_problem_statuses()
+    return redirect("/")
+    
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
     if not admin_check(request):
@@ -137,30 +140,26 @@ def problem():
 
     return render_template("problem.html", results=False, data=data)
 
-# GAME CREATION/JOINING
-def random_id():
-    return "".join([random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(6)])
-
 # MAIN
 @app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == "POST":
-        try:
-            name = request.form["player_name"]
-            id = request.form["game_id"]
-        except:
-            return render_template("index.html")
-        id = id.rstrip().upper()
-        print(name, id)
+    if request.method == "GET": return render_template("index.html")
+    
+    try:
+        name = request.form["player_name"]
+        id = request.form["game_id"]
+    except: return render_template("index.html")
+    id = id.rstrip().upper()
+    print(name, id)
 
-        for g_id in games:
-            games[g_id].validate_players()
-        try:
-            game = get_game(id)
-            p_id = game.add_player(name)
-            return redirect(f"/waiting?id={id}&player={p_id}")
-        except: pass
-    return render_template("index.html")
+    for g_id in games:
+        games[g_id].validate_players()
+    try:
+        game = get_game(id)
+        p_id = game.add_player(name)
+        return redirect(f"/waiting?id={id}&player={p_id}")
+    except: pass
+
 
 # ABOUT
 @app.route("/about")
@@ -181,8 +180,7 @@ def join():
             game = get_game(id)
             p_id = game.add_player(name)
             return redirect(f"/waiting?id={id}&player={p_id}")
-        except KeyError:
-            ...
+        except: pass
             # print(f"Game {id} not found. Active games: {" ".join([game.id for game in Games.__games])}")
     return render_template("join.html", id=id)
 
@@ -267,10 +265,52 @@ def update_problem_statuses():
         if data["status"] == "public": public.append([id,data["difficulty"]])
         elif data["status"] == "publvate": publvate.append([id,data["difficulty"]])
         else: private.append([id,data["difficulty"]])
+
     with open("problems_by_status.json",'w') as f:
         json.dump({"public": public, "publvate": publvate, "private": private},f)
+
+# SCOREBOARD
+
+@app.route("/scoreboard", methods=["GET"])
+def scoreboard():
+    id = request.args.get("id")
+    player = request.args.get("player")
+    try:
+        game = get_game(id)
+        p = game.get_player(player)
+        return render_template(
+            "scoreboard.html",
+            id=id,
+            player = player,
+            player_name = p.name,
+            problems = game.problems,
+            time = game.time_remaining()
+        )
+    except:
+        print(f"Scoreboard for game {id}, player {player} not found")
+    abort(404)
+
+@app.route("/host_scoreboard", methods=["GET"])
+def scoreboard_host():
+    id = request.args.get("id")
+    try:
+        game = get_game(id)
+        return render_template(
+            "host_scoreboard.html",
+            id = id,
+            problems = game.problems,
+            tst = False,
+            time = game.time_remaining()
+        )
+    except KeyError:
+        print(f"Game with id {id} not found")
+    abort(404)
+# API
+
 def api_error():
     return make_response(json.dumps({"error":"dne"}))
+
+# API/ auth stuff
 
 def get_logged_in_user(request):
     if "user_id" not in request.cookies or "hashed_pass" not in request.cookies:
@@ -359,6 +399,8 @@ def login():
     except: return clear_login_fail()
     return json.dumps({"error":"none","user":user_json(user)})
 
+# API/ problem info
+
 @app.route("/api/problem_names")
 def problem_names():
     '''
@@ -392,15 +434,7 @@ def problem_data():
 
     return json.dumps(res)
 
-@app.route("/api/check_admin", methods=["GET"])
-def request_is_admin():
-    curr_state = {"admin":False, "logged_in":False, "error":"none"}
-    if admin_check(request):
-        curr_state["admin"]=True
-        curr_state["logged_in"]=True
-        return json.dumps(curr_state)
-    return curr_state
-
+# API/ problem submission
 
 @app.route("/api/submit", methods=["POST"])
 def submit_solution():
@@ -408,7 +442,7 @@ def submit_solution():
 
     # print(f"received problem submission for {p}:", file.filename)
     now = datetime.datetime.now()
-    SUBMISSION_ID = now.strftime("%m-%d-%Y-%H-%M-%S-") + random_id()
+    SUBMISSION_ID = now.strftime("%m-%d-%Y-%H-%M-%S-") + "".join([random.choice(ALPHABET) for _ in range(6)])
     res = {
         "submission": SUBMISSION_ID,
         "problem": request.args.get("id"),
@@ -426,7 +460,6 @@ def submit_solution():
 
     with open(f"grading/{SUBMISSION_ID}.json",'w') as f: json.dump(res,f)
     with open(f"grading/todo/{SUBMISSION_ID}",'w') as f: f.write("")
-    # grader.grade(SUBMISSION_ID)
 
     try:
         user = get_logged_in_user(request)
@@ -452,7 +485,7 @@ def get_problem_results():
     if "game" not in res and "player" not in res:
         return json.dumps({"results":res["results"],"error":"none"})
     # give points to player if playing a game
-    g_id = res["game"]
+    g_id = res["game"] #TODO preferrably, the grader would do this directly
     p_id = res["player"]
     print("giving score to", p_id, "from game", g_id)
     try:
@@ -468,6 +501,8 @@ def get_problem_results():
         game.give_points(p_id, res["problem"], num_points)
     except KeyError: pass
     return json.dumps({"results":res["results"],"error":"none"})
+
+#API/ practice contests
 
 @app.route("/api/game_status", methods=["GET"])
 def get_game_status():
@@ -489,42 +524,6 @@ def get_players():
     except KeyError:
         print(f"No game found with id {id}")
     return api_error()
-
-# SCOREBOARD
-@app.route("/scoreboard", methods=["GET"])
-def scoreboard():
-    id = request.args.get("id")
-    player = request.args.get("player")
-    try:
-        game = get_game(id)
-        p = game.get_player(player)
-        return render_template(
-            "scoreboard.html",
-            id=id,
-            player = player,
-            player_name = p.name,
-            problems = game.problems,
-            time = game.time_remaining()
-        )
-    except:
-        print(f"Scoreboard for game {id}, player {player} not found")
-    abort(404)
-
-@app.route("/host_scoreboard", methods=["GET"])
-def scoreboard_host():
-    id = request.args.get("id")
-    try:
-        game = get_game(id)
-        return render_template(
-            "host_scoreboard.html",
-            id = id,
-            problems = game.problems,
-            tst = False,
-            time = game.time_remaining()
-        )
-    except KeyError:
-        print(f"Game with id {id} not found")
-    abort(404)
 
 # ERROR PAGES
 @app.errorhandler(404)

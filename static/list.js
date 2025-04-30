@@ -22,7 +22,10 @@ const diffToNum = {
     "very hard": 4
 }
 
-const problem_names = getContent("/api/problem_names", (problems) => {
+const getProblems = async () => {
+    const problems = await fetch("/api/problem_names").then(response => response.json());
+    if (problems.error && problems.error != "none") return;
+
     const public = problems.public;
     const publvate = problems.publvate;
     const private = problems.private;
@@ -55,24 +58,33 @@ const problem_names = getContent("/api/problem_names", (problems) => {
     publvate_details = new Array(publvate.length);
     private_details = new Array(private.length);
 
-    const grabInfo = (problems, details, problemContainer) => {
+    const grabInfo = async (problems, details, problemContainer) => {
         let l = 0;
-        problems.forEach((problemTuple, i) => {
-            getContent(`/api/problem_data?id=${problemTuple[0]}&title&difficulty&tags&status`, (problem) => {
-                details[i] = problem;
-                while (details[l] != undefined) {
-                    problemContainer.innerHTML += renderProblem(details[l]);
-                    l++;
-                }
-            })
+        problems.forEach(async (problemTuple, i) => {
+            const data = await fetch(`/api/problem_data?id=${problemTuple[0]}&title&difficulty&tags&status`).then(response => response.json());
+            if (data.error != "none" && data.error) return;
+
+            details[i] = data;
+            while (details[l] != undefined) {
+                problemContainer.innerHTML += renderProblem(details[l]);
+                l++;
+            }
+            if (l < details.length) return;
+
+            if (localStorage.getItem("sort-type")) {
+                currDir = -1 * Number(localStorage.getItem("sort-dir"));
+                currSort = localStorage.getItem("sort-type");
+                changeSort(currSort);
+            }
+            else changeSort("difficulty");
         });
     }
 
     grabInfo(public, public_details, public_problems);
     grabInfo(publvate, publvate_details, publvate_problems);
     grabInfo(private, private_details, private_problems);
-
-})
+}
+getProblems();
 
 const reverse = (func) => {
     return (a, b) => func(b, a);
@@ -105,8 +117,6 @@ const renderProblem = (p) => {
 
     if (p.id in user.attempted) colorType = "partial";
     if (p.id in user.solved) colorType = "solved";
-
-    console.log(colorType);
 
     return `
         <tr ${colorType != "" ? ("class=" + colorType) : ""}>
@@ -157,19 +167,21 @@ const updateArrows = () => {
         const a = item.getElementsByTagName("span").item(0);
 
         if (currSort == "alphabet") {
+            a.style.display = "initial";
             if (currDir == 1) a.innerText = "arrow_downward";
             else a.innerText = "arrow_upward";
         }
-        else a.innerText = "";
+        else a.style.display = "none";
     }
     for (const item of document.getElementsByClassName("difficulty-title")) {
         const a = item.getElementsByTagName("span").item(0);
 
         if (currSort == "difficulty") {
+            a.style.display = "initial";
             if (currDir == -1) a.innerText = "arrow_downward";
             else a.innerText = "arrow_upward";
         }
-        else a.innerText = "";
+        else a.style.display = "none";
     }
 
     for (const item of document.getElementsByClassName("tags-title")) {
@@ -215,28 +227,17 @@ const tableHeadInterior = `
     </tr>`
 
 
-
-doByTag("thead", (item) => item.innerHTML = tableHeadInterior);
-doByClass("problem-title", (item) => item.onclick = changeSort.bind(this, "alphabet"));
-doByClass("difficulty-title", (item) => item.onclick = changeSort.bind(this, "difficulty"));
+for (const item of document.getElementsByTagName("thead")) item.innerHTML = tableHeadInterior;
+for (const item of document.getElementsByClassName("problem-title")) item.onclick = changeSort.bind(this, "alphabet");
+for (const item of document.getElementsByClassName("difficulty-title")) item.onclick = changeSort.bind(this, "difficulty");
 
 for (const item of document.getElementsByClassName('tags-title')) item.onclick = () => {
-    toggleTags();
     updateArrows();
+    toggleTags();
     showProblems();
 }
 
 document.body.onload = () => {
     showProblems();
-    if (localStorage.getItem("sort-type")) {
-        currDir = -1 * Number(localStorage.getItem("sort-dir"));
-        currSort = localStorage.getItem("sort-type");
-        changeSort(currSort);
-    }
-    else changeSort("difficulty");
     updateArrows();
-}
-
-user.onLogin = () => {
-    showProblems();
 }

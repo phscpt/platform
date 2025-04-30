@@ -23,10 +23,7 @@ if (inGame) {
 }
 
 
-/**
- * 
- * @param {string} text 
- */
+/** @param {string} text  */
 const fixQuotes = (text) => text.replaceAll(`‘`, `'`).replaceAll(`’`, `'`).replaceAll(`“`, `"`).replaceAll(`”`, '"');
 
 // deal with form
@@ -84,11 +81,11 @@ const fillResults = (results) => {
     stopLoading();
 }
 
-const getGrade = (submissionID) => {
-    getContent("/api/submission_result?submission=" + submissionID, (data) => {
-        console.log(data);
-        fillResults(data.results);
-    });
+const getGrade = async (submissionID) => {
+    const data = await fetch("/api/submission_result?submission=" + submissionID).then(response => response.json());
+    if (data.error == "unready") setTimeout(getGrade.bind(this, submissionID), 1000);
+    if (data.error && data.error != "none") return;
+    fillResults(data.results);
 }
 
 const startLoading = () => {

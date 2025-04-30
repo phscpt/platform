@@ -1,4 +1,4 @@
-class User {
+class User extends EventTarget {
     id = null;
     username = null;
     #admin = false;
@@ -7,6 +7,7 @@ class User {
     #loggedIn = false;
 
     constructor() {
+        super();
         if (getCookie("user_id") == "") return;
 
         this.id = getCookie("user_id");
@@ -17,30 +18,20 @@ class User {
         this.username = null;
         this.attempted = {};
         this.isAdmin = false;
-        this.#loggedIn = false;
-
-        this.onLogout();
+        this.loggedIn = false;
     }
-
-    loginError() {
-        console.log("could not login :(")
-    }
-
-    onAdmin() { }
-    onLogin() { }
-    onLogout() { }
 
     get admin() { return this.#admin; }
     set admin(isAdmin) {
-        if (isAdmin) this.onAdmin();
+        if (isAdmin) this.dispatchEvent(new Event("admin"));
         this.#admin = isAdmin;
     }
 
     get loggedIn() { return this.#loggedIn }
     set loggedIn(loginState) {
         this.#loggedIn = loginState;
-        if (loginState) this.onLogin();
-        else this.onLogout()
+        if (loginState) this.dispatchEvent(new Event("login"));
+        else this.dispatchEvent(new Event("logout"));
     }
 
     async login() {
@@ -50,9 +41,8 @@ class User {
         }
 
         const loginData = await fetch(`/api/auth/login`).then(response => response.json());
-        console.log(loginData);
         if (loginData.error != "none") {
-            this.loginError();
+            console.log("Could not log in", loginData);
             this.loggedIn = false;
             return false;
         }
@@ -113,8 +103,8 @@ function setColorMode() {
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    let expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    const expiree = d.toUTCString();
+    document.cookie = `${cname}=${cvalue};expires=${expiree};path=/`;
 }
 
 function getCookie(cname) {
@@ -142,40 +132,15 @@ for (codeblock of document.getElementsByTagName("pre")) {
  * @param {string} url the url to GET json data from
  * @param {Function} callback ingest json data from the url
  */
-function getContent(url, callback) {
-    fetch(url)
-        .then(response => response.json())
-        .then((data) => {
-            if (data.error == "dne") return;
-            else if (data.error == "unready") setTimeout(getContent, 500, url, callback);
-            else callback(data);
-        });
+const getContent = async (url, callback) => {
+    const data = await fetch(url).then(response => response.json());
+    if (data.error == "dne") return;
+    if (data.error == "unready") {
+        setTimeout(getContent, 500, url, callback);
+        return;
+    }
+    callback(data);
 }
-
-/**
- * 
- * @param {string} className 
- * @param {Function} callbackfn 
- */
-const doByClass = (className, callbackfn) => {
-    for (let item of document.getElementsByClassName(className)) callbackfn(item);
-}
-
-/**
- * 
- * @param {string} tagName 
- * @param {Function} callbackfn 
- */
-const doByTag = (tagName, callbackfn) => {
-    for (let item of document.getElementsByTagName(tagName)) callbackfn(item);
-}
-
-/**
- * 
- * @param {string} id 
- * @param {Function} callbackfn 
- */
-const doById = (id, callbackfn) => callbackfn(document.getElementById(id));
 
 const encoder = new TextEncoder();
 

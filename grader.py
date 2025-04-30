@@ -192,6 +192,6 @@ if __name__ == "__main__":
     try:
         main()
     except:
-        print("Exiting...")
-log("closed peacefully\n\n")
+        print("\n\nExiting...")
+log("\nclosed peacefully\n\n")
 out.close()
