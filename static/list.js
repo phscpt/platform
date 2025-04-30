@@ -145,6 +145,8 @@ const showProblems = () => {
     public_problems.innerHTML = newPublic;
     publvate_problems.innerHTML = newPublvate;
     private_problems.innerHTML = newPrivate;
+
+    updateArrows();
 }
 
 /**
@@ -209,7 +211,6 @@ const changeSort = (sortName) => {
     localStorage.setItem("sort-type", currSort);
     localStorage.setItem("sort-dir", currDir);
     sortBy(cmpFunc);
-    updateArrows();
 }
 
 
@@ -232,12 +233,10 @@ for (const item of document.getElementsByClassName("problem-title")) item.onclic
 for (const item of document.getElementsByClassName("difficulty-title")) item.onclick = changeSort.bind(this, "difficulty");
 
 for (const item of document.getElementsByClassName('tags-title')) item.onclick = () => {
-    updateArrows();
     toggleTags();
     showProblems();
 }
 
 document.body.onload = () => {
     showProblems();
-    updateArrows();
 }
