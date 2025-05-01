@@ -525,6 +525,22 @@ def get_players():
         print(f"No game found with id {id}")
     return api_error()
 
+last_orz = time.time()
+
+#API/ random stuff
+@app.route("/api/orz",methods=["GET"])
+def orz():
+    global last_orz
+    if time.time() - last_orz < 2: return json.dumps({"error":"too fast :/"})
+    last_orz = time.time()
+    if not os.path.exists("orz"):
+        with open("orz",'w') as f: f.write("0")
+    with open("orz",'r') as f: cnt=int(f.read())
+
+    cnt+=1
+    with open("orz",'w') as f: f.write(str(cnt))
+    return json.dumps({"cnt":cnt})
+
 # ERROR PAGES
 @app.errorhandler(404)
 def page_not_found(e):
