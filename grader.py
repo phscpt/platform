@@ -39,10 +39,9 @@ def grade(id:str):
        - Otherwise, it returns `"Accepted"`
     '''
 
-    def cleanup(filename:str):
-        os.remove(f"tmp/{id}/{filename}")
-        if os.path.exists(f"tmp/{id}/a.out"): os.remove(f"tmp/{id}/a.out")
-        if os.path.exists(f"tmp/{id}/{filename.split('.')[0]}.class"): os.remove(f"tmp/{id}/{filename.split('.')[0]}.class")
+    def cleanup():
+        do_delete = os.listdir(f"tmp/{id}")
+        for file in do_delete: os.remove(f"tmp/{id}/{file}")
         os.rmdir(f"tmp/{id}")
 
     with open(f"grading/{id}.json",'r') as f:
@@ -148,10 +147,7 @@ def grade(id:str):
             results.append(["WA", time_elapsed])
     os.chdir(olddir)
 
-    os.remove(f"tmp/{id}/{filename}")
-    if os.path.exists(f"tmp/{id}/a.out"): os.remove(f"tmp/{id}/a.out")
-    if os.path.exists(f"tmp/{id}/{filename.split('.')[0]}.class"): os.remove(f"tmp/{id}/{filename.split('.')[0]}.class")
-    os.rmdir(f"tmp/{id}")
+    cleanup()
     
     res["results"] = results
     res["status"] = "graded"
