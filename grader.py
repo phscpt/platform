@@ -171,22 +171,18 @@ def main():
     rn = datetime.now().strftime("%m/%d/%Y at %H:%M:%S")
     log(f"\nGrader restarted {rn}\n")
     while True:
-        try:
-            todo = os.listdir("grading/todo")
-            if len(todo) == 1:
-                time.sleep(WAIT_TIME)
-                continue
-            todo.remove("readme.txt")
-            while len(todo) > 0:
-                tograde = todo.pop()
-                if not os.path.exists(f"grading/todo/{tograde}"): continue #another grader has already removed it -- reduce chance of race condition
-                os.remove(f"grading/todo/{tograde}")
-                if not os.path.exists(f"grading/{tograde}.json"): continue
-                grade(tograde)
+        todo = os.listdir("grading/todo")
+        if len(todo) == 1:
             time.sleep(WAIT_TIME)
-        except Exception as e:
-            out.close()
-            raise e
+            continue
+        todo.remove("readme.txt")
+        while len(todo) > 0:
+            tograde = todo.pop()
+            if not os.path.exists(f"grading/todo/{tograde}"): continue #another grader has already removed it -- reduce chance of race condition
+            os.remove(f"grading/todo/{tograde}")
+            if not os.path.exists(f"grading/{tograde}.json"): continue
+            grade(tograde)
+        time.sleep(WAIT_TIME)
 
 if __name__ == "__main__":
     try:
