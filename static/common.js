@@ -19,11 +19,12 @@ class User extends EventTarget {
         this.attempted = {};
         this.isAdmin = false;
         this.loggedIn = false;
+        setCookie("user_id", "", 30);
     }
 
     get admin() { return this.#admin; }
     set admin(isAdmin) {
-        if (isAdmin) this.dispatchEvent(new Event("admin"));
+        if (isAdmin == true) this.dispatchEvent(new Event("admin"));
         this.#admin = isAdmin;
     }
 

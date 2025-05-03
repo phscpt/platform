@@ -52,13 +52,6 @@ def admin_check(request) -> bool:
     except: return False
     return user.admin
 
-#TODO: remove this (move edit/upload to /public behind admin wall)
-@app.route("/list", methods=["GET","POST"])
-def catalogue():
-    if admin_check(request):
-        return render_template("list.html",problems=get_problem_names())
-    abort(401)
-
 @app.route("/public", methods=["GET","POST"])
 def public_catalogue():
     return render_template("list_public.html")
@@ -138,7 +131,7 @@ def problem():
             data["description"] = markdown.markdown(data["description"], extensions=['fenced_code'])
     except: abort(404)
 
-    return render_template("problem.html", results=False, data=data)
+    return render_template("problem.html", data=data)
 
 # MAIN
 @app.route("/", methods=["GET", "POST"])
@@ -181,7 +174,6 @@ def join():
             p_id = game.add_player(name)
             return redirect(f"/waiting?id={id}&player={p_id}")
         except: pass
-            # print(f"Game {id} not found. Active games: {" ".join([game.id for game in Games.__games])}")
     return render_template("join.html", id=id)
 
 @app.route("/log_in", methods=["GET"])
@@ -195,14 +187,11 @@ def sign_up():
 @app.route("/select", methods=["GET", "POST"])
 def problem_select():
     if request.method == "POST":
-        print("value is")
-        print(request.form.get("tst"))
-        try:
-            duration = int(request.form["timer"])
-        except:
-            duration = -1
+        try: duration = int(request.form["timer"])
+        except: duration = -1
 
-        game = Game(problems=request.form["problems"].rstrip().split("\n"), totalTime=duration, tst=request.form.get("tst"), doTeams=request.form.get("teams"))
+        game = Game(problems=request.form["problems"].rstrip().split("\n"),  totalTime=duration,
+                    tst=request.form.get("tst"), doTeams=request.form.get("teams")) # both props are inactive
 
         games[game.id] = game
         return redirect(f"host_waiting?id={game.id}")
@@ -217,7 +206,6 @@ def problem_select():
 
     # admins have access to all problems
     for problem in problems:
-        print(problem["status"])
         if problem["status"] == "public" or problem["status"] == "publvate":
             public_problems.append(problem)
     return render_template("select.html", problems = public_problems)
@@ -286,8 +274,7 @@ def scoreboard():
             problems = game.problems,
             time = game.time_remaining()
         )
-    except:
-        print(f"Scoreboard for game {id}, player {player} not found")
+    except: print(f"Scoreboard for game {id}, player {player} not found")
     abort(404)
 
 @app.route("/host_scoreboard", methods=["GET"])
@@ -362,10 +349,7 @@ def get_login_salt():
         return api_error()
 
     user = User(id)
-    if user.hashed_pass == "" or user.salt == "":
-        print("incomplete user")
-        return api_error()
-    print("bueno")
+    if user.hashed_pass == "" or user.salt == "": return api_error()
     return json.dumps({"salt": user.salt, "id":id, "error":"none"})
 
 @app.route("/api/auth/login",methods=["POST","GET"])

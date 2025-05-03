@@ -127,9 +127,13 @@ const renderProblem = (p) => {
             ${p.difficulty ? p.difficulty : "N/A"}
         </td>
         
-        <td style="padding: 10px; width: 30%;">
+        <td style="padding: 10px; width: 25%;">
             ${showTags ? (p.tags ? p.tags : "N/A") : ""}
         </td>
+        ${user.admin ?
+            `<td style="padding: 10px; width: 5 %; ">
+                <a href="${`/edit?id=` + p.id}"><span class="material-symbols-outlined">edit</span></a>
+            </td >` : ""}
         </tr>
     `
 };
@@ -214,8 +218,8 @@ const changeSort = (sortName) => {
 }
 
 
-const tableHeadInterior = `
-    <tr>
+let tableHeadInterior = `
+        <tr>
         <th style="width:50%;" class="problem-title">
             <div class="head-int">Problem <span class="material-symbols-outlined"></span></div>
         </th>
@@ -225,7 +229,7 @@ const tableHeadInterior = `
         <th style="width:30%;" class="tags-title">
             <div class="head-int">Tags<span class="material-symbols-outlined"></span></div>
         </th>
-    </tr>`
+    </tr > `
 
 
 for (const item of document.getElementsByTagName("thead")) item.innerHTML = tableHeadInterior;
@@ -240,3 +244,31 @@ for (const item of document.getElementsByClassName('tags-title')) item.onclick =
 document.body.onload = () => {
     showProblems();
 }
+
+user.addEventListener("admin", () => {
+    tableHeadInterior = `
+    <tr>
+        <th style="width:50%;" class="problem-title">
+            <div class="head-int">Problem <span class="material-symbols-outlined"></span></div>
+        </th>
+        <th style="width:20%;" class="difficulty-title">
+            <div class="head-int">Difficulty <span class="material-symbols-outlined"></span></div>
+        </th>
+        <th style="width:25%;" class="tags-title">
+            <div class="head-int">Tags<span class="material-symbols-outlined"></span></div>
+        </th>
+        <th style="width:5%;" class="edit-title">
+            <div class="head-int">Edit</div>
+        </th>
+    </tr > `
+    for (const item of document.getElementsByTagName("thead")) item.innerHTML = tableHeadInterior;
+    showProblems();
+    for (const item of document.getElementsByClassName("problem-title")) item.onclick = changeSort.bind(this, "alphabet");
+    for (const item of document.getElementsByClassName("difficulty-title")) item.onclick = changeSort.bind(this, "difficulty");
+
+    for (const item of document.getElementsByClassName('tags-title')) item.onclick = () => {
+        toggleTags();
+        showProblems();
+    }
+    document.getElementById("upload-link").style.display = "block";
+})
