@@ -164,10 +164,7 @@ def grade(id:str):
 WAIT_TIME = 5.0
 
 def main():
-    rn = datetime.now().strftime("%m/%d/%Y at %H:%M:%S")
     log(f"\nGrader restarted {rn}\n")
-    START = time.time()
-    EIGHT_HOURS = 8*60*60
     while True:
         todo = os.listdir("grading/todo")
         if len(todo) == 1:
@@ -180,10 +177,6 @@ def main():
             os.remove(f"grading/todo/{tograde}")
             if not os.path.exists(f"grading/{tograde}.json"): continue
             grade(tograde)
-
-        if time.time() - START >= EIGHT_HOURS:
-            log("[8 HOUR RESTART]")
-            return
 
         time.sleep(WAIT_TIME)
 
