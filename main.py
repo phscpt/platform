@@ -136,18 +136,17 @@ def about():
 @app.route("/join", methods=["GET", "POST"])
 def join():
     id = request.args.get("id")
-    if request.method == "POST":
-        try:
-            name = html.escape(request.form["player_name"],True)
-        except:
-            return render_template("join.html", id=id)
-        id = id.rstrip().upper()
-        try:
-            game = get_game(id)
-            p_id = game.add_player(name)
-            return redirect(f"/waiting?id={id}&player={p_id}")
-        except: pass
-    return render_template("join.html", id=id)
+    if request.method == "GET": return render_template("join.html")
+
+    try: name = html.escape(request.form["player_name"], True)
+    except: return render_template("join.html")
+    id = id.rstrip().upper()
+    try:
+        game = get_game(id)
+        p_id = game.add_player(name)
+        return redirect(f"/waiting?id={id}&player={p_id}")
+    except: pass
+
 
 @app.route("/log_in", methods=["GET"])
 def log_in():
@@ -516,7 +515,7 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html', data = traceback.format_exc()), 500
+    return render_template('500.html'), 500
 
 @app.errorhandler(401)
 def unauthorized(e):

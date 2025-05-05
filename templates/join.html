@@ -23,10 +23,15 @@
     <br>
     <div class="box">
         <form method="post">
-            <h2>Join Contest: {{ id }}</h2>
+            <h2>Join Contest: <span id="contest-id"></span></h2>
             <input name=player_name placeholder="Enter Name">
             <input type="submit" value="Join" class="button-emphasis">
         </form>
+        <script>
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get("id");
+            document.getElementById("contest-id").innerText = id;
+        </script>
     </div>
     <br>
     <br><br>
