@@ -15,25 +15,6 @@ users = []
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 
- # TODO: this is *REALLY* slow -- try to replace it with /api/problem_names calls as much as possible
-def get_problem_names() -> list:
-    # Get all problems, in sorted order
-    problem_names = os.listdir("problems")
-    problems = []
-    for p in problem_names:
-        if not ".json" in p:
-            continue
-        prob = json.load(open("problems/" + p, encoding='utf-8'))
-        prob["id"] = p.split(".")[0]
-        new_prob = {
-            "id": prob["id"],
-            "status": prob["status"],
-            "title": prob["title"],
-        }
-        problems.append(new_prob)
-    problems.sort(key = lambda x: x["title"])
-    return problems
-
 def admin_check(request) -> bool:
     try: user = get_logged_in_user(request)
     except: return False
@@ -188,20 +169,7 @@ def problem_select():
 
         games[game.id] = game
         return redirect(f"host_waiting?id={game.id}")
-    problems = get_problem_names()
-    public_problems = []
-    if not admin_check(request):
-        print("not admin")
-        for problem in problems:
-            if problem["status"] == "public":
-                public_problems.append(problem)
-        return render_template("select.html", problems = public_problems)
-
-    # admins have access to all problems
-    for problem in problems:
-        if problem["status"] == "public" or problem["status"] == "publvate":
-            public_problems.append(problem)
-    return render_template("select.html", problems = public_problems)
+    return render_template("select.html")
 
 # TODO: make api
 @app.route("/host_waiting", methods=["GET", "POST"])
@@ -232,7 +200,6 @@ def waiting():
         print(f"Game or player not found :(")
     return render_template("waiting.html", id=request.args.get("id"), player=player_name, player_id=player)
 
-# TODO: make api
 def update_problem_statuses():
     prob_paths = os.listdir("problems")
 
@@ -246,9 +213,15 @@ def update_problem_statuses():
         id = '.'.join(problem.split('.')[:-1])
 
         if "difficulty" not in data: data["difficulty"] = ""
-        if data["status"] == "public": public.append([id,data["difficulty"]])
-        elif data["status"] == "publvate": publvate.append([id,data["difficulty"]])
-        else: private.append([id,data["difficulty"]])
+
+        prob = {
+            "id":id,
+            "difficulty":data["difficulty"],
+            "title":data["title"]
+        }
+        if data["status"] == "public": public.append(prob)
+        elif data["status"] == "publvate": publvate.append(prob)
+        else: private.append(prob)
 
     with open("problems_by_status.json",'w') as f:
         json.dump({"public": public, "publvate": publvate, "private": private},f)
@@ -379,6 +352,20 @@ def login():
     try: user = get_logged_in_user(request)
     except: return clear_login_fail()
     return json.dumps({"error":"none","user":user_json(user)})
+
+# API/ game info
+
+@app.route("/api/games/game_data")
+def game_data():
+    try:
+        g_id = request.args.get("id")
+
+        game = get_game(g_id)
+    except: return api_error()
+    data = game.to_json()
+    data["error"] = "none"
+    return json.dumps(data)
+    
 
 # API/ problem info
 

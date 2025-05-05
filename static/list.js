@@ -51,17 +51,17 @@ const getProblems = async () => {
      * @param {[string, string]} b
      */
     const cmp = (a, b) => {
-        if (b[1].toLowerCase() in diffToNum && a[1].toLowerCase() in diffToNum) {
-            let bDiff = diffToNum[b[1].toLowerCase()];
-            let aDiff = diffToNum[a[1].toLowerCase()];
+        if (b.difficulty.toLowerCase() in diffToNum && a.difficulty.toLowerCase() in diffToNum) {
+            let bDiff = diffToNum[b.difficulty.toLowerCase()];
+            let aDiff = diffToNum[a.difficulty.toLowerCase()];
 
             if (aDiff != bDiff) return aDiff - bDiff;
         }
-        else if (b[1].toLowerCase() in diffToNum) return 1; //b goes first
-        else if (a[1].toLowerCase() in diffToNum) return -1; // a goes first
+        else if (b.difficulty.toLowerCase() in diffToNum) return 1; //b goes first
+        else if (a.difficulty.toLowerCase() in diffToNum) return -1; // a goes first
 
-        if (a[0] > b[0]) return 1;
-        if (b[0] > a[0]) return -1;
+        if (a.id > b.id) return 1;
+        if (b.id > a.id) return -1;
         return 0;
     }
     public.sort(cmp);
@@ -74,7 +74,7 @@ const getProblems = async () => {
     const grabInfo = async (problems, details, problemContainer) => {
         let l = 0;
         problems.forEach(async (problemTuple, i) => {
-            const data = await fetch(`/api/problem_data?id=${problemTuple[0]}&title&difficulty&tags&status`).then(response => response.json());
+            const data = await fetch(`/api/problem_data?id=${problemTuple.id}&title&difficulty&tags&status`).then(response => response.json());
             if (data.error != "none" && data.error) return;
 
             details[i] = data;

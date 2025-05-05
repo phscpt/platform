@@ -1,10 +1,36 @@
-let duration = parseInt(document.body.getAttribute("tim"));
+let duration = 1e4;
 let timerActive = (duration != -1);
 let totalTime = duration;
 let opac = 0;
 
+let playerName;
+
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
+const p_id = params.get("player");
+
+let gameData = {
+    "id": "",
+    "players": [],
+    "status": "",
+    "start_time": 1e4,
+    "duration": 1e4,
+    "problems": "",
+};
+
+const getGame = async () => {
+    const data = await fetch("/api/games/game_data" + window.location.search).then(response => response.json());
+    if (data.error != "none") return;
+
+    gameData = data;
+    duration = gameData.duration;
+    for (const p of gameData.players) {
+        if (p.id != p_id) continue;
+        playerName = p.name;
+    }
+}
+
+getGame();
 
 async function setTable() {
     //update table
@@ -24,7 +50,7 @@ async function setTable() {
     document.getElementById("player-list").innerHTML = "";
     for (let i = 0; i < players.length; i++) {
         let rank = i + 1;
-        if (document.body.hasAttribute("player_name")) if (players[i][1] == document.body.getAttribute("player_name")) {
+        if (playerName) if (players[i][1] == playerName) {
             rank = "→ " + String(i + 1);
         }
         let row = document.createElement("tr");
@@ -59,7 +85,7 @@ function update() {
 
     if (!timerActive) return;
 
-    if (duration >= 0) {
+    if (duration > 0) {
         let hours = parseInt(duration / 3600, 10)
         let minutes = parseInt(duration / 60 % 60, 10);
         let seconds = parseInt(duration % 60, 10);
@@ -76,7 +102,7 @@ function update() {
 
     if (!document.getElementById("panic-inducer")) return;
 
-    if (parseFloat(duration) < 0) {
+    if (duration < 0) {
         opac -= 0.1;
         document.getElementById("panic-inducer").style.opacity = Math.max(opac, 0);
     }
