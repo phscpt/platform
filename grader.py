@@ -164,7 +164,7 @@ def grade(id:str):
 WAIT_TIME = 5.0
 
 def main():
-    log(f"\nGrader restarted {rn}\n")
+    log(f"\nGrader restarted\n")
     while True:
         todo = os.listdir("grading/todo")
         if len(todo) == 1:
