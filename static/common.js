@@ -17,6 +17,7 @@ class User extends EventTarget {
         this.id = null;
         this.username = null;
         this.attempted = {};
+
         this.isAdmin = false;
         this.loggedIn = false;
         setCookie("user_id", "", 30);
@@ -36,7 +37,7 @@ class User extends EventTarget {
     }
 
     async login() {
-        if (this.id == null) {
+        if (!this.id) {
             this.admin = false;
             return false;
         }
@@ -101,6 +102,11 @@ function setColorMode() {
     }
 }
 
+/** 
+ * @param {string} cname
+ * @param {string} cvalue
+ * @param {number} exdays
+ */
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
@@ -108,6 +114,10 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = `${cname}=${cvalue};expires=${expiree};path=/`;
 }
 
+/**
+ * @param {string} cname 
+ * @returns {string}
+ */
 function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
@@ -145,6 +155,7 @@ const getContent = async (url, callback) => {
 
 const encoder = new TextEncoder();
 
+/** @param {string} text */
 const hash = async (text) => {
     const data = encoder.encode(text);
 

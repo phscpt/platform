@@ -37,9 +37,11 @@ document.getElementById("file").onchange = () => {
 }
 
 submissionText.onchange = () => {
+
     submissionText.value = fixQuotes(submissionText.value);
     if (userChosenTextType) return;
 
+    /** @type {string} */
     const text = submissionText.value;
 
     const pyHints = ["print(", "input()", "##PY", "else:"];
@@ -119,6 +121,7 @@ const submitCode = (code, language) => {
 const reader = new FileReader();
 reader.onload = () => {
     const sol_text = reader.result;
+    /** @type {string} */
     const language = document.getElementById("language").value;
     submitCode(sol_text, language);
 }
@@ -130,6 +133,7 @@ reader.onload = () => {
 const submit = () => {
     if (selectedTab == 1) {
         if (!submissionBox.reportValidity()) throw new Error("Invalid form contents");
+        /** @type {File} */
         const file = document.getElementById("file").files[0];
 
         reader.readAsText(file);
@@ -137,6 +141,7 @@ const submit = () => {
     else submitCode(submissionText.value, languageText.value);
 }
 
+/** @param {number} tab */
 const setSelectedTab = (tab) => {
     if (selectedTab == tab) return;
 
@@ -154,9 +159,8 @@ document.getElementById("tab-2").onclick = setSelectedTab.bind(this, 2);
 
 setSelectedTab(1)
 
-console.log(user);
-user.onLogin = () => {
+user.addEventListener("login", () => {
     if (problem in user.attempted) {
         getGrade(user.attempted[problem]);
     }
-}
+})

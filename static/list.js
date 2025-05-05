@@ -1,3 +1,8 @@
+/*
+ * This code is too dry :/
+ * we should fix it at some point
+ */
+
 const public_problems = document.getElementById("public-problems");
 const publvate_problems = document.getElementById("publvate-problems");
 const private_problems = document.getElementById("private-problems");
@@ -26,8 +31,13 @@ const getProblems = async () => {
     const problems = await fetch("/api/problem_names").then(response => response.json());
     if (problems.error && problems.error != "none") return;
 
+    /** @type {[string, string][]} */
     const public = problems.public;
+
+    /** @type {[string, string][]} */
     const publvate = problems.publvate;
+
+    /** @type {[string, string][]} */
     const private = problems.private;
 
     if (publvate.length == 0 && private.length == 0) {
@@ -36,7 +46,10 @@ const getProblems = async () => {
         document.getElementById("public-title").innerText = "Catalogue";
     }
 
-
+    /**
+     * @param {[string, string]} a
+     * @param {[string, string]} b
+     */
     const cmp = (a, b) => {
         if (b[1].toLowerCase() in diffToNum && a[1].toLowerCase() in diffToNum) {
             let bDiff = diffToNum[b[1].toLowerCase()];
@@ -92,7 +105,10 @@ const reverse = (func) => {
 
 const cmpDiff = (a, b) => {
     if (b.difficulty.toLowerCase() in diffToNum && a.difficulty.toLowerCase() in diffToNum) {
+        /** @type {number} */
         let bDiff = diffToNum[b.difficulty.toLowerCase()];
+
+        /** @type {number} */
         let aDiff = diffToNum[a.difficulty.toLowerCase()];
 
         if (aDiff != bDiff) return aDiff - bDiff;
@@ -134,8 +150,7 @@ const renderProblem = (p) => {
             `<td style="padding: 10px; width: 5 %; ">
                 <a href="${`/edit?id=` + p.id}"><span class="material-symbols-outlined">edit</span></a>
             </td >` : ""}
-        </tr>
-    `
+        </tr>`
 };
 
 const showProblems = () => {
@@ -153,10 +168,7 @@ const showProblems = () => {
     updateArrows();
 }
 
-/**
- * 
- * @param {Function} cmp 
- */
+/** @param {Function} cmp */
 const sortBy = (cmp) => {
     public_details.sort(cmp);
     publvate_details.sort(cmp);
@@ -165,7 +177,7 @@ const sortBy = (cmp) => {
     showProblems();
 }
 
-let currSort = "buhsort";
+let currSort = "OTZ";
 let currDir = 1;
 
 const updateArrows = () => {

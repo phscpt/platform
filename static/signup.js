@@ -13,7 +13,6 @@ const getSalt = async () => {
     document.getElementById("submit").disabled = false;
 }
 
-
 getSalt();
 const form = document.getElementById("credentials");
 
