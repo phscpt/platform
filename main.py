@@ -14,14 +14,6 @@ last_users_clean = time.time()
 users = []
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
-def sortByDifficulty(x) -> int:
-    # comparator used to sort problems in increasing difficulty
-    mapping = {
-        "trivial": 0, "easy": 1, "medium": 2, "hard": 3, "very hard": 4
-    }
-    if "difficulty" in x and x["difficulty"].lower() in mapping:
-        return mapping[x["difficulty"].lower()]
-    return 5
 
  # TODO: this is *REALLY* slow -- try to replace it with /api/problem_names calls as much as possible
 def get_problem_names() -> list:
@@ -38,13 +30,8 @@ def get_problem_names() -> list:
             "status": prob["status"],
             "title": prob["title"],
         }
-        if "difficulty" in prob and prob["difficulty"] != "":
-            new_prob["difficulty"] = prob["difficulty"]
-        if "tags" in prob and prob["tags"] != "":
-            new_prob["tags"] = prob["tags"]
         problems.append(new_prob)
     problems.sort(key = lambda x: x["title"])
-    problems.sort(key = sortByDifficulty)
     return problems
 
 def admin_check(request) -> bool:
@@ -56,6 +43,7 @@ def admin_check(request) -> bool:
 def public_catalogue():
     return render_template("list_public.html")
 
+# TODO: make this an API endpoint as well!
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     # ensure only admin can access this page
@@ -86,7 +74,8 @@ def upload():
     )
     update_problem_statuses()
     return redirect("/")
-    
+
+# TODO make this call out to api 
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
     if not admin_check(request):
@@ -119,6 +108,7 @@ def edit():
         return redirect("/list")
     return render_template("edit.html", max_testcases=max_testcases, data=data)
 
+# TODO lowk just make problems grab text from /api/problem_data
 @app.route('/problem', methods=["GET", "POST"])
 def problem():
     # Get problem id
@@ -134,6 +124,7 @@ def problem():
     return render_template("problem.html", data=data)
 
 # MAIN
+# TODO: figure out what the POST request is doing here (for game join?) and jam it into api
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "GET": return render_template("index.html")
@@ -160,6 +151,7 @@ def about():
     return render_template("about.html")
 
 # JOIN
+# TODO: api-ify
 @app.route("/join", methods=["GET", "POST"])
 def join():
     id = request.args.get("id")
@@ -184,6 +176,7 @@ def log_in():
 def sign_up():
     return render_template("sign_up.html")
 
+# TODO Turn this into api call as well
 @app.route("/select", methods=["GET", "POST"])
 def problem_select():
     if request.method == "POST":
@@ -210,6 +203,7 @@ def problem_select():
             public_problems.append(problem)
     return render_template("select.html", problems = public_problems)
 
+# TODO: make api
 @app.route("/host_waiting", methods=["GET", "POST"])
 def host():
     id = request.args.get("id")
@@ -222,6 +216,7 @@ def host():
             print(f"Game {id} not found. Active games: {[games[g_id].id for g_id in games] }")
     return render_template("host_waiting.html")
 
+# TODO: make api
 @app.route("/waiting", methods=["GET"])
 def waiting():
     id = request.args.get("id")
@@ -237,6 +232,7 @@ def waiting():
         print(f"Game or player not found :(")
     return render_template("waiting.html", id=request.args.get("id"), player=player_name, player_id=player)
 
+# TODO: make api
 def update_problem_statuses():
     prob_paths = os.listdir("problems")
 
@@ -258,7 +254,7 @@ def update_problem_statuses():
         json.dump({"public": public, "publvate": publvate, "private": private},f)
 
 # SCOREBOARD
-
+# #TODO: make it grab info from (need to make) games API... itd make so much more sense please bro
 @app.route("/scoreboard", methods=["GET"])
 def scoreboard():
     id = request.args.get("id")
@@ -277,6 +273,7 @@ def scoreboard():
     except: print(f"Scoreboard for game {id}, player {player} not found")
     abort(404)
 
+# TODO api ify
 @app.route("/host_scoreboard", methods=["GET"])
 def scoreboard_host():
     id = request.args.get("id")

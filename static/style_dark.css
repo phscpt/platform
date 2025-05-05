@@ -12,6 +12,10 @@ h3 {
     letter-spacing: 1px;
 }
 
+* {
+    transition: all 0.2s, background 1s;
+}
+
 #main {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
