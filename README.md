@@ -9,7 +9,7 @@ https://phscpt.pythonanywhere.com
 - [x] Grader support for Python, Java and C++
 - [x] Persistent Scoreboards across system restarts
 - [x] Client-side storage of problem results
-- [X] User accounts
+- [x] User accounts
 - [ ] Interactive grading
 - [ ] Reworked UI
 - [ ] Teams in practice contests
