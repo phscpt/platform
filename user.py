@@ -130,6 +130,14 @@ class User:
         self.save()
 
     def check_login(self, hashedpass):
+        '''
+        Checks the login against `hashedpass` which SHOULD be hash(hash(pass)+[MM/YYYY]) --> auto expires at end of month
+        '''
+        def hash(text:str) -> str:
+            encoded = text.encode()
+            return hashlib.sha256(encoded).hexdigest()
+        date = datetime.now().strftime("%m-%Y")
         if self.hashed_pass == "" or self.salt=="": return False
-        if hashedpass == self.hashed_pass: return True
+        if hashedpass == hash(self.hashed_pass + date): return True
+
         return False

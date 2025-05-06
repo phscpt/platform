@@ -40,6 +40,16 @@ const doError = () => {
     submit.disabled = false;
 }
 
+const formattedDate = () => {
+    const now = new Date();
+    let month = new String(now.getMonth() + 1);
+    let year = new String(now.getFullYear());
+
+    while (month.length < 2) month = "0" + month;
+
+    return `${month}-${year}`;
+}
+
 submit.onclick = async () => {
     if (!checkForm()) return;
     submit.disabled = true;
@@ -53,10 +63,11 @@ submit.onclick = async () => {
     const salt = data.salt;
     const id = data.id;
     const hashHex = await hash(password.value + salt);
+    const hashedSquared = await hash(hashHex + formattedDate());
 
     const loginData = await fetch(`/api/auth/login`, {
         method: "POST",
-        body: JSON.stringify({ hashed_pass: hashHex, id: id }),
+        body: JSON.stringify({ hashed_pass: hashedSquared, id: id }),
         headers: { "Content-type": "application/json; charset=UTF-8" }
     }).then(response => response.json());
 

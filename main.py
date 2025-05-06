@@ -324,33 +324,36 @@ def get_login_salt():
 @app.route("/api/auth/login",methods=["POST","GET"])
 def login():
     def user_json(u:User):
-        print(u.solved_problems)
         return {"admin":u.admin, "attempted":u.attempted_problems, "solved": u.solved_problems, "username":u.username, "id":u.id}
     if time.time() - last_users_clean >= 1800: Users.del_empty()
 
-    if request.method=="POST":
-        data = request.get_json()
-
-        try: user = User(data["id"])
-        except: return api_error()
-        if not user.check_login(data["hashed_pass"]): return api_error()
-
-        res = make_response(json.dumps({"error":"none","user":user_json(user)}))
-        THIRTY_DAYS = datetime.timedelta(days=30)
-
-        res.set_cookie("hashed_pass",user.hashed_pass, max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
-        res.set_cookie("user_id",user.id,max_age=THIRTY_DAYS)
-
-        return res
     def clear_login_fail():
         res = api_error()
         res.delete_cookie("hashed_pass")
         res.delete_cookie("user_id")
         return res
+    
+    if request.method == "GET":
+        try: user = get_logged_in_user(request)
+        except: return clear_login_fail()
+        return json.dumps({"error":"none","user":user_json(user)})
+    
+    data = request.get_json()
 
-    try: user = get_logged_in_user(request)
-    except: return clear_login_fail()
-    return json.dumps({"error":"none","user":user_json(user)})
+    try: user = User(data["id"])
+    except: return api_error()
+    if not user.check_login(data["hashed_pass"]): return api_error()
+
+    res = make_response(json.dumps({"error":"none","user":user_json(user)}))
+    THIRTY_DAYS = datetime.timedelta(days=30)
+
+    res.set_cookie("hashed_pass",data["hashed_pass"], max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
+    res.set_cookie("user_id",user.id,max_age=THIRTY_DAYS)
+
+    return res
+    
+
+    
 
 # API/ game info
 
