@@ -193,7 +193,6 @@ def waiting():
     try:
         game = get_game(id)
         p = game.get_player(player)
-        print(p, "bruh")
         player_name = p.name
     except KeyError:
         print(f"Game or player not found :(")
@@ -529,6 +528,7 @@ def unauthorized(e):
 #     raise Exception("Intentional crash tester function triggered")
 #     return
 
+Users.del_empty()
 if __name__ == "__main__":
     app.run("127.0.0.1",8000)
     # app.run("0.0.0.0")

@@ -60,14 +60,12 @@ submit.onclick = async () => {
         return;
     }
 
-    const salt = data.salt;
-    const id = data.id;
-    const hashHex = await hash(password.value + salt);
+    const hashHex = await hash(password.value + data.salt);
     const hashedSquared = await hash(hashHex + formattedDate());
 
     const loginData = await fetch(`/api/auth/login`, {
         method: "POST",
-        body: JSON.stringify({ hashed_pass: hashedSquared, id: id }),
+        body: JSON.stringify({ hashed_pass: hashedSquared, id: data.id }),
         headers: { "Content-type": "application/json; charset=UTF-8" }
     }).then(response => response.json());
 
