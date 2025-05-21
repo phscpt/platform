@@ -264,3 +264,7 @@ tbody tr:nth-child(even).solved {
 tbody tr:nth-child(even).partial {
     background-color: #efe1c3;
 }
+
+td {
+    vertical-align: middle;
+}

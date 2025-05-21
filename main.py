@@ -211,7 +211,11 @@ def update_problem_statuses():
 
     for problem in prob_paths:
         if not ".json" in problem: continue
-        with open(f"problems/{problem}") as f: data = json.load(f)
+        try:
+            with open(f"problems/{problem}") as f: data = json.load(f)
+        except:
+            print(f"Could not open problem {problem}")
+            continue
         id = '.'.join(problem.split('.')[:-1])
 
         if "difficulty" not in data: data["difficulty"] = ""
