@@ -13,6 +13,7 @@ class Users:
     email_to_id = {}
     username_to_id = {}
 
+    @staticmethod
     def save_indexing():
         with open("users/indexing.json",'w') as f:
             json.dump({
@@ -23,6 +24,8 @@ class Users:
                 "email": Users.email_to_id,
                 "username": Users.username_to_id
             })
+            
+    @staticmethod
     def load_indexing():
         if not os.path.exists("users/indexing.json"): Users.save_indexing()
         with open("users/indexing.json") as f:
@@ -30,6 +33,7 @@ class Users:
             Users.email_to_id = a["email"]
             Users.username_to_id = a["username"]
 
+    @staticmethod
     def del_empty():
         paths = os.listdir("users/")
         for path in paths:

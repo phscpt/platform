@@ -22,7 +22,7 @@ class Player:
             return
         self.id = random_player_id()
         self.name = html.escape(name)
-        self.scores = [0 for _ in range(num_problems)]
+        self.scores:list[float] = [0 for _ in range(num_problems)]
         self.results = {}
         self.last_submit=0
     
@@ -38,16 +38,30 @@ class Player:
             "last_submit": self.last_submit,
         }
 
+def save_game(func):
+    def a(self:"Game", *args):
+        self.load()
+        res = func(self, *args)
+        self.save()
+        return res
+    return a
+    
+def load_game(func):
+    def a(self:"Game", *args):
+        self.load()
+        return func(self, *args)
+    return a
 
 class Game:
-    def __init__(self, problems:list[str]=[], totalTime=0, tst:str="off", doTeams:bool=False, g_id=""):
+    def __init__(self, problems:list[str]=[], totalTime=0, tst:"str|None"="off", doTeams:bool=False, g_id=""):
         if g_id != "":
             assert os.path.exists(f"{GAMES_PATH}/{g_id}.json")
             self.id=g_id
             self.last_load=0
             self.load()
             return
-
+        if tst == None: tst="off"
+        if not isinstance(doTeams,bool): doTeams=False
         self.id = random_id()
         self.players:list[Player] = []
         self.status = "waiting"
@@ -100,22 +114,8 @@ class Game:
             self.from_json(jsoned)
         self.last_load = time.time()
 
-    def _save_wrap(func):
-        def a(self, *args):
-            self.load()
-            res = func(self, *args)
-            self.save()
-            return res
-        return a
-    
-    def _load_wrap(func):
-        def a(self, *args):
-            self.load()
-            return func(self, *args)
-        return a
-    
-    @_save_wrap
-    def add_player(self, name:str) -> str:
+    @save_game
+    def add_player(self:"Game", name:str) -> str:
 
         name = self.unique_name(name)
 
@@ -124,7 +124,7 @@ class Game:
         print(self.players)
         return player.id
     
-    @_load_wrap
+    @load_game
     def unique_name(self, name:str) -> str:
         names = set([player.name for player in self.players])
         name=name.strip()
@@ -136,13 +136,13 @@ class Game:
     def get_id(self):
         return self.id
     
-    @_save_wrap
+    @save_game
     def start(self):
         self.status = "started"
         self.start_time = time.time()
     
-    @_save_wrap
-    def give_points(self, player_id:str, problem, points:int):
+    @save_game
+    def give_points(self, player_id:str, problem, points:float):
         if self.time_remaining() < -1: raise Exception(f"Contest over")
         problem_idx = self.problems.index(problem)
         for player in self.players:
@@ -153,11 +153,11 @@ class Game:
             return
         raise KeyError()
     
-    @_save_wrap
+    @save_game
     def validate_players(self) -> None:
         for player in self.players: player.name = html.escape(player.name)
 
-    @_load_wrap
+    @load_game
     def get_player(self, player_id:str) -> Player:
         print(self.players)
         for player in self.players:

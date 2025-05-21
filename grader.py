@@ -85,7 +85,7 @@ def grade(id:str):
             res["status"]="graded"
             res["results"] = [["CE","Compile Error"]]
             with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
-            cleanup(filename)
+            cleanup()
             return
         log("java compilation successful",id=id)
     elif language == "cpp":
@@ -97,7 +97,7 @@ def grade(id:str):
             res["status"]="graded"
             res["results"] = [["CE","Compile Error"]]
             with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
-            cleanup(filename)
+            cleanup()
             return
         log("cpp compilation successful",id=id)
 

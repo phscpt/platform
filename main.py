@@ -62,6 +62,7 @@ def edit():
     if not admin_check(request):
         abort(401)
     p = request.args.get("id")
+    if not p: abort(404)
     with open("problems/" + p + ".json", encoding='utf-8') as f:
         data = json.load(f)
     data["id"] = p
@@ -94,7 +95,7 @@ def edit():
 def problem():
     # Get problem id
     p = request.args.get("id")
-
+    if not p: abort(404)
     # Load problem description + convert to html
     try:
         with open("problems/" + p + ".json", encoding='utf-8') as f:
@@ -124,6 +125,7 @@ def index():
         p_id = game.add_player(name)
         return redirect(f"/waiting?id={id}&player={p_id}")
     except: pass
+    return abort(404)
 
 
 # ABOUT
@@ -137,7 +139,7 @@ def about():
 def join():
     id = request.args.get("id")
     if request.method == "GET": return render_template("join.html")
-
+    if not id: return abort(404)
     try: name = html.escape(request.form["player_name"], True)
     except: return render_template("join.html")
     id = id.rstrip().upper()
@@ -146,6 +148,7 @@ def join():
         p_id = game.add_player(name)
         return redirect(f"/waiting?id={id}&player={p_id}")
     except: pass
+    return abort(404)
 
 
 @app.route("/log_in", methods=["GET"])
@@ -164,7 +167,7 @@ def problem_select():
         except: duration = -1
 
         game = Game(problems=request.form["problems"].rstrip().split("\n"),  totalTime=duration,
-                    tst=request.form.get("tst"), doTeams=request.form.get("teams")) # both props are inactive
+                    tst=request.form.get("tst"), doTeams=bool(request.form.get("teams"))) # both props are inactive
 
         games[game.id] = game
         return redirect(f"host_waiting?id={game.id}")
@@ -174,6 +177,7 @@ def problem_select():
 @app.route("/host_waiting", methods=["GET", "POST"])
 def host():
     id = request.args.get("id")
+    if not id: return abort(404)
     if request.method == "POST":
         try:
             game = get_game(id)
@@ -189,7 +193,7 @@ def waiting():
     id = request.args.get("id")
     player = request.args.get("player")
     player_name = "unknown"
-
+    if id == None or player == None: return abort(404)
     try:
         game = get_game(id)
         p = game.get_player(player)
@@ -230,6 +234,7 @@ def update_problem_statuses():
 def scoreboard():
     id = request.args.get("id")
     player = request.args.get("player")
+    if id == None or player == None: return abort(404)
     try:
         game = get_game(id)
         p = game.get_player(player)
@@ -248,6 +253,7 @@ def scoreboard():
 @app.route("/host_scoreboard", methods=["GET"])
 def scoreboard_host():
     id = request.args.get("id")
+    if id==None: abort(404)
     try:
         game = get_game(id)
         return render_template(
@@ -286,7 +292,7 @@ def finish_signup():
     hashed_pass = request.get_json()["hashed_pass"]
     username = request.args.get("username")
     email = request.args.get("email")
-    print(id)
+    assert id
     try: user = User(id)
     except FileNotFoundError: return api_error()
     print(hashed_pass)
@@ -360,7 +366,7 @@ def login():
 def game_data():
     try:
         g_id = request.args.get("id")
-
+        if not g_id: return api_error()
         game = get_game(g_id)
     except: return api_error()
     data = game.to_json()
@@ -476,16 +482,18 @@ def get_problem_results():
 @app.route("/api/game_status", methods=["GET"])
 def get_game_status():
     id = request.args.get("id")
+    if not id: return api_error()
     try:
         game = get_game(id)
         return json.dumps({"status":game.status, "error":"none"})
     except:
-        print(f"API request for status of game id {id} failed.")
+        # print(f"API request for status of game id {id} failed.")
         return api_error()
 
 @app.route("/api/players", methods=["GET"])
 def get_players():
     id = request.args.get("id")
+    if not id: return api_error()
     try:
         game = get_game(id)
         listified = list(map(Player.to_list,game.players))
