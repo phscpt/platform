@@ -87,7 +87,7 @@ def edit():
             "testcases": testcases
         }))
         update_problem_statuses()
-        return redirect("/list")
+        return redirect("/public")
     return render_template("edit.html", max_testcases=max_testcases, data=data)
 
 # TODO lowk just make problems grab text from /api/problem_data
