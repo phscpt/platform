@@ -153,12 +153,13 @@ def grade(id:str):
     res["status"] = "graded"
     
     if "user" in res:
-        allAC = True
-        for result in results:
-            if result[0] != "AC": allAC = False
-        if allAC:
-            user = User(res["user"])
-            user.add_solved(res["problem"],id)
+        if res["user"] != "null":
+            allAC = True
+            for result in results:
+                if result[0] != "AC": allAC = False
+            if allAC:
+                user = User(res["user"])
+                user.add_solved(res["problem"],id)
     with open(f"grading/{id}.json",'w') as f: json.dump(res, f)
 
 WAIT_TIME = 5.0
@@ -167,19 +168,21 @@ def main():
     print("started")
     log(f"\nGrader restarted\n")
     while True:
-        todo = os.listdir("grading/todo")
-        if len(todo) == 1:
-            time.sleep(WAIT_TIME)
-            continue
-        todo.remove("readme.txt")
-        while len(todo) > 0:
-            tograde = todo.pop()
-            if not os.path.exists(f"grading/todo/{tograde}"): continue #another grader has already removed it -- reduce chance of race condition
-            os.remove(f"grading/todo/{tograde}")
-            if not os.path.exists(f"grading/{tograde}.json"): continue
-            grade(tograde)
+        try:
+            todo = os.listdir("grading/todo")
+            if len(todo) == 1:
+                time.sleep(WAIT_TIME)
+                continue
+            todo.remove("readme.txt")
+            while len(todo) > 0:
+                tograde = todo.pop()
+                if not os.path.exists(f"grading/todo/{tograde}"): continue #another grader has already removed it -- reduce chance of race condition
+                os.remove(f"grading/todo/{tograde}")
+                if not os.path.exists(f"grading/{tograde}.json"): continue
+                grade(tograde)
 
-        time.sleep(WAIT_TIME)
+            time.sleep(WAIT_TIME)
+        except: pass
 
 if __name__ == "__main__":
     try:
