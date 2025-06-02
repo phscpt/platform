@@ -130,6 +130,10 @@ def grade(id:str):
             log("time limit exceeded on test", len(results),id=id)
             results.append(["TLE","--"])
             continue
+        except Exception as e:
+            print(e)
+            results.append(["??","--"])
+            continue
         if output[1] != "": # Some error happened
             log(output[1],id=id)
             results.append(["RE", time_elapsed])
@@ -182,7 +186,9 @@ def main():
                 grade(tograde)
 
             time.sleep(WAIT_TIME)
-        except: pass
+        except Exception as e:
+            print(e)
+            pass
 
 if __name__ == "__main__":
     try:
