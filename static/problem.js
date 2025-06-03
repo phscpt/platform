@@ -83,9 +83,12 @@ const fillResults = (results, submissionID) => {
     resultsContainer.appendChild(resultDisplay);
     stopLoading();
 
-    document.querySelector("#past-sols").innerHTML = `<a target=_blank href="api/submission?submission=${submissionID}">
+    let allSols = "";
+    allSols += `<li><a target=_blank href="api/submission?submission=${submissionID}">
         ${submissionID.substring(0, submissionID.lastIndexOf("-"))}
-    </a>`;
+    </a></li>`;
+    document.querySelector("#past-sols").innerHTML = `<h2>Previous Submissions</h2>
+    <ul>${allSols}</ul>`;
 }
 
 const getGrade = async (submissionID) => {
