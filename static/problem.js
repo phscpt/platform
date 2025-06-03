@@ -67,8 +67,9 @@ const resultName = {
 /**
  * Fill the results panel with recieved submission results
  * @param {string[][]} results has results in a list of length-2 lists in the form [RESULT, time]
+ * @param {string} submissionID has results in a list of length-2 lists in the form [RESULT, time]
  */
-const fillResults = (results) => {
+const fillResults = (results, submissionID) => {
     const resultDisplay = document.createElement("div");
     resultDisplay.className = "grid-tiny";
     results.forEach((result, i) => {
@@ -81,13 +82,17 @@ const fillResults = (results) => {
     resultsContainer.innerHTML = `<div id="loading-spinny-container" class="box loading-spinny-container"><div class="loading-spinny"></div></div>`;
     resultsContainer.appendChild(resultDisplay);
     stopLoading();
+
+    document.querySelector("#past-sols").innerHTML = `<a href="api/submission?submission=${submissionID}">
+        ${submissionID.substring(0, submissionID.lastIndexOf("-"))}
+    </a>`;
 }
 
 const getGrade = async (submissionID) => {
     const data = await fetch("/api/submission_result?submission=" + submissionID).then(response => response.json());
     if (data.error == "unready") setTimeout(getGrade.bind(this, submissionID), 1000);
     if (data.error && data.error != "none") return;
-    fillResults(data.results);
+    fillResults(data.results, submissionID);
 }
 
 const startLoading = () => {
