@@ -83,7 +83,7 @@ const fillResults = (results, submissionID) => {
     resultsContainer.appendChild(resultDisplay);
     stopLoading();
 
-    document.querySelector("#past-sols").innerHTML = `<a href="api/submission?submission=${submissionID}">
+    document.querySelector("#past-sols").innerHTML = `<a target=_blank href="api/submission?submission=${submissionID}">
         ${submissionID.substring(0, submissionID.lastIndexOf("-"))}
     </a>`;
 }
