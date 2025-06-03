@@ -227,7 +227,7 @@ def grade1(id:str):
                 user.add_solved(submission["problem"],id)
     cleanup()
 
-WAIT_TIME = 5.0
+WAIT_TIME = 1.0
 
 def main():
     print("started")

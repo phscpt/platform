@@ -481,6 +481,21 @@ def get_problem_results():
     except KeyError: pass
     return json.dumps({"results":res["results"],"error":"none"})
 
+@app.route("/api/submission",methods=["GET"])
+def get_submission():
+    if "submission" not in request.args: return api_error()
+    sub_id = request.args.get("submission")
+    if not os.path.exists(f"grading/{sub_id}.json"): return api_error()
+
+    with open(f"grading/{sub_id}.json",'r') as f: submission = json.load(f)
+
+    try:
+        if get_logged_in_user(request).id != submission["user"]: return api_error()
+        code = submission["code"]
+        return code
+    except:
+        return api_error()
+
 #API/ practice contests
 
 @app.route("/api/game_status", methods=["GET"])
