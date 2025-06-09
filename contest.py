@@ -170,13 +170,13 @@ class Game:
         return self.duration - (time.time() - self.start_time)
 
 
-games:dict[str,Game] = dict()
+# games:dict[str,Game] = dict()
 
 def get_game(id:str) -> Game:
-    if id in games: return games[id]
+    # if id in games: return games[id]
 
     if os.path.exists(f"{GAMES_PATH}/{id}.json"):
-        games[id] = Game(g_id=id)
-        return games[id]
+        # games[id] = Game(g_id=id)
+        return Game(g_id=id)
     
     raise FileNotFoundError(f"Game {id} cannot be found")

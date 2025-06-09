@@ -69,10 +69,10 @@ def grade(id:str):
     def cleanup():
         # should only do this if it actually exists
         os.chdir(OLDDIR)
-        if os.path.exists(f"tmp/{id}"):
-            for name in os.listdir(f"tmp/{id}"):
-                os.remove(f"tmp/{id}/{name}")
-            os.rmdir(f"tmp/{id}")
+        # if os.path.exists(f"tmp/{id}"):
+        #     for name in os.listdir(f"tmp/{id}"):
+        #         os.remove(f"tmp/{id}/{name}")
+        #     os.rmdir(f"tmp/{id}")
         submission["results"] = results
         submission["status"] = "graded"
         with open(f"grading/{id}.json",'w') as f: json.dump(submission, f)
@@ -158,7 +158,7 @@ def grade(id:str):
     if language == "java":
         err = subprocess.run(["javac", filename],capture_output=True).stderr.decode()
         filename = filename.split(".")[0]
-        if not os.path.isfile(filename):
+        if not os.path.isfile(filename + ".class"):
             log("JAVA/CE", id=id)
             log(err,id=id)
             results.append(["CE","--"])
@@ -184,7 +184,7 @@ def grade(id:str):
     }
 
     LANG_TAG = language.capitalize()
-
+    log(os.getcwd())
     for test in testcases:
         inp:str = elim_whitespace(test[0])
         ans:str = elim_whitespace(test[1])
@@ -217,7 +217,7 @@ def grade(id:str):
 
     os.chdir(OLDDIR)    
     if "user" in submission:
-        if submission["user"] != "null":
+        if submission["user"] != "null" and submission["user"] != "":
             allAC = True
             for result in results:
                 if result[0] != "AC": allAC = False
@@ -232,6 +232,7 @@ def main():
     print("started")
     log(f"\nGrader restarted\n")
     while True:
+        os.chdir(OLDDIR)
         todo = os.listdir("grading/todo")
         if len(todo) == 1:
             time.sleep(WAIT_TIME)
@@ -251,7 +252,8 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print(os.getcwd())
+        print("🚨🚨🚨 !!!ERROR ERROR ERROR!!! 🚨🚨🚨")
+        print("CURRENT DIRECTORY: " + os.getcwd())
         print("\n\nExiting...")
         raise e
 log("\nclosed peacefully\n\n")

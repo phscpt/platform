@@ -118,8 +118,8 @@ def index():
     id = id.rstrip().upper()
     print(name, id)
 
-    for g_id in games:
-        games[g_id].validate_players()
+    # for g_id in games:
+    #     games[g_id].validate_players()
     try:
         game = get_game(id)
         p_id = game.add_player(name)
@@ -169,7 +169,7 @@ def problem_select():
         game = Game(problems=request.form["problems"].rstrip().split("\n"),  totalTime=duration,
                     tst=request.form.get("tst"), doTeams=bool(request.form.get("teams"))) # both props are inactive
 
-        games[game.id] = game
+        # games[game.id] = game
         return redirect(f"host_waiting?id={game.id}")
     return render_template("select.html")
 
@@ -184,7 +184,7 @@ def host():
             game.start()
             return redirect(f"/host_scoreboard?id={id}")
         except KeyError:
-            print(f"Game {id} not found. Active games: {[games[g_id].id for g_id in games] }")
+            print(f"Game {id} not found. Active games: {'games dp is off bc lollers'}")
     return render_template("host_waiting.html")
 
 # TODO: make api
