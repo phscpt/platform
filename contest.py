@@ -74,6 +74,7 @@ class Game:
         if totalTime > 0: self.duration=int(totalTime)*60
 
         self.problems = [problem.rstrip() for problem in problems]
+        self.save()
         print("created game", self.id)
         print("problems:", problems)
 

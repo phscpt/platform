@@ -168,7 +168,7 @@ def problem_select():
 
         game = Game(problems=request.form["problems"].rstrip().split("\n"),  totalTime=duration,
                     tst=request.form.get("tst"), doTeams=bool(request.form.get("teams"))) # both props are inactive
-
+        game.save()
         # games[game.id] = game
         return redirect(f"host_waiting?id={game.id}")
     return render_template("select.html")
