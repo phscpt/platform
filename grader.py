@@ -2,6 +2,7 @@ import subprocess, os, json, sys, time
 from subprocess import Popen, PIPE
 from datetime import datetime
 from user import User
+import contest
 
 out = open("graderlog.log", 'a')
 def log(*args,id=""):
@@ -224,6 +225,27 @@ def grade(id:str):
             if allAC:
                 user = User(submission["user"])
                 user.add_solved(submission["problem"],id)
+    if "game" in submission and "player" in submission:
+        if submission["game"] != "null" and submission["game"] != "" and submission["player"] != "":
+            try:
+                game = contest.get_game(id=submission["game"])
+                p = game.get_player(submission["player"])
+                
+                num_ac = 0
+                for res in results:
+                    if res[0] == "AC":
+                        num_ac += 1
+
+                if num_ac == len(results): num_points = 100
+                elif num_ac > 1: num_points = 100 * (num_ac - 1)/(len(results) - 1)
+                else: num_points = -0.0001
+                
+                p.results[submission['problem']] = results
+                game.give_points(submission['player'], submission["problem"], num_points)
+
+            except Exception as e:
+                log(e,id=id)
+                pass
     cleanup()
 
 WAIT_TIME = 1.0
