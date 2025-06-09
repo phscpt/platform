@@ -14,7 +14,7 @@ def log(*args,id=""):
     out.write(timeinfo + " ".join(args) + "\n")
     out.flush()
 
-olddir = os.getcwd()
+OLDDIR = os.getcwd()
 EXTENSIONS = {
     "cpp": ".cpp",
     "python": ".py",
@@ -28,7 +28,7 @@ def elim_whitespace(a: str) -> str:
     strippedLines = list(map(str.rstrip, a.splitlines()))
     return "\n".join(strippedLines).replace("\r","")
 
-def grade1(id:str):
+def grade(id:str):
     '''
      Takes in a filename and problem name and runs it using each test case
 
@@ -58,18 +58,17 @@ def grade1(id:str):
 
     # Sanity check that there's actually a submission for the request
     
-    start_path = os.getcwd()
 
     submission:dict = dict()
     results:list[list[str]] = []
     
     def error():
-        os.chdir(start_path)
+        os.chdir(OLDDIR)
         if os.path.exists(f"grading/{id}.json"): os.remove(f"grading/{id}.json")
 
     def cleanup():
         # should only do this if it actually exists
-        os.chdir(start_path)
+        os.chdir(OLDDIR)
         if os.path.exists(f"tmp/{id}"):
             for name in os.listdir(f"tmp/{id}"):
                 os.remove(f"tmp/{id}/{name}")
@@ -207,7 +206,6 @@ def grade1(id:str):
             log(proc.stderr,id=id)
             log(proc.stdout,id=id)
             log(proc.returncode,id=id)
-            log("/RE")
             continue
         out = elim_whitespace(proc.stdout)
         run_time = str((end-start)//int(1e6))
@@ -240,11 +238,12 @@ def main():
                 continue
             todo.remove("readme.txt")
             while len(todo) > 0:
+                os.chdir(OLDDIR)
                 tograde = todo.pop()
                 if not os.path.exists(f"grading/todo/{tograde}"): continue #another grader has already removed it -- reduce chance of race condition
                 os.remove(f"grading/todo/{tograde}")
                 if not os.path.exists(f"grading/{tograde}.json"): continue
-                grade1(tograde)
+                grade(tograde)
 
             time.sleep(WAIT_TIME)
         except Exception as e:
