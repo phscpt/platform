@@ -215,6 +215,7 @@ def grade(id:str):
         log(f'''{LANG_TAG}/WA on test {len(results)}\nProgram Outputted: {out}\nCorrect solution: {ans}''')
         results.append(["WA",run_time])
 
+    os.chdir(OLDDIR)    
     if "user" in submission:
         if submission["user"] != "null":
             allAC = True
@@ -231,30 +232,27 @@ def main():
     print("started")
     log(f"\nGrader restarted\n")
     while True:
-        try:
-            todo = os.listdir("grading/todo")
-            if len(todo) == 1:
-                time.sleep(WAIT_TIME)
-                continue
-            todo.remove("readme.txt")
-            while len(todo) > 0:
-                os.chdir(OLDDIR)
-                tograde = todo.pop()
-                if not os.path.exists(f"grading/todo/{tograde}"): continue #another grader has already removed it -- reduce chance of race condition
-                os.remove(f"grading/todo/{tograde}")
-                if not os.path.exists(f"grading/{tograde}.json"): continue
-                grade(tograde)
-
+        todo = os.listdir("grading/todo")
+        if len(todo) == 1:
             time.sleep(WAIT_TIME)
-        except Exception as e:
-            print(e)
-            pass
+            continue
+        todo.remove("readme.txt")
+        while len(todo) > 0:
+            os.chdir(OLDDIR)
+            tograde = todo.pop()
+            if not os.path.exists(f"grading/todo/{tograde}"): continue #another grader has already removed it -- reduce chance of race condition
+            os.remove(f"grading/todo/{tograde}")
+            if not os.path.exists(f"grading/{tograde}.json"): continue
+            grade(tograde)
+
+        time.sleep(WAIT_TIME)
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print(e)
+        print(os.getcwd())
         print("\n\nExiting...")
+        raise e
 log("\nclosed peacefully\n\n")
 out.close()
