@@ -4,14 +4,10 @@ import json, os, random, time, markdown, uuid, hashlib, glob, string, html, trac
 from contest import *
 from flask import Flask, request, render_template, redirect, abort, make_response
 from user import User, Users
+from config import EXTENDED_ALPHABET, MAX_TESTCASES
 app = Flask(__name__)
 
-ALPHABET = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_-"
-
-max_testcases = 10
 last_users_clean = time.time()
-
-users = []
 
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 
@@ -29,66 +25,46 @@ def public_catalogue():
 def upload():
     # ensure only admin can access this page
     if not admin_check(request): abort(401)
-
-    if request.method == "GET": return render_template("create.html", max_testcases=max_testcases)
-    
-    id = request.form["id"]
-    title = request.form["title"]
-    status = request.form["status"]
-    description = request.form["description"]
-    testcases = []
-    for i in range(max_testcases):
-        inp = request.form["input" + str(i)]
-        out = request.form["output" + str(i)]
-        # check if empty
-        if inp.rstrip() != "" and out.rstrip() != "":
-            testcases.append([inp, out])
-    open("problems/" + id + ".json", "w", encoding='utf-8').write(
-        json.dumps({
-            "title": title,
-            "status": status,
-            "difficulty": request.form["difficulty"],
-            "tags": request.form["tags"],
-            "description": description,
-            "testcases": testcases
-        })
-    )
-    update_problem_statuses()
-    return redirect("/")
+    if request.method == "GET": return render_template("create.html", max_testcases=MAX_TESTCASES)
+    return _update_problem(request.form["id"],request.form)
 
 # TODO make this call out to api 
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
-    if not admin_check(request):
-        abort(401)
+    if not admin_check(request): abort(401)
     p = request.args.get("id")
     if not p: abort(404)
     with open("problems/" + p + ".json", encoding='utf-8') as f:
         data = json.load(f)
     data["id"] = p
     if request.method == "POST":
-        id = request.form["id"]
-        title = request.form["title"]
-        status = request.form["status"]
-        description = request.form["description"]
-        testcases = []
-        for i in range(max_testcases):
-            inp = request.form["input" + str(i)]
-            out = request.form["output" + str(i)]
-            # check if empty
-            if inp.rstrip() != "" and out.rstrip() != "":
-                testcases.append([inp, out])
-        open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({
-            "title": title,
-            "status": status,
-            "difficulty": request.form["difficulty"],
-            "tags": request.form["tags"],
-            "description": description,
-            "testcases": testcases
-        }))
-        update_problem_statuses()
-        return redirect("/problem?id="+id)
-    return render_template("edit.html", max_testcases=max_testcases, data=data)
+        return _update_problem(p,request.form)
+    return render_template("edit.html", max_testcases=MAX_TESTCASES, data=data)
+
+def _update_problem(problem_id, problem_form):
+    id = problem_id
+    with open("problems/" + id + ".json", encoding='utf-8') as f:
+        data = json.load(f)
+    data["id"] = id
+    title = problem_form["title"]
+    status = problem_form["status"]
+    description = problem_form["description"]
+    testcases = []
+    for i in range(MAX_TESTCASES):
+        inp:str = problem_form["input" + str(i)]
+        out:str = problem_form["output" + str(i)]
+        # check if empty
+        if inp.rstrip() != "" and out.rstrip() != "": testcases.append([inp, out])
+    open("problems/" + id + ".json", "w", encoding='utf-8').write(json.dumps({
+        "title": title,
+        "status": status,
+        "difficulty": problem_form["difficulty"],
+        "tags": problem_form["tags"],
+        "description": description,
+        "testcases": testcases
+    }))
+    update_problem_statuses()
+    return redirect("/problem?id="+id)
 
 # TODO lowk just make problems grab text from /api/problem_data
 @app.route('/problem', methods=["GET", "POST"])
@@ -277,11 +253,13 @@ def api_error():
 
 # API/ auth stuff
 
-def get_logged_in_user(request):
-    if "user_id" not in request.cookies or "hashed_pass" not in request.cookies:
+def get_logged_in_user(request_obj):
+    if "user_id" not in request_obj.cookies or "hashed_pass" not in request_obj.cookies:
         raise LookupError
-    user = User(request.cookies.get("user_id"))
-    if user.check_login(request.cookies.get("hashed_pass")): return user
+    try:
+        user = User(request_obj.cookies.get("user_id"))
+    except FileNotFoundError: raise LookupError(f"User with ID {request_obj.cookies.get('user_id')} not found.")
+    if user.check_login(request_obj.cookies.get("hashed_pass")): return user
     raise LookupError
 
 @app.route("/api/auth/start_signup")
@@ -421,7 +399,7 @@ def submit_solution():
 
     # print(f"received problem submission for {p}:", file.filename)
     now = datetime.datetime.now()
-    SUBMISSION_ID = now.strftime("%m-%d-%Y-%H-%M-%S-") + "".join([random.choice(ALPHABET) for _ in range(6)])
+    SUBMISSION_ID = now.strftime("%m-%d-%Y-%H-%M-%S-") + "".join([random.choice(EXTENDED_ALPHABET) for _ in range(6)])
     res = {
         "submission": SUBMISSION_ID,
         "problem": request.args.get("id"),
@@ -457,28 +435,6 @@ def get_problem_results():
     if res["status"] != "graded": return json.dumps({"error":"unready"})
     results = res["results"]
 
-    num_ac = 0
-    for r in results:
-        if r[0] == "AC": num_ac += 1
-
-    if "game" not in res and "player" not in res:
-        return json.dumps({"results":res["results"],"error":"none"})
-    # give points to player if playing a game
-    g_id = res["game"] #TODO preferrably, the grader would do this directly
-    p_id = res["player"]
-    print("giving score to", p_id, "from game", g_id)
-    try:
-        game = get_game(g_id)
-        player = game.get_player(p_id)
-        if num_ac == len(results):
-            num_points = 100
-        elif num_ac > 1:
-            num_points = 100 * (num_ac - 1)/(len(results) - 1)
-        else:
-            num_points = -0.0001
-        player.results[res["problem"]] = results
-        game.give_points(p_id, res["problem"], num_points)
-    except KeyError: pass
     return json.dumps({"results":res["results"],"error":"none"})
 
 @app.route("/api/submission",methods=["GET"])

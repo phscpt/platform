@@ -1,12 +1,12 @@
 import json, random, os, hashlib
 from datetime import datetime
+from config import EXTENDED_ALPHABET
 
-ALPHABET = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890_-"
 def generate_id():
-    return "".join([random.choice(ALPHABET) for _ in range(10)])
+    return "".join([random.choice(EXTENDED_ALPHABET) for _ in range(10)])
 
 def generate_salt():
-    return "".join([random.choice(ALPHABET) for _ in range(32)])
+    return "".join([random.choice(EXTENDED_ALPHABET) for _ in range(32)])
 
 
 class Users:

@@ -3,6 +3,7 @@ from subprocess import Popen, PIPE
 from datetime import datetime
 from user import User
 import contest
+import config
 
 out = open("graderlog.log", 'a')
 def log(*args,id=""):
@@ -28,6 +29,9 @@ def elim_whitespace(a: str) -> str:
     '''
     strippedLines = list(map(str.rstrip, a.splitlines()))
     return "\n".join(strippedLines).replace("\r","")
+
+def get_path(*args):
+    return os.path.join(OLDDIR,*args)
 
 def grade(id:str):
     '''
@@ -62,29 +66,31 @@ def grade(id:str):
 
     submission:dict = dict()
     results:list[list[str]] = []
-    
+    SUBMISSION_FILE = get_path("grading",f"{id}.json")
     def error():
-        os.chdir(OLDDIR)
-        if os.path.exists(f"grading/{id}.json"): os.remove(f"grading/{id}.json")
+        grade_path = get_path("grading",f"{id}.json")
+        if os.path.exists(grade_path): os.remove(grade_path)
 
     def cleanup():
         # should only do this if it actually exists
-        os.chdir(OLDDIR)
-        # if os.path.exists(f"tmp/{id}"):
-        #     for name in os.listdir(f"tmp/{id}"):
-        #         os.remove(f"tmp/{id}/{name}")
-        #     os.rmdir(f"tmp/{id}")
+
+        build_dir = get_path("tmp",id)
+
+        if os.path.exists(build_dir):
+            for name in os.listdir(build_dir):
+                os.remove(get_path(build_dir,name))
+            os.rmdir(build_dir)
         submission["results"] = results
         submission["status"] = "graded"
-        with open(f"grading/{id}.json",'w') as f: json.dump(submission, f)
-        
-    if not os.path.isfile(f"grading/{id}.json"): 
+        with open(SUBMISSION_FILE,'w') as f: json.dump(submission, f)
+    
+    if not os.path.isfile(SUBMISSION_FILE):
         log(f"Invalid submission ID",id=id)
         error()
         return
     try:
         # Load up the submission data
-        with open(f"grading/{id}.json") as f: submission = json.load(f)
+        with open(SUBMISSION_FILE) as f: submission = json.load(f)
     except:
         log("Invalid (non-json) submission formatting",id=id)
         error()
@@ -95,31 +101,20 @@ def grade(id:str):
         log("Invalid submission contents", id=id)
         error()
         return
-    
+    PROBLEM_FILE = get_path("problems",f"{submission['problem']}.json")
     # Sanity check that problem really exists
-    if not os.path.isfile(f"problems/{submission['problem']}.json"):
+    if not os.path.isfile(PROBLEM_FILE):
         log(f"Invalid problem ID '{submission['problem']}.json'", id=id)
         error()
         return
 
     # Load the testcases from the problem
-    with open(f"problems/{submission['problem']}.json") as f: problem:dict = json.load(f)
+    with open(PROBLEM_FILE) as f: problem:dict = json.load(f)
     try: testcases:list = problem["testcases"]
     except:
         log(f"No testcases specified for problem {submission['problem']}")
         error()
         return
-    
-    # Sanity check that tmp actually exists
-    if not os.path.exists("tmp"):
-        log(f"No tmp folder created, likely in wrong directory ({os.getcwd()})")
-        cleanup()
-        return
-
-    # Move into the compilation/running directory for the problem
-    os.chdir("tmp")
-    if not os.path.exists(id): os.mkdir(id)
-    os.chdir(id)
 
     language:str = submission["lang"]
 
@@ -141,14 +136,17 @@ def grade(id:str):
             break
         if filename.startswith(id):
             log("JAVA/No class found",id=id)
+            results.append(["CE","--"])
             cleanup()
             return
-
-    with open(filename,'w') as f: f.write(code)
-
+    BUILD_PATH = get_path("tmp",id)
+    if not os.path.exists(BUILD_PATH): os.mkdir(BUILD_PATH)
+    code_path = get_path(BUILD_PATH,filename)
+    with open(code_path,'w') as f: f.write(code)
+    BUILD_PATH = get_path("tmp",id)
     ## COMPILE
     if language == "cpp":
-        err = subprocess.run(["g++", filename],capture_output=True).stderr.decode()
+        err = subprocess.run(["g++", code_path],capture_output=True,cwd=BUILD_PATH).stderr.decode()
         if not os.path.isfile("a.out"):
             log("CPP/CE",id=id)
             log(err)
@@ -157,9 +155,10 @@ def grade(id:str):
             return
         log("CPP/Compiled",id=id)
     if language == "java":
-        err = subprocess.run(["javac", filename],capture_output=True).stderr.decode()
+        err = subprocess.run(["javac", code_path],capture_output=True,cwd=BUILD_PATH).stderr.decode()
         filename = filename.split(".")[0]
-        if not os.path.isfile(filename + ".class"):
+        code_path = get_path("tmp",id,filename)
+        if not os.path.isfile(code_path + ".class"):
             log("JAVA/CE", id=id)
             log(err,id=id)
             results.append(["CE","--"])
@@ -171,21 +170,14 @@ def grade(id:str):
     ## EXECUTE
 
     COMMANDS = {
-        "cpp": ["./a.out"],
+        "cpp": ["./a.out"], ## CHECK IF THIS WORKS??
         "java": ["java", filename],
         "python": ["python3", filename],
     }
 
     cmd = COMMANDS[language]
 
-    TIMELIMITS = {
-        "cpp":1,
-        "java":2,
-        "python":4,
-    }
-
-    LANG_TAG = language.capitalize()
-    log(os.getcwd())
+    LANG_TAG = language.upper()
     for test in testcases:
         inp:str = elim_whitespace(test[0])
         ans:str = elim_whitespace(test[1])
@@ -193,7 +185,7 @@ def grade(id:str):
 
         try:
             start=time.perf_counter_ns()
-            proc = subprocess.run(cmd, capture_output=True, input=inp, text=True, timeout=TIMELIMITS[language])
+            proc = subprocess.run(cmd, capture_output=True, input=inp, text=True, timeout=config.TIMELIMITS[language],cwd=BUILD_PATH)
             end=time.perf_counter_ns()
         except subprocess.TimeoutExpired:
             log(f"{LANG_TAG}/TLE on test {len(results)}", id=id)
@@ -216,7 +208,7 @@ def grade(id:str):
         log(f'''{LANG_TAG}/WA on test {len(results)}\nProgram Outputted: {out}\nCorrect solution: {ans}''')
         results.append(["WA",run_time])
 
-    os.chdir(OLDDIR)    
+    os.chdir(OLDDIR)
     if "user" in submission:
         if submission["user"] != "null" and submission["user"] != "":
             allAC = True
@@ -254,8 +246,8 @@ def main():
     print("started")
     log(f"\nGrader restarted\n")
     while True:
-        os.chdir(OLDDIR)
-        todo = os.listdir("grading/todo")
+        TODO_DIR = get_path("grading","todo")
+        todo = os.listdir(TODO_DIR)
         if len(todo) == 1:
             time.sleep(WAIT_TIME)
             continue
@@ -263,9 +255,9 @@ def main():
         while len(todo) > 0:
             os.chdir(OLDDIR)
             tograde = todo.pop()
-            if not os.path.exists(f"grading/todo/{tograde}"): continue #another grader has already removed it -- reduce chance of race condition
-            os.remove(f"grading/todo/{tograde}")
-            if not os.path.exists(f"grading/{tograde}.json"): continue
+            if not os.path.exists(get_path(TODO_DIR, tograde)): continue #another grader has already removed it -- reduce chance of race condition
+            os.remove(get_path(TODO_DIR, tograde))
+            if not os.path.exists( get_path("grading", f"{tograde}.json") ): continue
             grade(tograde)
 
         time.sleep(WAIT_TIME)

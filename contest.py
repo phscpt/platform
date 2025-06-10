@@ -1,6 +1,6 @@
 import random, html, time, os, json
 
-ALPHABET = "QWERTYUIOPASDFGHJKLZXCVBNM"
+from config import ALPHABET
 
 GAMES_PATH = "games"
 LOAD_INTERVAL = 30
