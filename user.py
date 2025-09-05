@@ -145,3 +145,6 @@ class User:
         if hashedpass == hash(self.hashed_pass + date): return True
 
         return False
+    
+    # OK SO REALLY
+    # we should have one that checks against the token instead
