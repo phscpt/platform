@@ -2,10 +2,10 @@ import json, random, os, hashlib
 from datetime import datetime
 from config import EXTENDED_ALPHABET
 
-def generate_id():
+def rand_short():
     return "".join([random.choice(EXTENDED_ALPHABET) for _ in range(10)])
 
-def generate_salt():
+def rand_long():
     return "".join([random.choice(EXTENDED_ALPHABET) for _ in range(32)])
 
 
@@ -48,7 +48,7 @@ class User:
             self.id=id
             self.load()
             return
-        self.id = generate_id()
+        self.id = rand_short()
         self.username = ""
         self.email = ""
         self.hashed_pass = ""
@@ -58,6 +58,7 @@ class User:
         self.joined_contests = []
         self.date_created = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
         self.admin = False
+        self.tokens = []
         self.save()
 
     def to_json(self) -> dict:
@@ -75,7 +76,8 @@ class User:
                 "solved": self.solved_problems
             },
             "contests": { "joined": self.joined_contests },
-            "meta": { "date-created": self.date_created }
+            "meta": { "date-created": self.date_created },
+            "tokens": self.tokens
         }
         return jsoned
     
@@ -90,6 +92,7 @@ class User:
         self.solved_problems = jsoned["problems"]["solved"]
         self.joined_contests = jsoned["contests"]["joined"]
         self.date_created = jsoned["meta"]["date-created"]
+        if "tokens" in jsoned: self.tokens=jsoned["tokens"]
 
     def load(self):
         if not os.path.exists(f"users/{self.id}.json"): raise FileNotFoundError
@@ -119,7 +122,7 @@ class User:
     def set_salt(self) -> str:
         self.load()
         if self.salt != "" and self.hashed_pass != "": raise Exception("Salt already set")
-        self.salt = generate_salt()
+        self.salt = rand_long()
         self.save()
         return self.salt
     
@@ -137,6 +140,7 @@ class User:
         '''
         Checks the login against `hashedpass` which SHOULD be hash(hash(pass)+[MM/YYYY]) --> auto expires at end of month
         '''
+        
         def hash(text:str) -> str:
             encoded = text.encode()
             return hashlib.sha256(encoded).hexdigest()
@@ -145,6 +149,42 @@ class User:
         if hashedpass == hash(self.hashed_pass + date): return True
 
         return False
-    
-    # OK SO REALLY
-    # we should have one that checks against the token instead
+
+    def remove_expired_tokens(self):
+        self.load()
+        i=len(self.tokens-1)
+        removed=False
+        month = datetime.now().month
+        year = datetime.now().year
+        while i>=0:
+            if (self.tokens[i]["date"][0] > month or self.tokens[i]["date"][1] > year): 
+                self.tokens.pop(i)
+                removed=True
+            i-=1
+        if removed: self.save()
+
+    def generate_token(self) -> str:
+        self.load()
+        token = rand_short()
+        month = datetime.now().month
+        year = datetime.now().year
+        next_month = [month+1, year]
+        if next_month[0] >= 12:
+            next_month[0] = 0
+            next_month[1]+=1
+        self.tokens.append({"date":next_month,"value":token})
+        self.save()
+        
+        return token
+
+    def check_token(self, token) -> bool:
+        print("BRO WTF IS THIS :SOB:")
+        print(self.tokens)
+        self.remove_expired_tokens()
+        print("OK NOW EVIL")
+        print(self.tokens)
+        for t in self.tokens:
+            print(t["value"])
+            if token == t["value"]: return True
+        print("warcrimes")
+        return False
