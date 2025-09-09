@@ -1,7 +1,7 @@
 import subprocess, os, json, sys, time
 from subprocess import Popen, PIPE
 from datetime import datetime
-from user import User
+from user import User, Users
 import contest
 import config
 
@@ -239,11 +239,9 @@ def grade(id:str):
             allAC = True
             for result in results:
                 if result[0] != "AC": allAC = False
-            if allAC:
-                try:
-                    user = User(submission["user"])
-                    user.add_solved(submission["problem"],id)
-                except: pass
+            if allAC and Users.exists(submission["user"]):
+                User(submission["user"]).add_solved(submission["problem"],id)
+                
     if "game" in submission and "player" in submission:
         if submission["game"] != "null" and submission["game"] != "" and submission["player"] != "":
             try:

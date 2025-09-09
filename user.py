@@ -8,7 +8,6 @@ def rand_short():
 def rand_long():
     return "".join([random.choice(EXTENDED_ALPHABET) for _ in range(32)])
 
-
 class Users:
     email_to_id = {}
     username_to_id = {}
@@ -41,6 +40,10 @@ class Users:
             try: user = User(path[:-5])
             except: os.remove("users/" + path)
             if user.hashed_pass == "": os.remove("users/" + path)
+
+    @staticmethod
+    def exists(id:str) -> bool:
+        return os.path.exists(f"users/{id}.json")
 
 class User:
     def __init__(self, id=""):

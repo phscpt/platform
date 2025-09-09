@@ -416,16 +416,15 @@ def submit_solution():
         res["game"] = request.args.get("g_id")
         res["player"] = request.args.get("player")
 
-    try: res["user"] = request.cookies.get("user_id")
-    except: pass
-
-    with open(f"grading/{SUBMISSION_ID}.json",'w') as f: json.dump(res,f)
-    with open(f"grading/todo/{SUBMISSION_ID}",'w') as f: f.write("")
-
     try:
         user = get_logged_in_user(request)
         user.add_attempted(request.args.get("id"),SUBMISSION_ID)
-    except: pass
+        res["user"] = user.id
+    except:
+        pass
+
+    with open(f"grading/{SUBMISSION_ID}.json",'w') as f: json.dump(res,f)
+    with open(f"grading/todo/{SUBMISSION_ID}",'w') as f: f.write("")
 
     return json.dumps({"submissionID": SUBMISSION_ID, "error":"none"})
 
