@@ -254,12 +254,14 @@ def api_error():
 # API/ auth stuff
 
 def get_logged_in_user(request_obj):
-    if "user_id" not in request_obj.cookies or "hashed_pass" not in request_obj.cookies:
+    if "user_id" not in request_obj.cookies or "token" not in request_obj.cookies:
         raise LookupError
+    
+    print("SIGMA??")
     try:
         user = User(request_obj.cookies.get("user_id"))
     except FileNotFoundError: raise LookupError(f"User with ID {request_obj.cookies.get('user_id')} not found.")
-    if user.check_login(request_obj.cookies.get("hashed_pass")): return user
+    if user.check_token(request_obj.cookies.get("token")): return user
     raise LookupError
 
 @app.route("/api/auth/start_signup")
@@ -316,31 +318,33 @@ def login():
 
     def clear_login_fail():
         res = api_error()
-        res.delete_cookie("hashed_pass")
+        res.delete_cookie("token")
         res.delete_cookie("user_id")
         return res
     
+
     if request.method == "GET":
+        # This is auto-login
         try: user = get_logged_in_user(request)
         except: return clear_login_fail()
+        print(user)
         return json.dumps({"error":"none","user":user_json(user)})
     
     data = request.get_json()
 
     try: user = User(data["id"])
     except: return api_error()
-    if not user.check_login(data["hashed_pass"]): return api_error()
-
+    
+    if not user.check_pass(data["hashed_pass"]): return api_error()
+    token = user.generate_token()
+    
     res = make_response(json.dumps({"error":"none","user":user_json(user)}))
     THIRTY_DAYS = datetime.timedelta(days=30)
 
-    res.set_cookie("hashed_pass",data["hashed_pass"], max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
+    # res.set_cookie("hashed_pass",data["hashed_pass"], max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
+    res.set_cookie("token",token, max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
     res.set_cookie("user_id",user.id,max_age=THIRTY_DAYS)
-
     return res
-    
-
-    
 
 # API/ game info
 

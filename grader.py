@@ -33,6 +33,69 @@ def elim_whitespace(a: str) -> str:
 def get_path(*args):
     return os.path.join(OLDDIR,*args)
 
+def is_valid_submission(submission:dict) -> bool:
+    return "problem" in submission and "status" in submission and "code" in submission and "lang" in submission
+
+def grade_fail(id:str):
+    submission_file = get_path("grading",f"{id}.json")
+    submission = dict()
+    if os.path.isfile(submission_file):
+        try:
+            with open(submission_file,'r') as f: submission=json.load(f)
+        except:
+            log(f"Could not open submission {id}-- overriding instead",id=id)
+    
+    submission["results"] = [["CE","--"],]
+    submission["status"] = "graded"
+
+def check_submission(id:str):
+    '''Checks if a submission with given ID *can* be graded'''
+
+    submission_file = get_path("grading",f"{id}.json")
+    if not os.path.isfile(submission_file):
+        log("Invalid submission ID",id=id)
+        raise FileNotFoundError(f"Submission {submission_file} does not exist")
+    
+    submission = dict()
+    try:
+        with open(submission_file,"r") as f: submission = json.load(f)
+    except:
+        log(f"{submission_file} fomatted incorrectly", id=id)
+        raise KeyError(f"{submission_file} formatted incorrectly")
+    
+    if not is_valid_submission(submission):
+        log(f"{submission_file} doesn't include all keys",id=id)
+        raise KeyError(f"{submission_file} missing keys")
+    
+    problem_file = get_path("problems",f"{submission['problem']}.json")
+
+    problem=dict()
+
+    try:
+        with open(problem_file,'r') as f: problem = json.load(f)
+    except:
+        log(f"{problem_file} does not exist", id=id)
+        raise FileNotFoundError(f"Problem {problem} does not exist")
+    if "testcases" not in problem or type(problem["testcases"]) is not list:
+        log(f"Problem {submission['problem']} has no testcases!")
+
+    if submission["lang"] not in EXTENSIONS:
+        log(f"Language {submission["lang"]} is not valid",id=id)
+        raise NotImplementedError(f"Cannot grade language '{submission['lang']}'")
+
+def grade_fail(id:str):
+    submission_file = get_path("grading",f"{id}.json")
+    if not os.path.isfile(submission_file):
+        log(f"Could not fail submission {id}: does not exist",id=id)
+        return
+
+def find_java_classname(code:str):
+    tokens = code.split()
+    for i in range(1,len(tokens)):
+        if tokens[i-1] != 'class': continue
+        return f"{tokens[i]}.java"
+    return ''
+
 def grade(id:str):
     '''
      Takes in a filename and problem name and runs it using each test case
@@ -60,20 +123,20 @@ def grade(id:str):
     #    d. If the stripped output and answer don't match, give a WA √
     #    e. Otherwise, give an AC √
     # 10. Cleanup (jump to here if get cooked early) √
-
-    # Sanity check that there's actually a submission for the request
     
+    try:
+        check_submission(id)
+    except Exception as e:
+        log(f"Could not grade {id}")
+        grade_fail(id)
+        return
 
     submission:dict = dict()
     results:list[list[str]] = []
     SUBMISSION_FILE = get_path("grading",f"{id}.json")
-    def error():
-        grade_path = get_path("grading",f"{id}.json")
-        if os.path.exists(grade_path): os.remove(grade_path)
 
     def cleanup():
         # should only do this if it actually exists
-
         build_dir = get_path("tmp",id)
 
         if os.path.exists(build_dir):
@@ -84,61 +147,20 @@ def grade(id:str):
         submission["status"] = "graded"
         with open(SUBMISSION_FILE,'w') as f: json.dump(submission, f)
     
-    if not os.path.isfile(SUBMISSION_FILE):
-        log(f"Invalid submission ID",id=id)
-        error()
-        return
-    try:
-        # Load up the submission data
-        with open(SUBMISSION_FILE) as f: submission = json.load(f)
-    except:
-        log("Invalid (non-json) submission formatting",id=id)
-        error()
-        return
-    
-    # Sanity check that the grading request is correctly formatted
-    if not ("problem" in submission and "status" in submission and "code" in submission and "lang" in submission ):
-        log("Invalid submission contents", id=id)
-        error()
-        return
+    with open(SUBMISSION_FILE) as f: submission = json.load(f)
     PROBLEM_FILE = get_path("problems",f"{submission['problem']}.json")
-    # Sanity check that problem really exists
-    if not os.path.isfile(PROBLEM_FILE):
-        log(f"Invalid problem ID '{submission['problem']}.json'", id=id)
-        error()
-        return
-
+    
     # Load the testcases from the problem
     with open(PROBLEM_FILE) as f: problem:dict = json.load(f)
-    try: testcases:list = problem["testcases"]
-    except:
-        log(f"No testcases specified for problem {submission['problem']}")
-        error()
-        return
-
+    testcases:list = problem["testcases"]
     language:str = submission["lang"]
-
-    # Sanity check that the language is valid
-    if language not in EXTENSIONS:
-        log(f"Invalid language ({language}) requested",id=id)
-        cleanup()
-        return
-    filename = f"{id}{EXTENSIONS[language]}"
     code:str = submission['code']
 
-    # Detect classname for java submissions
+    filename = f"{id}{EXTENSIONS[language]}"
     if language == 'java':
-        tokens = code.split()
-        for i in range(1,len(tokens)):
-            if tokens[i-1] != 'class': continue
-            
-            filename = f"{tokens[i]}.java"
-            break
-        if filename.startswith(id):
-            log("JAVA/No class found",id=id)
-            results.append(["CE","--"])
-            cleanup()
-            return
+        filename=find_java_classname(code)
+        if filename == '': grade_fail(id)
+
     BUILD_PATH = get_path("tmp",id)
     if not os.path.exists(BUILD_PATH): os.mkdir(BUILD_PATH)
     code_path = get_path(BUILD_PATH,filename)
@@ -146,11 +168,14 @@ def grade(id:str):
     BUILD_PATH = get_path("tmp",id)
     ## COMPILE
     if language == "cpp":
-        err = subprocess.run(["g++", code_path],capture_output=True,cwd=BUILD_PATH).stderr.decode()
+        process = subprocess.run(["g++", code_path],capture_output=True,cwd=BUILD_PATH)
+        err=process.stderr.decode()
+        out=process.stdout.decode()
         if not os.path.isfile("a.out"):
             log("CPP/CE",id=id)
-            log(err)
-
+            log("Error: ", err, id=id)
+            results.append(["CE","--"])
+            
             cleanup()
             return
         log("CPP/Compiled",id=id)
@@ -215,8 +240,10 @@ def grade(id:str):
             for result in results:
                 if result[0] != "AC": allAC = False
             if allAC:
-                user = User(submission["user"])
-                user.add_solved(submission["problem"],id)
+                try:
+                    user = User(submission["user"])
+                    user.add_solved(submission["problem"],id)
+                except: pass
     if "game" in submission and "player" in submission:
         if submission["game"] != "null" and submission["game"] != "" and submission["player"] != "":
             try:

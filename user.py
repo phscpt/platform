@@ -24,7 +24,7 @@ class Users:
                 "email": Users.email_to_id,
                 "username": Users.username_to_id
             })
-            
+
     @staticmethod
     def load_indexing():
         if not os.path.exists("users/indexing.json"): Users.save_indexing()
@@ -103,7 +103,6 @@ class User:
     def save(self):
         with open(f"users/{self.id}.json",'w') as f:
             json.dump(self.to_json(),f)
-        
 
     def set_details(self, username, email):
         self.load()
@@ -121,7 +120,7 @@ class User:
 
     def set_salt(self) -> str:
         self.load()
-        if self.salt != "" and self.hashed_pass != "": raise Exception("Salt already set")
+        if self.salt != "" and self.hashed_pass != "": return self.salt
         self.salt = rand_long()
         self.save()
         return self.salt
@@ -136,7 +135,7 @@ class User:
         self.solved_problems[problem] = id
         self.save()
 
-    def check_login(self, hashedpass):
+    def check_pass(self, hashedpass):
         '''
         Checks the login against `hashedpass` which SHOULD be hash(hash(pass)+[MM/YYYY]) --> auto expires at end of month
         '''
@@ -152,12 +151,12 @@ class User:
 
     def remove_expired_tokens(self):
         self.load()
-        i=len(self.tokens-1)
+        i=len(self.tokens)-1
         removed=False
         month = datetime.now().month
         year = datetime.now().year
         while i>=0:
-            if (self.tokens[i]["date"][0] > month or self.tokens[i]["date"][1] > year): 
+            if (month >= int(self.tokens[i]["date"][0]) or year > int(self.tokens[i]["date"][1])): 
                 self.tokens.pop(i)
                 removed=True
             i-=1
@@ -178,13 +177,10 @@ class User:
         return token
 
     def check_token(self, token) -> bool:
-        print("BRO WTF IS THIS :SOB:")
-        print(self.tokens)
         self.remove_expired_tokens()
-        print("OK NOW EVIL")
-        print(self.tokens)
         for t in self.tokens:
-            print(t["value"])
             if token == t["value"]: return True
-        print("warcrimes")
         return False
+
+    def __str__(self)->str:
+        return f"<User id: {self.id}, username: {self.username} {'admin' if self.admin else ''}>"
