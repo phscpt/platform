@@ -92,6 +92,7 @@ class User:
         self.solved_problems = jsoned["problems"]["solved"]
         self.joined_contests = jsoned["contests"]["joined"]
         self.date_created = jsoned["meta"]["date-created"]
+        self.tokens = []
         if "tokens" in jsoned: self.tokens=jsoned["tokens"]
 
     def load(self):
