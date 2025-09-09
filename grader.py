@@ -80,7 +80,7 @@ def check_submission(id:str):
         log(f"Problem {submission['problem']} has no testcases!")
 
     if submission["lang"] not in EXTENSIONS:
-        log(f"Language {submission["lang"]} is not valid",id=id)
+        log(f"Language {submission['lang']} is not valid",id=id)
         raise NotImplementedError(f"Cannot grade language '{submission['lang']}'")
 
 def grade_fail(id:str):
