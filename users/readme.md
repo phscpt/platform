@@ -1,0 +1,1 @@
+# User data gets stored here in JSON format
