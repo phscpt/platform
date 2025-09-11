@@ -435,10 +435,9 @@ def get_problem_results():
     if not os.path.exists(f"grading/{submission}.json"): return api_error()
 
     with open(f"grading/{submission}.json",'r') as f: res = json.load(f)
-    if res["status"] != "graded": return json.dumps({"error":"unready"})
-    results = res["results"]
+    if res["status"] != "graded": return json.dumps({"status":res["status"],"error":"none"})
 
-    return json.dumps({"results":res["results"],"error":"none"})
+    return json.dumps({"results":res["results"],"status":"graded","error":"none"})
 
 @app.route("/api/submission",methods=["GET"])
 def get_submission():
@@ -447,7 +446,8 @@ def get_submission():
     if not os.path.exists(f"grading/{sub_id}.json"): return api_error()
 
     with open(f"grading/{sub_id}.json",'r') as f: submission = json.load(f)
-
+    
+    if "user" not in submission: return code 
     try:
         if get_logged_in_user(request).id != submission["user"]: return api_error()
         code = submission["code"]

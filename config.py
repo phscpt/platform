@@ -2,7 +2,7 @@ EXTENDED_ALPHABET = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567
 MAX_TESTCASES = 10
 ALPHABET = "QWERTYUIOPASDFGHJKLZXCVBNM"
 TIMELIMITS = {
-        "cpp":1,
-        "java":2,
-        "python":4,
-    }
+    "cpp":1,
+    "java":2,
+    "python":4,
+}

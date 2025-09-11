@@ -69,9 +69,12 @@ const resultName = {
  * @param {string[][]} results has results in a list of length-2 lists in the form [RESULT, time]
  * @param {string} submissionID has results in a list of length-2 lists in the form [RESULT, time]
  */
-const fillResults = (results, submissionID) => {
-    const resultDisplay = document.createElement("div");
+function fillResults (results, submissionID) {
+    clearResText();
+
+    const resultDisplay = document.querySelector("#results-display");
     resultDisplay.className = "grid-tiny";
+    resultDisplay.innerHTML="";
     results.forEach((result, i) => {
         resultDisplay.innerHTML += `
             <div class = "result-box ${(result[0] == "AC") ? "success" : "fail"}" title = ${resultName[result[0]]}>
@@ -79,10 +82,7 @@ const fillResults = (results, submissionID) => {
             </div> `;
     });
 
-    resultsContainer.innerHTML = `<div id="loading-spinny-container" class="box loading-spinny-container"><div class="loading-spinny"></div></div>`;
-    resultsContainer.appendChild(resultDisplay);
     stopLoading();
-
     let allSols = "";
     allSols += `<li><a target=_blank href="api/submission?submission=${submissionID}">
         ${submissionID.substring(0, submissionID.lastIndexOf("-"))}
@@ -91,20 +91,33 @@ const fillResults = (results, submissionID) => {
     <ul>${allSols}</ul>`;
 }
 
-const getGrade = async (submissionID) => {
+function clearResText() {
+    for (const node of document.querySelector("#res-texts").children) node.style="display:none";
+}
+
+async function getGrade(submissionID) {
     const data = await fetch("/api/submission_result?submission=" + submissionID).then(response => response.json());
-    if (data.error == "unready") setTimeout(getGrade.bind(this, submissionID), 1000);
     if (data.error && data.error != "none") return;
+    if (data.status != "graded")  {
+        if (data.status == "grading") {
+            clearResText();
+            document.querySelector("#grading").style.display="block";
+        }
+
+        setTimeout(getGrade.bind(this, submissionID), 1000);
+        return;
+    }
     fillResults(data.results, submissionID);
 }
 
 const startLoading = () => {
     submissionBox.reset();
     document.getElementById("submit").disabled = true;
-    resultsContainer.innerHTML = `
-    <div id="loading-spinny-container" class="box loading-spinny-container" style="display:block">
-        <div class="loading-spinny"></div>
-    </div><h2>grading...</h2>`;
+    // document.querySelector(".loading-spinny").style.background="red";
+    document.querySelector("#loading-spinny-container").style.display="block";
+    document.querySelector("#results-filler").style.display="none";
+    document.querySelector("#waiting").style="display:block";
+    document.querySelector("#results-display").innerHTML="";
 }
 
 const stopLoading = () => {

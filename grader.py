@@ -7,10 +7,11 @@ import config
 
 out = open("graderlog.log", 'a')
 def log(*args,id=""):
+    '''Adds a timestamp-ed log of the message to `graderlog.log`'''
     args = list(map(str, args))
     id=str(id)
     now = datetime.now()
-    timeinfo = now.strftime("%m/%d %H:%M:%S")
+    timeinfo = now.strftime("%m-%d %H:%M:%S")
     if id!="": timeinfo += " " + id[-6:]
     timeinfo += ": "
     out.write(timeinfo + " ".join(args) + "\n")
@@ -24,13 +25,15 @@ EXTENSIONS = {
 }
 
 def elim_whitespace(a: str) -> str:
-    '''
-    sanitizes whitespace for each line individually
-    '''
-    strippedLines = list(map(str.rstrip, a.splitlines()))
+    '''Remove end/start- of line whitespace for submission results (do **not** use on code!)'''
+    strippedLines = list(map(str.strip, a.splitlines()))
     return "\n".join(strippedLines).replace("\r","")
 
 def get_path(*args):
+    '''Join filepath together
+
+    e.g. `get_path("joe","bro","obama")` would return `[platform absolute]/joe/bro/obama`
+    '''
     return os.path.join(OLDDIR,*args)
 
 def is_valid_submission(submission:dict) -> bool:
@@ -39,14 +42,13 @@ def is_valid_submission(submission:dict) -> bool:
 def grade_fail(id:str):
     submission_file = get_path("grading",f"{id}.json")
     submission = dict()
-    if os.path.isfile(submission_file):
-        try:
-            with open(submission_file,'r') as f: submission=json.load(f)
-        except:
-            log(f"Could not open submission {id}-- overriding instead",id=id)
-    
+    if not os.path.isfile(submission_file):
+        log(f"Could not open submission {id}-- overriding instead",id=id)
+        return
+    with open(submission_file,'r') as f: submission=json.load(f)    
     submission["results"] = [["CE","--"],]
     submission["status"] = "graded"
+    with open(submission_file,'w') as f: json.dump(submission,f)
 
 def check_submission(id:str):
     '''Checks if a submission with given ID *can* be graded'''
@@ -58,11 +60,13 @@ def check_submission(id:str):
     
     submission = dict()
     try:
+        # `submission_file` should be valid JSON
         with open(submission_file,"r") as f: submission = json.load(f)
     except:
         log(f"{submission_file} fomatted incorrectly", id=id)
         raise KeyError(f"{submission_file} formatted incorrectly")
     
+    # Check important fields (code,lang,etc)
     if not is_valid_submission(submission):
         log(f"{submission_file} doesn't include all keys",id=id)
         raise KeyError(f"{submission_file} missing keys")
@@ -83,12 +87,6 @@ def check_submission(id:str):
         log(f"Language {submission['lang']} is not valid",id=id)
         raise NotImplementedError(f"Cannot grade language '{submission['lang']}'")
 
-def grade_fail(id:str):
-    submission_file = get_path("grading",f"{id}.json")
-    if not os.path.isfile(submission_file):
-        log(f"Could not fail submission {id}: does not exist",id=id)
-        return
-
 def find_java_classname(code:str):
     tokens = code.split()
     for i in range(1,len(tokens)):
@@ -96,36 +94,45 @@ def find_java_classname(code:str):
         return f"{tokens[i]}.java"
     return ''
 
+def save_score(submission:dict, results:list[list]):
+    if submission["user"] == "null" or submission["user"] == "": return
+    allAC = ( len(filter(lambda res: res[0]=="AC",results)) == len(results) ) # fuctional moment
+    if allAC and Users.exists(submission["user"]):
+        User(submission["user"]).add_solved(submission["problem"],id)
+
+def save_game_score(submission:dict, results:list[list],id):
+    if submission["game"] == "null" or submission["game"] == "" or submission["player"] == "": return
+    try:
+        game = contest.get_game(id=submission["game"])
+        p = game.get_player(submission["player"])
+    except Exception as e:
+        log(e,id=id)
+        return
+    
+    num_ac = len(filter(lambda res: res[0]=="AC",results)) # functional moment
+
+    if num_ac == len(results): num_points = 100
+    elif num_ac > 1: num_points = 100 * (num_ac - 1)/(len(results) - 1)
+    else: num_points = -0.0001
+    
+    p.results[submission['problem']] = results
+    
+    try: game.give_points(submission['player'], submission["problem"], num_points)
+    except Exception as e: log(e,id=id)
+
 def grade(id:str):
     '''
-     Takes in a filename and problem name and runs it using each test case
+     Takes in a submission ID and runs it through each test case
 
      For each test case:
+       - If the submission is malformed or the program does not compile, it marks the entire submission as `"Compilation Error"`
        - If the program takes over `TIME_LIMIT` to execute, it returns `"Time Limit Exceeded"` for that testcase
        - If the program produces incorrect output, it returns `"Wrong Answer"`
        - If the program crashes, it returns `"Runtime Error"`
        - Otherwise, it returns `"Accepted"`
     '''
 
-    # 1. Check grading for id √
-    # 2. Open grading/id √
-    # 3. Get problem name from grading/id √
-    # 4. Open problem √
-    # 5. Get correct testcase input/output for each testcase √
-    # 6. Make directory in tmp for problem √
-    # 7. Navigate to that directory √
-    # 8. In that directory, compile the code (if it's C++ or Java) √
-    #    a. If there's an error (doesn't get compiled), give a CE √
-    # 9. For each test case: √
-    #    a. Run the compiled code --> store error and output (put timelimit on it) √
-    #    b. If there's an error, give an RE √
-    #    c. If it exceeds the timelimit, give a TLE √
-    #    d. If the stripped output and answer don't match, give a WA √
-    #    e. Otherwise, give an AC √
-    # 10. Cleanup (jump to here if get cooked early) √
-    
-    try:
-        check_submission(id)
+    try: check_submission(id)
     except Exception as e:
         log(f"Could not grade {id}")
         grade_fail(id)
@@ -133,7 +140,7 @@ def grade(id:str):
 
     submission:dict = dict()
     results:list[list[str]] = []
-    SUBMISSION_FILE = get_path("grading",f"{id}.json")
+    submission_file = get_path("grading",f"{id}.json")
 
     def cleanup():
         # should only do this if it actually exists
@@ -145,13 +152,15 @@ def grade(id:str):
             os.rmdir(build_dir)
         submission["results"] = results
         submission["status"] = "graded"
-        with open(SUBMISSION_FILE,'w') as f: json.dump(submission, f)
+        with open(submission_file,'w') as f: json.dump(submission, f)
     
-    with open(SUBMISSION_FILE) as f: submission = json.load(f)
-    PROBLEM_FILE = get_path("problems",f"{submission['problem']}.json")
+    with open(submission_file) as f: submission = json.load(f)
+    submission["status"] = "grading"
+    with open(submission_file,'w') as f: json.dump(submission,f)
     
     # Load the testcases from the problem
-    with open(PROBLEM_FILE) as f: problem:dict = json.load(f)
+    problem_file = get_path("problems",f"{submission['problem']}.json")
+    with open(problem_file,'r') as f: problem:dict = json.load(f)
     testcases:list = problem["testcases"]
     language:str = submission["lang"]
     code:str = submission['code']
@@ -159,50 +168,47 @@ def grade(id:str):
     filename = f"{id}{EXTENSIONS[language]}"
     if language == 'java':
         filename=find_java_classname(code)
-        if filename == '': grade_fail(id)
+        if filename == '':
+            grade_fail(id)
+            return
 
     BUILD_PATH = get_path("tmp",id)
-    if not os.path.exists(BUILD_PATH): os.mkdir(BUILD_PATH)
+    if os.path.exists(BUILD_PATH): 
+        log("Submission already being graded", id=id)
+        grade_fail(id)
+        return
+    os.mkdir(BUILD_PATH)
     code_path = get_path(BUILD_PATH,filename)
     with open(code_path,'w') as f: f.write(code)
-    BUILD_PATH = get_path("tmp",id)
+
     ## COMPILE
-    if language == "cpp":
-        process = subprocess.run(["g++", code_path],capture_output=True,cwd=BUILD_PATH)
+    LANG_TAG = language.upper()
+
+    if language != "python":
+        if language == "cpp": process = subprocess.run(["g++", code_path],capture_output=True,cwd=BUILD_PATH)
+        if language == "java": process = subprocess.run(["javac", code_path],capture_output=True,cwd=BUILD_PATH)
+
         err=process.stderr.decode()
         out=process.stdout.decode()
-        if not os.path.isfile("a.out"):
-            log("CPP/CE",id=id)
+
+        if process.returncode != 0 or err != "":
+            log(f"{LANG_TAG}/CE",id=id)
             log("Error: ", err, id=id)
             results.append(["CE","--"])
             
             cleanup()
             return
-        log("CPP/Compiled",id=id)
-    if language == "java":
-        err = subprocess.run(["javac", code_path],capture_output=True,cwd=BUILD_PATH).stderr.decode()
-        filename = filename.split(".")[0]
-        code_path = get_path("tmp",id,filename)
-        if not os.path.isfile(code_path + ".class"):
-            log("JAVA/CE", id=id)
-            log(err,id=id)
-            results.append(["CE","--"])
-
-            cleanup()
-            return
-        log("JAVA/Compiled",id=id)
+        log(f"{LANG_TAG}/Compiled",id=id)
     
     ## EXECUTE
-
     COMMANDS = {
-        "cpp": ["./a.out"], ## CHECK IF THIS WORKS??
+        "cpp": ["./a.out"],
         "java": ["java", filename],
         "python": ["python3", filename],
     }
 
     cmd = COMMANDS[language]
 
-    LANG_TAG = language.upper()
     for test in testcases:
         inp:str = elim_whitespace(test[0])
         ans:str = elim_whitespace(test[1])
@@ -234,38 +240,11 @@ def grade(id:str):
         results.append(["WA",run_time])
 
     os.chdir(OLDDIR)
-    if "user" in submission:
-        if submission["user"] != "null" and submission["user"] != "":
-            allAC = True
-            for result in results:
-                if result[0] != "AC": allAC = False
-            if allAC and Users.exists(submission["user"]):
-                User(submission["user"]).add_solved(submission["problem"],id)
-                
-    if "game" in submission and "player" in submission:
-        if submission["game"] != "null" and submission["game"] != "" and submission["player"] != "":
-            try:
-                game = contest.get_game(id=submission["game"])
-                p = game.get_player(submission["player"])
-                
-                num_ac = 0
-                for res in results:
-                    if res[0] == "AC":
-                        num_ac += 1
-
-                if num_ac == len(results): num_points = 100
-                elif num_ac > 1: num_points = 100 * (num_ac - 1)/(len(results) - 1)
-                else: num_points = -0.0001
-                
-                p.results[submission['problem']] = results
-                game.give_points(submission['player'], submission["problem"], num_points)
-
-            except Exception as e:
-                log(e,id=id)
-                pass
+    if "user" in submission: save_score(submission,results)
+    if "game" in submission and "player" in submission: save_game_score(submission,results,id)
     cleanup()
 
-WAIT_TIME = 1.0
+WAIT_TIME = 3.0
 
 def main():
     print("started")
@@ -291,9 +270,9 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print("🚨🚨🚨 !!!ERROR ERROR ERROR!!! 🚨🚨🚨")
-        print("CURRENT DIRECTORY: " + os.getcwd())
-        print("\n\nExiting...")
+        log("🚨🚨🚨 !!!ERROR ERROR ERROR!!! 🚨🚨🚨")
+        log("CURRENT DIRECTORY: " + os.getcwd())
+        log("\n\nExiting...")
         raise e
 log("\nclosed peacefully\n\n")
 out.close()

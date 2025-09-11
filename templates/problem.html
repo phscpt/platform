@@ -49,6 +49,7 @@
                 <span class="material-symbols-outlined">code</span>
             </button>
         </div>
+        <!-- This is the actual interior of the panel -->
         <div class="box" id="tab-content-container">
             <div id="tab-1-content">
                 <form id="submission-box">
@@ -90,7 +91,13 @@
         <div id="loading-spinny-container" class="box loading-spinny-container">
             <div class="loading-spinny"></div>
         </div>
-        Submit a program to view results
+
+        <div id="res-texts">
+            <span id="results-filler">Submit a program to view results</span>
+            <h2 id="waiting" style="display:none">waiting...</h2>
+            <h2 id="grading" style="display:none">grading...</h2>
+        </div>
+        <div id="results-display"></div>
     </div>
     <div id="past-sols"></div>
 
