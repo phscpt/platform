@@ -100,7 +100,7 @@ async function getGrade(submissionID) {
     try {
         data = await fetch("/api/submission_result?submission=" + submissionID).then(response => response.json());
     } catch {
-        setTimeout(getGrade.bind(this, submissionID), 1000);
+        setTimeout(getGrade.bind(this, submissionID), 5000);
     }
     if (data.error && data.error != "none") return;
     if (data.status != "graded")  {

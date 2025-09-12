@@ -262,7 +262,11 @@ def main():
             if not os.path.exists(get_path(TODO_DIR, tograde)): continue #another grader has already removed it -- reduce chance of race condition
             os.remove(get_path(TODO_DIR, tograde))
             if not os.path.exists( get_path("grading", f"{tograde}.json") ): continue
+            log(f"Grading {tograde}")
+            print(f"Grading {tograde}")
             grade(tograde)
+            log(f"Graded {tograde}")
+            print(f"Graded {tograde}")
 
         time.sleep(WAIT_TIME)
 
