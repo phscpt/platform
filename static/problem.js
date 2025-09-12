@@ -96,7 +96,12 @@ function clearResText() {
 }
 
 async function getGrade(submissionID) {
-    const data = await fetch("/api/submission_result?submission=" + submissionID).then(response => response.json());
+    let data=null;
+    try {
+        data = await fetch("/api/submission_result?submission=" + submissionID).then(response => response.json());
+    } catch {
+        setTimeout(getGrade.bind(this, submissionID), 1000);
+    }
     if (data.error && data.error != "none") return;
     if (data.status != "graded")  {
         if (data.status == "grading") {
