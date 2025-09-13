@@ -35,10 +35,10 @@
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <button id="scoreboard_button" style="display:none">Back to Scoreboard</button>
     <button id="catalog_button" onclick="location.href='public'">Back to Catalogue</button>
-    <h1>{{ data.title }}</h1>
-    <div class="box">
-        {{ data.description | safe }}
-    </div>
+    <!-- problem.js fills these -->
+    <h1 id="problem-title"></h1>
+    <div class="box" id="problem-desc"></div>
+    <!--  -->
     <h2>Submit solution</h2>
     <div id="submission-panel">
         <div id="tabs">

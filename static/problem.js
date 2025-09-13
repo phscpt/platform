@@ -190,3 +190,17 @@ user.addEventListener("login", () => {
         getGrade(user.attempted[problem]);
     }
 })
+
+const loadProblem = async () => {
+    const res = await fetch(`/api/problem_data?id=${problem}&title&description`);
+    if (!res.ok) {
+        console.log("couldn't load problem...");
+        return;
+    }
+    const problemData = await res.json();
+
+    document.querySelector('#problem-title').innerText = problemData.title;
+    document.querySelector('#problem-desc').innerHTML = problemData.description;
+}
+
+loadProblem();

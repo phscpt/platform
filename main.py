@@ -390,6 +390,7 @@ def problem_data():
         if property in request.args:
             if property not in problem: problem[property] = ""
             res[property] = problem[property]
+            if property == "description": res[property] = markdown.markdown(problem["description"],extensions=["fenced_code"])
 
     if "testcases" in request.args and is_admin: res["testcases"] = problem["testcases"]
 
