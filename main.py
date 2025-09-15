@@ -448,10 +448,10 @@ def get_submission():
 
     with open(f"grading/{sub_id}.json",'r') as f: submission = json.load(f)
     
+    code = submission["code"]
     if "user" not in submission: return code 
     try:
         if get_logged_in_user(request).id != submission["user"]: return api_error()
-        code = submission["code"]
         return code
     except:
         return api_error()

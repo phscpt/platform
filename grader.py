@@ -185,9 +185,10 @@ def grade(id:str):
     LANG_TAG = language.upper()
 
     if language != "python":
+        process = ""
         if language == "cpp": process = subprocess.run(["g++", code_path],capture_output=True,cwd=BUILD_PATH)
         if language == "java": process = subprocess.run(["javac", code_path],capture_output=True,cwd=BUILD_PATH)
-
+        assert type(process) == subprocess.CompletedProcess
         err=process.stderr.decode()
         out=process.stdout.decode()
 
