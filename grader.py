@@ -276,6 +276,7 @@ if __name__ == "__main__":
     except Exception as e:
         log("🚨🚨🚨 !!!ERROR ERROR ERROR!!! 🚨🚨🚨")
         log("CURRENT DIRECTORY: " + os.getcwd())
+        log(e)
         log("\n\nExiting...")
         raise e
 log("\nclosed peacefully\n\n")
