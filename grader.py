@@ -96,7 +96,7 @@ def find_java_classname(code:str):
 
 def save_score(submission:dict, results:list[list]):
     if submission["user"] == "null" or submission["user"] == "": return
-    allAC = ( len(filter(lambda res: res[0]=="AC",results)) == len(results) ) # fuctional moment
+    allAC = ( len(list(filter(lambda res: res[0]=="AC",results))) == len(results) ) # fuctional moment
     if allAC and Users.exists(submission["user"]):
         User(submission["user"]).add_solved(submission["problem"],id)
 
@@ -109,7 +109,7 @@ def save_game_score(submission:dict, results:list[list],id):
         log(e,id=id)
         return
     
-    num_ac = len(filter(lambda res: res[0]=="AC",results)) # functional moment
+    num_ac = len(list(filter(lambda res: res[0]=="AC",results))) # functional moment
 
     if num_ac == len(results): num_points = 100
     elif num_ac > 1: num_points = 100 * (num_ac - 1)/(len(results) - 1)
