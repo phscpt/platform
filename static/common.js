@@ -61,7 +61,8 @@ const user = new User();
 user.login();
 
 function storm() {
-    const stormScript = document.createElement("script", { src: "//cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js" });
+    const stormScript = document.createElement("script");
+    stormScript.src="//cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js";
     stormScript.onload = () => {
         snowStorm.excludeMobile = false;
         snowStorm.followMouse = false;
@@ -77,6 +78,7 @@ function storm() {
         snowStorm.flakeWidth = 20;
         snowStorm.flakeHeight = 20;
     }
+    document.head.appendChild(stormScript);
 }
 
 let mode = parseInt(localStorage.getItem("mode")) || 1;
@@ -133,10 +135,18 @@ function getCookie(cname) {
 setColorMode();
 // storm();
 
-// copy function for input/output
-for (codeblock of document.getElementsByTagName("pre")) {
-    codeblock.onclick = function () { navigator.clipboard.writeText(this.innerText); }
+/** Allow copy-pasting on code blocks */
+function updateCodeBlocks() {    
+    for (const codeblock of document.querySelectorAll("pre")) {
+        codeblock.onclick = function() {
+            navigator.clipboard.writeText(codeblock.innerText);
+            this.classList.add("copied");
+            setTimeout(()=>this.classList.remove("copied"),2000);
+        }
+    }
 }
+
+addEventListener("load",updateCodeBlocks);
 
 /**
  * GET and process json data

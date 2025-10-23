@@ -12,10 +12,6 @@ h3 {
     letter-spacing: 1px;
 }
 
-* {
-    transition: all 0.2s, background 1s;
-}
-
 #main {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -234,6 +230,11 @@ pre>code::before {
     font-size: 10px;
     font-style: italic;
     text-align: right;
+}
+
+pre.copied>code::before {
+    content: "copied!";
+    color: #a0ffa0;
 }
 
 tr.solved {

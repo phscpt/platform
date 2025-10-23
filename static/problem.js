@@ -202,12 +202,12 @@ const loadProblem = async () => {
     document.querySelector('#problem-title').innerText = problemData.title;
     
     document.querySelector('#problem-desc').innerHTML = problemData.description;
-    MathJax.Hub.Typeset();
-
-    // MathJax.Hub.Update(document.querySelector('#problem-desc'), ()=>console.log("what the fuck"));
-    // const text = MathJax.HTML.TextNode(problemData.description);
-    // console.log(text);
-    // document.querySelector('#problem-desc').innerHTML = MathJax.HTML.TextNode(problemData.description);
+    
+    updateCodeBlocks();
+    try {
+        MathJax.Hub.Typeset();
+    }
+    catch (e) { } // If MathJax isn't accessible yet, it'll typeset everything *anyways*, so we're good :)
 }
 
 loadProblem();

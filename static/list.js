@@ -99,6 +99,7 @@ const getProblems = async () => {
 }
 getProblems();
 
+/** @param {Function} func the function to reverse inputs of */
 const reverse = (func) => {
     return (a, b) => func(b, a);
 }
