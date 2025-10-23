@@ -9,6 +9,8 @@ app = Flask(__name__)
 
 last_users_clean = time.time()
 
+dev = False # this is horrible
+
 # PROBLEM CREATION/EDITING/SOLUTION GRADING
 
 def admin_check(request) -> bool:
@@ -43,9 +45,6 @@ def edit():
 
 def _update_problem(problem_id, problem_form):
     id = problem_id
-    with open("problems/" + id + ".json", encoding='utf-8') as f:
-        data = json.load(f)
-    data["id"] = id
     title = problem_form["title"]
     status = problem_form["status"]
     description = problem_form["description"]
@@ -257,7 +256,6 @@ def get_logged_in_user(request_obj):
     if "user_id" not in request_obj.cookies or "token" not in request_obj.cookies:
         raise LookupError
     
-    print("SIGMA??")
     try:
         user = User(request_obj.cookies.get("user_id"))
     except FileNotFoundError: raise LookupError(f"User with ID {request_obj.cookies.get('user_id')} not found.")
@@ -342,7 +340,8 @@ def login():
     THIRTY_DAYS = datetime.timedelta(days=30)
 
     # res.set_cookie("hashed_pass",data["hashed_pass"], max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
-    res.set_cookie("token",token, max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
+    if not dev: res.set_cookie("token",token, max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
+    else: res.set_cookie("token",token, max_age=THIRTY_DAYS)
     res.set_cookie("user_id",user.id,max_age=THIRTY_DAYS)
     return res
 
@@ -520,4 +519,5 @@ def unauthorized(e):
 Users.del_empty()
 if __name__ == "__main__":
     app.run("127.0.0.1",8000)
+    dev=True
     # app.run("0.0.0.0")
