@@ -200,7 +200,14 @@ const loadProblem = async () => {
     const problemData = await res.json();
 
     document.querySelector('#problem-title').innerText = problemData.title;
+    
     document.querySelector('#problem-desc').innerHTML = problemData.description;
+    MathJax.Hub.Typeset();
+
+    // MathJax.Hub.Update(document.querySelector('#problem-desc'), ()=>console.log("what the fuck"));
+    // const text = MathJax.HTML.TextNode(problemData.description);
+    // console.log(text);
+    // document.querySelector('#problem-desc').innerHTML = MathJax.HTML.TextNode(problemData.description);
 }
 
 loadProblem();
