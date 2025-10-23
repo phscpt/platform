@@ -5,6 +5,13 @@ from user import User, Users
 import contest
 import config
 
+size = os.path.getsize("graderlog.log")
+if size > 1_000_000:
+    for i in range(1000):
+        if os.path.exists(f"graderlog{i}.log"): continue
+        os.system(f"mv graderlog.log graderlog{i}.log")
+        break
+
 out = open("graderlog.log", 'a')
 def log(*args,id=""):
     '''Adds a timestamp-ed log of the message to `graderlog.log`'''
