@@ -78,7 +78,7 @@ def problem():
             data["description"] = markdown.markdown(data["description"], extensions=['fenced_code'])
     except: abort(404)
 
-    return render_template("problem.html", data=data)
+    return render_template("problem.html")
 
 # MAIN
 # TODO: figure out what the POST request is doing here (for game join?) and jam it into api
