@@ -248,7 +248,9 @@ def scoreboard_host():
 # API
 
 def api_error():
-    return make_response(json.dumps({"error":"dne"}))
+    res = make_response(json.dumps({"error":"dne"}),)
+    res.mimetype="text/plain"
+    return res
 
 # API/ auth stuff
 
@@ -259,7 +261,8 @@ def get_logged_in_user(request_obj):
     try:
         user = User(request_obj.cookies.get("user_id"))
     except FileNotFoundError: raise LookupError(f"User with ID {request_obj.cookies.get('user_id')} not found.")
-    if user.check_token(request_obj.cookies.get("token")): return user
+    if user.check_token(request_obj.cookies.get("token")):
+        return user
     raise LookupError
 
 @app.route("/api/auth/start_signup")
@@ -518,6 +521,6 @@ def unauthorized(e):
 
 Users.del_empty()
 if __name__ == "__main__":
-    app.run("127.0.0.1",8000)
     dev=True
+    app.run("127.0.0.1",8000)
     # app.run("0.0.0.0")

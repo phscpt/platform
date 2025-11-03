@@ -1,5 +1,5 @@
 import json, random, os, hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 from config import EXTENDED_ALPHABET
 
 def rand_short():
@@ -38,7 +38,9 @@ class Users:
         for path in paths:
             if path == "indexing.json" or path == "readme.md": continue
             try: user = User(path[:-5])
-            except: os.remove("users/" + path)
+            except:
+                os.remove("users/" + path)
+                continue
             if user.hashed_pass == "": os.remove("users/" + path)
 
     @staticmethod
@@ -153,14 +155,18 @@ class User:
 
         return False
 
+    # this token system is horrendus but... it's *my* horrendus token system :)
     def remove_expired_tokens(self):
         self.load()
         i=len(self.tokens)-1
         removed=False
-        month = datetime.now().month
-        year = datetime.now().year
+        ONE_MONTH = timedelta(days=31)
+        TODAY = datetime.now()
         while i>=0:
-            if (month >= int(self.tokens[i]["date"][0]) or year > int(self.tokens[i]["date"][1])): 
+            token = self.tokens[i]
+            date = datetime(int(token["date"][1]),int(token["date"][0]),1)
+            if date + ONE_MONTH < TODAY:
+                print(f"Removing token for {date} bc today is {TODAY}")
                 self.tokens.pop(i)
                 removed=True
             i-=1
@@ -168,14 +174,11 @@ class User:
 
     def generate_token(self) -> str:
         self.load()
-        token = rand_short()
+        token = rand_long()
         month = datetime.now().month
         year = datetime.now().year
-        next_month = [month+1, year]
-        if next_month[0] >= 12:
-            next_month[0] = 0
-            next_month[1]+=1
-        self.tokens.append({"date":next_month,"value":token})
+        TODAY = [month, year]
+        self.tokens.append({"date":TODAY,"value":token})
         self.save()
         
         return token
