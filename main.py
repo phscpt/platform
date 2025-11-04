@@ -343,7 +343,8 @@ def login():
     THIRTY_DAYS = datetime.timedelta(days=30)
 
     # res.set_cookie("hashed_pass",data["hashed_pass"], max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
-    if not dev: res.set_cookie("token",token, max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
+    dev = True
+    if not dev: res.set_cookie("token",token, max_age=THIRTY_DAYS,secure=True, httponly=True)
     else: res.set_cookie("token",token, max_age=THIRTY_DAYS)
     res.set_cookie("user_id",user.id,max_age=THIRTY_DAYS)
     return res
@@ -521,6 +522,5 @@ def unauthorized(e):
 
 Users.del_empty()
 if __name__ == "__main__":
-    dev=True
     app.run("127.0.0.1",8000)
     # app.run("0.0.0.0")
