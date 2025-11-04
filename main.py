@@ -344,7 +344,7 @@ def login():
 
     # res.set_cookie("hashed_pass",data["hashed_pass"], max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
 
-    if not dev: res.set_cookie("token",token, max_age=THIRTY_DAYS,secure=True, httponly=True)
+    if not dev: res.set_cookie("token",token, max_age=THIRTY_DAYS,secure=True, httponly=True, samesite="Strict")
     else: res.set_cookie("token",token, max_age=THIRTY_DAYS,secure=True)
     res.set_cookie("user_id",user.id,max_age=THIRTY_DAYS)
     return res
