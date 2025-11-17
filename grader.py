@@ -155,9 +155,8 @@ def grade(id:str):
 
         if os.path.exists(build_dir):
             for name in os.listdir(build_dir):
-                ...
-                # os.remove(get_path(build_dir,name))
-            # os.rmdir(build_dir)
+                os.remove(get_path(build_dir,name))
+            os.rmdir(build_dir)
         submission["results"] = results
         submission["status"] = "graded"
         with open(submission_file,'w') as f: json.dump(submission, f)
@@ -215,8 +214,6 @@ def grade(id:str):
         "java": ["java", filename[:filename.find(".java")]],
         "python": ["python3", filename],
     }
-
-    print(COMMANDS[language])
 
     cmd = COMMANDS[language]
 
