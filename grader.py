@@ -6,7 +6,7 @@ import contest
 import config
 
 size = os.path.getsize("graderlog.log")
-if size > 1_000_000:
+if size > 100_000:
     for i in range(1000):
         if os.path.exists(f"graderlog{i}.log"): continue
         os.system(f"mv graderlog.log graderlog{i}.log")
@@ -155,8 +155,9 @@ def grade(id:str):
 
         if os.path.exists(build_dir):
             for name in os.listdir(build_dir):
-                os.remove(get_path(build_dir,name))
-            os.rmdir(build_dir)
+                ...
+                # os.remove(get_path(build_dir,name))
+            # os.rmdir(build_dir)
         submission["results"] = results
         submission["status"] = "graded"
         with open(submission_file,'w') as f: json.dump(submission, f)
@@ -214,6 +215,8 @@ def grade(id:str):
         "java": ["java", filename],
         "python": ["python3", filename],
     }
+
+    print(COMMANDS[language])
 
     cmd = COMMANDS[language]
 

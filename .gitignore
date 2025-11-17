@@ -25,5 +25,5 @@ games/*
 .vscode/*
 
 SECRET.txt
-graderlog.log
+graderlog*.log
 problems_by_status.json
