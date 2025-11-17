@@ -212,7 +212,7 @@ def grade(id:str):
     ## EXECUTE
     COMMANDS = {
         "cpp": ["./a.out"],
-        "java": ["java", filename],
+        "java": ["java", filename[:filename.find(".java")]],
         "python": ["python3", filename],
     }
 
